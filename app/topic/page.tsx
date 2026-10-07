@@ -5,6 +5,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import MentionTextarea from "@/components/MentionTextarea";
 import ReactionBar from "@/components/ReactionBar";
+import StickerPicker from "@/components/StickerPicker";
+import StickerText from "@/components/StickerText";
 
 type Topic = { id: string; title: string; body: string; created_at: string; community_id: string; author_id: string };
 type Post = { id: string; body: string; created_at: string; author_id: string };
@@ -120,14 +122,14 @@ function TopicContent() {
       <button className="backButton" onClick={() => router.push("/")}>← Retour au forum</button>
       <p className="eyebrow">{community?.icon} {community?.name ?? "COMMUNAUTÉ"}</p>
       <h1>{topic.title}</h1>
-      <article className="topicPost"><p className="topicMeta"><strong>{profiles[topic.author_id]?.display_name ?? "Membre"}</strong> · ⭐ {profiles[topic.author_id]?.reputation ?? 0} · publié le {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p><div className="topicContent">{topic.body}</div><div className="postActions"><div><div className="voteBar"><button className={myVotes[topic.id] === 1 ? "vote active" : "vote"} onClick={() => vote(topic.id, "topic", 1)}>▲</button><strong>{votes[topic.id] ?? 0}</strong><button className={myVotes[topic.id] === -1 ? "vote active" : "vote"} onClick={() => vote(topic.id, "topic", -1)}>▼</button></div><ReactionBar topicId={topic.id} /></div><button className="reportButton" onClick={() => openReport("topic", topic.id)}>⚑ Signaler</button></div></article>
+      <article className="topicPost"><p className="topicMeta"><strong>{profiles[topic.author_id]?.display_name ?? "Membre"}</strong> · ⭐ {profiles[topic.author_id]?.reputation ?? 0} · publié le {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p><div className="topicContent"><StickerText body={topic.body} /></div><div className="postActions"><div><div className="voteBar"><button className={myVotes[topic.id] === 1 ? "vote active" : "vote"} onClick={() => vote(topic.id, "topic", 1)}>▲</button><strong>{votes[topic.id] ?? 0}</strong><button className={myVotes[topic.id] === -1 ? "vote active" : "vote"} onClick={() => vote(topic.id, "topic", -1)}>▼</button></div><ReactionBar topicId={topic.id} /></div><button className="reportButton" onClick={() => openReport("topic", topic.id)}>⚑ Signaler</button></div></article>
       <section className="replies">
         <h2>{posts.length} réponse{posts.length !== 1 ? "s" : ""}</h2>
-        {posts.map((post, i) => <article className="reply" key={post.id}><div className="replyNumber">#{i + 1}</div><div><p className="topicMeta"><strong>{profiles[post.author_id]?.display_name ?? "Membre"}</strong> · ⭐ {profiles[post.author_id]?.reputation ?? 0} · {new Date(post.created_at).toLocaleDateString("fr-FR")}</p><p>{post.body}</p><div className="postActions"><div><div className="voteBar"><button className={myVotes[post.id] === 1 ? "vote active" : "vote"} onClick={() => vote(post.id, "post", 1)}>▲</button><strong>{votes[post.id] ?? 0}</strong><button className={myVotes[post.id] === -1 ? "vote active" : "vote"} onClick={() => vote(post.id, "post", -1)}>▼</button></div><ReactionBar postId={post.id} /></div><button className="reportButton" onClick={() => openReport("post", post.id)}>⚑ Signaler</button></div></div></article>)}
+        {posts.map((post, i) => <article className="reply" key={post.id}><div className="replyNumber">#{i + 1}</div><div><p className="topicMeta"><strong>{profiles[post.author_id]?.display_name ?? "Membre"}</strong> · ⭐ {profiles[post.author_id]?.reputation ?? 0} · {new Date(post.created_at).toLocaleDateString("fr-FR")}</p><p><StickerText body={post.body} /></p><div className="postActions"><div><div className="voteBar"><button className={myVotes[post.id] === 1 ? "vote active" : "vote"} onClick={() => vote(post.id, "post", 1)}>▲</button><strong>{votes[post.id] ?? 0}</strong><button className={myVotes[post.id] === -1 ? "vote active" : "vote"} onClick={() => vote(post.id, "post", -1)}>▼</button></div><ReactionBar postId={post.id} /></div><button className="reportButton" onClick={() => openReport("post", post.id)}>⚑ Signaler</button></div></div></article>)}
       </section>
       <form className="replyForm" onSubmit={submit}>
         <h2>Répondre</h2>
-        <MentionTextarea value={reply} onChange={setReply} placeholder="Votre réponse…"/>
+        <MentionTextarea value={reply} onChange={setReply} placeholder="Votre réponse…"/><StickerPicker onSelect={sticker => setReply(value => value + (value ? " " : "") + `[sticker:${sticker.id}]`)} />
         {message && <p className="authMessage">{message}</p>}
         <button className="primary" disabled={posting}>{posting ? "Publication…" : "Publier la réponse"}</button>
       </form>
