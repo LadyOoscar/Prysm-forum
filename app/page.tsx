@@ -1,5 +1,57 @@
-"use client"; import {useState} from "react";
-const communities=[["✦","Blabla"],["🌈","LGBTQIA+"],["⚧","Trans"],["♀","Lesbiennes"],["♂","Gays"],["◐","Bi / Pan"],["🎮","Jeux vidéo"],["📚","Manga & BD"],["🎬","Cinéma & séries"],["🎵","Musique"],["✧","Culture"],["🍜","Cuisine"],["🌿","Fantasy"],["🐾","Animaux"]];
-const topics=[["Quel est votre jeu vidéo doudou ?","🎮","142","38"],["Les petites victoires qu'on ne célèbre pas assez","🌈","89","24"],["Vos mangas préférés avec des personnages queer ?","📚","76","19"],["Comment savoir si c'est un date ou juste un café ?","💕","113","31"],["On se fait une partie ce soir ?","🎲","54","17"],["La chanson qui vous accompagne en ce moment","🎵","61","28"]];
-const gods=[["⚖️","Kael","Justice","Modération & équité"],["💗","Nyra","Liens","Rencontres & relations"],["📚","Eon","Archives","Mémoire du forum"],["🎲","Mira","Animation","Événements & communautés"]];
-export default function Home(){const[open,setOpen]=useState(false);return <main><header><div className="brand">PRYSM<span>✦</span></div><nav><a className="active">Forum</a><a>Rencontres</a><a>Communautés</a><a>Panthéon</a></nav><a className="profile" href="/login">☾ <span>Mon profil</span></a></header><section className="hero"><div><p className="eyebrow">✦ LE FORUM QUI EST VIVANT</p><h1>Un espace pour<br/><em>être soi.</em></h1><p className="intro">Discuter, rire, débattre, rencontrer des gens et trouver sa communauté. PRYSM rassemble les couleurs qui font notre monde.</p><button className="primary" onClick={()=>setOpen(true)}>+ Créer un sujet</button></div><div className="orb">✦<small>PRYSM</small></div></section><div className="layout"><aside><div className="sideTitle">COMMUNAUTÉS <span>+</span></div>{communities.map(([icon,c],i)=><div className={i===0?"community selected":"community"} key={c}><span>{icon}</span>{c}<b>{i<3?12-i*3:""}</b></div>)}</aside><section className="feed"><div className="feedHead"><div><span className="eyebrow">COMMUNAUTÉ</span><h2>Blabla</h2></div><button className="filter">Les plus récents ▾</button></div>{topics.map(t=><article className="topic" key={t[0]}><div className="topicIcon">{t[1]}</div><div className="topicBody"><h3>{t[0]}</h3><p>Discussion · il y a quelques heures</p></div><div className="stats"><span>💬 {t[3]}</span><span>♡ {t[2]}</span></div></article>)}</section><aside className="pantheon"><div className="sideTitle">LE PANTHÉON <span>✦</span></div>{gods.map(g=><div className="god" key={g[1]}><div className="godIcon">{g[0]}</div><div><strong>{g[1]}</strong><small>{g[2]} · {g[3]}</small></div></div>)}<div className="aiNote">Les divinités sont des IA clairement identifiées. Elles assistent la communauté sans se faire passer pour des membres humains.</div></aside></div>{open&&<div className="modal" onClick={()=>setOpen(false)}><div className="modalCard" onClick={e=>e.stopPropagation()}><button className="close" onClick={()=>setOpen(false)}>×</button><p className="eyebrow">NOUVELLE DISCUSSION</p><h2>Qu'avez-vous envie de partager ?</h2><textarea placeholder="Écrivez votre sujet…"/><button className="primary" onClick={()=>setOpen(false)}>Publier le sujet</button></div></div>}</main>}
+"use client";
+
+import { useState } from "react";
+
+const communities = [["✦","Blabla"],["🌈","LGBTQIA+"],["⚧","Trans"],["♀","Lesbiennes"],["♂","Gays"],["◐","Bi / Pan"],["🎮","Jeux vidéo"],["📚","Manga & BD"],["🎬","Cinéma & séries"],["🎵","Musique"],["✧","Culture"],["🍜","Cuisine"],["🌿","Fantasy"],["🐾","Animaux"]];
+const topics = [["Quel est votre jeu vidéo doudou ?","🎮","142","38"],["Les petites victoires qu'on ne célèbre pas assez","🌈","89","24"],["Vos mangas préférés avec des personnages queer ?","📚","76","19"],["Comment savoir si c'est un date ou juste un café ?","💕","113","31"],["On se fait une partie ce soir ?","🎲","54","17"],["La chanson qui vous accompagne en ce moment","🎵","61","28"]];
+const gods = [["⚖️","Kael","Justice","Modération & équité"],["💗","Nyra","Liens","Rencontres & relations"],["📚","Eon","Archives","Mémoire du forum"],["🎲","Mira","Animation","Événements & communautés"]];
+
+export default function Home() {
+  const [open, setOpen] = useState(false);
+
+  return <main>
+    <header>
+      <div className="brand">PRYSM<span>✦</span></div>
+      <nav><a className="active">Forum</a><a>Rencontres</a><a>Communautés</a><a>Panthéon</a></nav>
+      <a className="profile" href="/profile">☾ <span>Mon profil</span></a>
+    </header>
+
+    <section className="hero">
+      <div>
+        <p className="eyebrow">✦ LE FORUM QUI EST VIVANT</p>
+        <h1>Un espace pour<br/><em>être soi.</em></h1>
+        <p className="intro">Discuter, rire, débattre, rencontrer des gens et trouver sa communauté. PRYSM rassemble les couleurs qui font notre monde.</p>
+        <button className="primary" onClick={() => setOpen(true)}>+ Créer un sujet</button>
+      </div>
+      <div className="orb">✦<small>PRYSM</small></div>
+    </section>
+
+    <div className="layout">
+      <aside>
+        <div className="sideTitle">COMMUNAUTÉS <span>+</span></div>
+        {communities.map(([icon, c], i) => <div className={i === 0 ? "community selected" : "community"} key={c}><span>{icon}</span>{c}<b>{i < 3 ? 12 - i * 3 : ""}</b></div>)}
+      </aside>
+
+      <section className="feed">
+        <div className="feedHead"><div><span className="eyebrow">COMMUNAUTÉ</span><h2>Blabla</h2></div><button className="filter">Les plus récents ▾</button></div>
+        {topics.map(t => <article className="topic" key={t[0]}><div className="topicIcon">{t[1]}</div><div className="topicBody"><h3>{t[0]}</h3><p>Discussion · il y a quelques heures</p></div><div className="stats"><span>💬 {t[3]}</span><span>♡ {t[2]}</span></div></article>)}
+      </section>
+
+      <aside className="pantheon">
+        <div className="sideTitle">LE PANTHÉON <span>✦</span></div>
+        {gods.map(g => <div className="god" key={g[1]}><div className="godIcon">{g[0]}</div><div><strong>{g[1]}</strong><small>{g[2]} · {g[3]}</small></div></div>)}
+        <div className="aiNote">Les divinités sont des IA clairement identifiées. Elles assistent la communauté sans se faire passer pour des membres humains.</div>
+      </aside>
+    </div>
+
+    {open && <div className="modal" onClick={() => setOpen(false)}>
+      <div className="modalCard" onClick={e => e.stopPropagation()}>
+        <button className="close" onClick={() => setOpen(false)}>×</button>
+        <p className="eyebrow">NOUVELLE DISCUSSION</p>
+        <h2>Qu'avez-vous envie de partager ?</h2>
+        <textarea placeholder="Écrivez votre sujet…"/>
+        <button className="primary" onClick={() => setOpen(false)}>Publier le sujet</button>
+      </div>
+    </div>}
+  </main>;
+}
