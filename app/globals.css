@@ -257,3 +257,58 @@ nav .active{background:var(--surface-3);color:var(--text)}
   .mobileNav a.active .mobileNavIcon{color:var(--accent-strong)}
   .welcomeBar{margin-top:12px}
 }
+
+/* PRYSM INTERNAL PAGES V2 */
+.communityPage,.topicPage,.pantheonPage,.searchPage,.messagesShell{
+  max-width:1040px;margin:0 auto;padding:28px 20px 80px;
+}
+.communityHero{
+  display:grid;grid-template-columns:auto 1fr auto;gap:20px;align-items:center;
+  padding:28px;border:1px solid var(--line);border-radius:18px;
+  background:linear-gradient(135deg,var(--surface-2),var(--surface));
+  box-shadow:0 20px 60px rgba(0,0,0,.18);
+}
+.communityHeroIcon{width:64px;height:64px;border-radius:16px;display:grid;place-items:center;background:var(--accent-soft);font-size:30px}
+.communityHero h1,.topicPage h1,.pantheonPage h1{margin:4px 0;font-size:30px;letter-spacing:-.035em}
+.communityHero p:not(.eyebrow){color:var(--muted);max-width:650px;line-height:1.6}
+.communityHeroActions{display:flex;gap:8px}
+.communityStats{display:flex;gap:1px;margin:14px 0;background:var(--line);border-radius:12px;overflow:hidden}
+.communityStats div{flex:1;background:var(--surface);padding:14px;text-align:center}
+.communityStats strong,.communityStats span{display:block}
+.communityStats strong{font-size:20px}.communityStats span{color:var(--muted);font-size:11px}
+.communityRules{padding:15px 18px;margin-bottom:18px;background:var(--surface);border:1px solid var(--line-soft);border-radius:12px;color:var(--muted);line-height:1.55}
+.communityTopics{background:rgba(21,18,28,.5);border:1px solid var(--line-soft);border-radius:14px;padding:14px}
+.topicPage>h1{max-width:850px}
+.topicPost,.reply,.replyForm{background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.topicPost{padding:22px}.topicContent{font-size:15px;line-height:1.75;color:#e7e0eb}
+.replies{margin-top:28px}.replies h2{font-size:18px}
+.reply{padding:18px;margin:10px 0}
+.replyNumber{color:var(--muted-2);font-size:11px;margin-bottom:8px}
+.replyForm{padding:18px;margin-top:24px}
+.replyForm h2{font-size:17px;margin-top:0}
+.pantheonPage,.searchPage,.messagesShell{max-width:1040px}
+.pantheonLead{max-width:720px;color:var(--muted);line-height:1.6}
+.pantheonGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:24px 0}
+.godCard{padding:18px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;color:var(--text)}
+.godCard.selectedGod{background:var(--accent-soft);border-color:#553d62;box-shadow:inset 3px 0 var(--accent)}
+.godCard span{font-size:24px}.godCard strong,.godCard small,.godCard p{display:block}.godCard small,.godCard p{color:var(--muted)}.godCard p{font-size:12px;line-height:1.5}
+.invocationCard{padding:22px;background:var(--surface);border:1px solid var(--line);border-radius:16px}
+.invocationCard textarea{min-height:130px}
+.godResponse{margin-top:16px;padding:15px;border-radius:11px;background:var(--surface-2);border:1px solid var(--line-soft)}
+.searchPage h1,.messagesShell h1{font-size:30px;letter-spacing:-.03em}
+.searchIntro,.messagesIntro>p:last-child{color:var(--muted)}
+@media(max-width:760px){
+ .communityPage,.topicPage,.pantheonPage,.searchPage,.messagesShell{padding:18px 14px 70px}
+ .communityHero{grid-template-columns:auto 1fr}.communityHeroActions{grid-column:1/-1}
+ .communityHeroActions .primary,.communityHeroActions .secondaryButton{flex:1}
+ .communityStats strong{font-size:17px}
+ .pantheonGrid{grid-template-columns:1fr 1fr}
+ .pantheonPage h1,.topicPage h1,.searchPage h1,.messagesShell h1{font-size:25px}
+}
+@media(max-width:500px){
+ .communityHero{padding:18px;grid-template-columns:1fr}
+ .communityHeroIcon{width:52px;height:52px}
+ .communityHeroActions{grid-column:auto;flex-direction:column}
+ .pantheonGrid{grid-template-columns:1fr}
+ .communityStats div{padding:11px 6px}
+}
