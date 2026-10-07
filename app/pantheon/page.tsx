@@ -13,7 +13,6 @@ const gods = [
 ];
 
 export default function PantheonPage() {
-  const supabase = createClient();
   const [selected,setSelected]=useState(gods[0]);
   const [context,setContext]=useState("");
   const [response,setResponse]=useState("");
@@ -21,6 +20,7 @@ export default function PantheonPage() {
 
   async function invoke(event:FormEvent){
     event.preventDefault();
+    const supabase = createClient();
     setBusy(true);
     const {data:claims}=await supabase.auth.getClaims();
     const userId=typeof claims?.claims?.sub==="string"?claims.claims.sub:null;
