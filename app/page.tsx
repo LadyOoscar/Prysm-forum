@@ -1,57 +1,221 @@
 "use client";
 
-import { useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 
-const communities = [["✦","Blabla"],["🌈","LGBTQIA+"],["⚧","Trans"],["♀","Lesbiennes"],["♂","Gays"],["◐","Bi / Pan"],["🎮","Jeux vidéo"],["📚","Manga & BD"],["🎬","Cinéma & séries"],["🎵","Musique"],["✧","Culture"],["🍜","Cuisine"],["🌿","Fantasy"],["🐾","Animaux"]];
-const topics = [["Quel est votre jeu vidéo doudou ?","🎮","142","38"],["Les petites victoires qu'on ne célèbre pas assez","🌈","89","24"],["Vos mangas préférés avec des personnages queer ?","📚","76","19"],["Comment savoir si c'est un date ou juste un café ?","💕","113","31"],["On se fait une partie ce soir ?","🎲","54","17"],["La chanson qui vous accompagne en ce moment","🎵","61","28"]];
-const gods = [["⚖️","Kael","Justice","Modération & équité"],["💗","Nyra","Liens","Rencontres & relations"],["📚","Eon","Archives","Mémoire du forum"],["🎲","Mira","Animation","Événements & communautés"]];
+type Community = {
+  id: string;
+  slug: string;
+  name: string;
+  icon: string;
+};
+
+type Topic = {
+  id: string;
+  title: string;
+  body: string;
+  community_id: string;
+  created_at: string;
+};
+
+const fallbackGods = [
+  ["⚖️", "Kael", "Justice", "Modération & équité"],
+  ["💗", "Nyra", "Liens", "Rencontres & relations"],
+  ["📚", "Eon", "Archives", "Mémoire du forum"],
+  ["🎲", "Mira", "Animation", "Événements & communautés"],
+];
 
 export default function Home() {
+  const router = useRouter();
+  const supabase = createClient();
+  const [communities, setCommunities] = useState<Community[]>([]);
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [selectedCommunity, setSelectedCommunity] = useState("blabla");
   const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [communityId, setCommunityId] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [publishing, setPublishing] = useState(false);
+  const [message, setMessage] = useState("");
 
-  return <main>
-    <header>
-      <div className="brand">PRYSM<span>✦</span></div>
-      <nav><a className="active">Forum</a><a>Rencontres</a><a>Communautés</a><a>Panthéon</a></nav>
-      <a className="profile" href="/profile">☾ <span>Mon profil</span></a>
-    </header>
+  useEffect(() => {
+    async function loadForum() {
+      const [{ data: communityRows }, { data: topicRows }] = await Promise.all([
+        supabase.from("communities").select("id,slug,name,icon").order("name"),
+        supabase
+          .from("topics")
+          .select("id,title,body,community_id,created_at")
+          .order("created_at", { ascending: false })
+          .limit(12),
+      ]);
 
-    <section className="hero">
-      <div>
-        <p className="eyebrow">✦ LE FORUM QUI EST VIVANT</p>
-        <h1>Un espace pour<br/><em>être soi.</em></h1>
-        <p className="intro">Discuter, rire, débattre, rencontrer des gens et trouver sa communauté. PRYSM rassemble les couleurs qui font notre monde.</p>
-        <button className="primary" onClick={() => setOpen(true)}>+ Créer un sujet</button>
-      </div>
-      <div className="orb">✦<small>PRYSM</small></div>
-    </section>
+      setCommunities(communityRows ?? []);
+      setTopics(topicRows ?? []);
 
-    <div className="layout">
-      <aside>
-        <div className="sideTitle">COMMUNAUTÉS <span>+</span></div>
-        {communities.map(([icon, c], i) => <div className={i === 0 ? "community selected" : "community"} key={c}><span>{icon}</span>{c}<b>{i < 3 ? 12 - i * 3 : ""}</b></div>)}
-      </aside>
+      const defaultCommunity =
+        communityRows?.find((community) => community.slug === "blabla") ?? communityRows?.[0];
+      if (defaultCommunity) {
+        setSelectedCommunity(defaultCommunity.slug);
+        setCommunityId(defaultCommunity.id);
+      }
+      setLoading(false);
+    }
 
-      <section className="feed">
-        <div className="feedHead"><div><span className="eyebrow">COMMUNAUTÉ</span><h2>Blabla</h2></div><button className="filter">Les plus récents ▾</button></div>
-        {topics.map(t => <article className="topic" key={t[0]}><div className="topicIcon">{t[1]}</div><div className="topicBody"><h3>{t[0]}</h3><p>Discussion · il y a quelques heures</p></div><div className="stats"><span>💬 {t[3]}</span><span>♡ {t[2]}</span></div></article>)}
+    loadForum();
+  }, []);
+
+  function openComposer() {
+    setMessage("");
+    setTitle("");
+    setBody("");
+    const community =
+      communities.find((item) => item.slug === selectedCommunity) ?? communities[0];
+    if (community) setCommunityId(community.id);
+    setOpen(true);
+  }
+
+  async function createTopic(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setMessage("");
+
+    if (title.trim().length < 3 || body.trim().length < 3 || !communityId) {
+      setMessage("Ajoutez un titre, un message et une communauté.");
+      return;
+    }
+
+    setPublishing(true);
+    const { data: claims } = await supabase.auth.getClaims();
+
+    if (!claims?.claims?.sub) {
+      router.push("/login");
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("topics")
+      .insert({
+        community_id: communityId,
+        author_id: claims.claims.sub,
+        title: title.trim(),
+        body: body.trim(),
+      })
+      .select("id")
+      .single();
+
+    setPublishing(false);
+
+    if (error) {
+      setMessage("Impossible de publier ce sujet pour le moment.");
+      return;
+    }
+
+    setOpen(false);
+    router.push(`/topic/${data.id}`);
+  }
+
+  const visibleTopics = topics.filter((topic) => {
+    if (!selectedCommunity) return true;
+    const community = communities.find((item) => item.slug === selectedCommunity);
+    return !community || topic.community_id === community.id;
+  });
+
+  return (
+    <main>
+      <header>
+        <div className="brand">PRYSM<span>✦</span></div>
+        <nav><a className="active">Forum</a><a>Rencontres</a><a>Communautés</a><a>Panthéon</a></nav>
+        <a className="profile" href="/profile">☾ <span>Mon profil</span></a>
+      </header>
+
+      <section className="hero">
+        <div>
+          <p className="eyebrow">✦ LE FORUM QUI EST VIVANT</p>
+          <h1>Un espace pour<br/><em>être soi.</em></h1>
+          <p className="intro">Discuter, rire, débattre, rencontrer des gens et trouver sa communauté. PRYSM rassemble les couleurs qui font notre monde.</p>
+          <button className="primary" onClick={openComposer}>+ Créer un sujet</button>
+        </div>
+        <div className="orb">✦<small>PRYSM</small></div>
       </section>
 
-      <aside className="pantheon">
-        <div className="sideTitle">LE PANTHÉON <span>✦</span></div>
-        {gods.map(g => <div className="god" key={g[1]}><div className="godIcon">{g[0]}</div><div><strong>{g[1]}</strong><small>{g[2]} · {g[3]}</small></div></div>)}
-        <div className="aiNote">Les divinités sont des IA clairement identifiées. Elles assistent la communauté sans se faire passer pour des membres humains.</div>
-      </aside>
-    </div>
+      <div className="layout">
+        <aside>
+          <div className="sideTitle">COMMUNAUTÉS <span>+</span></div>
+          {loading ? (
+            <div className="community">Chargement…</div>
+          ) : (
+            communities.map((community) => (
+              <button
+                className={community.slug === selectedCommunity ? "community selected" : "community"}
+                key={community.id}
+                onClick={() => setSelectedCommunity(community.slug)}
+              >
+                <span>{community.icon}</span>{community.name}
+              </button>
+            ))
+          )}
+        </aside>
 
-    {open && <div className="modal" onClick={() => setOpen(false)}>
-      <div className="modalCard" onClick={e => e.stopPropagation()}>
-        <button className="close" onClick={() => setOpen(false)}>×</button>
-        <p className="eyebrow">NOUVELLE DISCUSSION</p>
-        <h2>Qu'avez-vous envie de partager ?</h2>
-        <textarea placeholder="Écrivez votre sujet…"/>
-        <button className="primary" onClick={() => setOpen(false)}>Publier le sujet</button>
+        <section className="feed">
+          <div className="feedHead">
+            <div>
+              <span className="eyebrow">COMMUNAUTÉ</span>
+              <h2>{communities.find((c) => c.slug === selectedCommunity)?.name ?? "Blabla"}</h2>
+            </div>
+            <button className="filter">Les plus récents ▾</button>
+          </div>
+
+          {loading ? (
+            <article className="topic"><div className="topicBody"><p>Chargement des discussions…</p></div></article>
+          ) : visibleTopics.length === 0 ? (
+            <article className="topic"><div className="topicBody"><h3>Cette communauté attend son premier sujet.</h3><p>Pourquoi ne pas lancer la discussion ?</p></div></article>
+          ) : (
+            visibleTopics.map((topic) => {
+              const community = communities.find((item) => item.id === topic.community_id);
+              return (
+                <article className="topic" key={topic.id} onClick={() => router.push(`/topic/${topic.id}`)}>
+                  <div className="topicIcon">{community?.icon ?? "✦"}</div>
+                  <div className="topicBody"><h3>{topic.title}</h3><p>{community?.name ?? "Discussion"} · {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p></div>
+                  <div className="stats"><span>💬</span><span>♡</span></div>
+                </article>
+              );
+            })
+          )}
+        </section>
+
+        <aside className="pantheon">
+          <div className="sideTitle">LE PANTHÉON <span>✦</span></div>
+          {fallbackGods.map((god) => <div className="god" key={god[1]}><div className="godIcon">{god[0]}</div><div><strong>{god[1]}</strong><small>{god[2]} · {god[3]}</small></div></div>)}
+          <div className="aiNote">Les divinités sont des IA clairement identifiées. Elles assistent la communauté sans se faire passer pour des membres humains.</div>
+        </aside>
       </div>
-    </div>}
-  </main>;
+
+      {open && (
+        <div className="modal" onClick={() => setOpen(false)}>
+          <div className="modalCard" onClick={(event) => event.stopPropagation()}>
+            <button className="close" onClick={() => setOpen(false)}>×</button>
+            <p className="eyebrow">NOUVELLE DISCUSSION</p>
+            <h2>Qu'avez-vous envie de partager ?</h2>
+            <form className="authForm" onSubmit={createTopic}>
+              <label>Communauté
+                <select value={communityId} onChange={(event) => setCommunityId(event.target.value)} required>
+                  <option value="" disabled>Choisir une communauté</option>
+                  {communities.map((community) => <option key={community.id} value={community.id}>{community.icon} {community.name}</option>)}
+                </select>
+              </label>
+              <label>Titre
+                <input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={160} placeholder="Le titre de votre sujet" required />
+              </label>
+              <label>Message
+                <textarea value={body} onChange={(event) => setBody(event.target.value)} maxLength={10000} placeholder="Écrivez votre sujet…" required />
+              </label>
+              {message && <p className="authMessage">{message}</p>}
+              <button className="primary" type="submit" disabled={publishing}>{publishing ? "Publication…" : "Publier le sujet"}</button>
+            </form>
+          </div>
+        </div>
+      )}
+    </main>
+  );
 }
