@@ -14,7 +14,7 @@ type Community = {
   display_order: number;
 };
 
-type Topic = { id: string; title: string; body: string; community_id: string; created_at: string };
+type Topic = { id: string; title: string; body: string; community_id: string; author_id: string; created_at: string };\ntype Profile = { id: string; username: string; display_name: string; reputation: number; avatar_url: string | null };
 
 const fallbackGods = [
   ["⚖️", "Kael", "Justice", "Modération & équité"],
@@ -27,7 +27,7 @@ export default function Home() {
   const router = useRouter();
   const supabase = createClient();
   const [communities, setCommunities] = useState<Community[]>([]);
-  const [topics, setTopics] = useState<Topic[]>([]);
+  const [topics, setTopics] = useState<Topic[]>([]);\n  const [profiles, setProfiles] = useState<Record<string, Profile>>({});\n  const [replyCounts, setReplyCounts] = useState<Record<string, number>>({});
   const [selectedCommunity, setSelectedCommunity] = useState("blabla");
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -47,7 +47,7 @@ export default function Home() {
           .order("display_order"),
         supabase
           .from("topics")
-          .select("id,title,body,community_id,created_at")
+          .select("id,title,body,community_id,author_id,created_at")
           .order("created_at", { ascending: false })
           .limit(12),
       ]);
@@ -207,9 +207,9 @@ export default function Home() {
                   <div className="topicIcon">{community?.icon ?? "✦"}</div>
                   <div className="topicBody">
                     <h3>{topic.title}</h3>
-                    <p>{community?.name ?? "Discussion"} · {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p>
+                    <p>{community?.name ?? "Discussion"} · {profiles[topic.author_id]?.display_name ?? "Membre"} · {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p>
                   </div>
-                  <div className="stats"><span>💬</span><span>♡</span></div>
+                  <div className="stats"><span>💬 {replyCounts[topic.id] ?? 0}</span><span>⭐ {profiles[topic.author_id]?.reputation ?? 0}</span></div>
                 </article>
               );
             })
