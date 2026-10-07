@@ -11,7 +11,6 @@ type Community = { name: string; icon: string; slug: string };
 export default function PublicProfilePage() {
   const { username } = useParams<{ username: string }>();
   const router = useRouter();
-  const supabase = createClient();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [communities, setCommunities] = useState<Record<string, Community>>({});
@@ -23,6 +22,7 @@ export default function PublicProfilePage() {
 
   useEffect(() => {
     async function load() {
+      const supabase = createClient();
       const { data: p } = await supabase.from("profiles").select("id,username,display_name,bio,avatar_url,banner_url,pronouns,identity,interests,reputation").eq("username", username).maybeSingle();
       if (!p) { setLoading(false); return; }
 
@@ -56,6 +56,7 @@ export default function PublicProfilePage() {
 
   async function toggleFollow() {
     if (!profile || !me || me === profile.id) return;
+    const supabase = createClient();
     if (following) {
       const { error } = await supabase.from("user_follows").delete().eq("follower_id", me).eq("following_id", profile.id);
       if (!error) { setFollowing(false); setFollowers(v => Math.max(0, v - 1)); }
