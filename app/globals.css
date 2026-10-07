@@ -312,3 +312,9 @@ nav .active{background:var(--surface-3);color:var(--text)}
  .pantheonGrid{grid-template-columns:1fr}
  .communityStats div{padding:11px 6px}
 }
+
+.profilePage{min-height:100vh;background:var(--bg)}
+.profileShell{max-width:760px;margin:0 auto;padding:28px 20px 80px}
+.profileShell .authCard{width:100%;max-width:none;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.18)}
+.profileShell .authBrand{display:none}
+@media(max-width:760px){.profileShell{padding:16px 14px 70px}.profileShell .authCard{padding:20px 16px}}
