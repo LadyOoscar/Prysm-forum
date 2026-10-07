@@ -16,7 +16,6 @@ function TopicContent() {
   const params = useSearchParams();
   const router = useRouter();
   const id = params.get("id");
-  const supabase = createClient();
   const [topic, setTopic] = useState<Topic | null>(null);
   const [community, setCommunity] = useState<{name:string;icon:string} | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -34,6 +33,7 @@ function TopicContent() {
   const [reportMessage, setReportMessage] = useState("");
 
   async function load() {
+    const supabase = createClient();
     if (!id) return;
     const { data: t } = await supabase.from("topics").select("id,title,body,created_at,community_id,author_id").eq("id", id).maybeSingle();
     if (!t) { setLoading(false); return; }
@@ -57,6 +57,7 @@ function TopicContent() {
   useEffect(() => { load(); }, [id]);
 
   async function vote(targetId: string, targetType: "topic" | "post", value: number) {
+    const supabase = createClient();
     if (voting) return;
     setVoting(targetId);
     const { data: claims } = await supabase.auth.getClaims();
@@ -72,6 +73,7 @@ function TopicContent() {
   }
 
   async function submitReport(event: FormEvent<HTMLFormElement>) {
+    const supabase = createClient();
     event.preventDefault();
     if (!reportTarget || reportReason.trim().length < 3) return;
     setReporting(true);
@@ -96,6 +98,7 @@ function TopicContent() {
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
+    const supabase = createClient();
     event.preventDefault();
     setMessage("");
     if (reply.trim().length < 2 || !id) return;
