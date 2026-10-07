@@ -63,7 +63,7 @@ export default function PublicProfilePage() {
             {profile.bio && <p className="publicBio">{profile.bio}</p>}
             {profile.interests?.length > 0 && <div className="profileTags">{profile.interests.map(interest => <span key={interest}>#{interest}</span>)}</div>}
           </div>
-          <div className="reputationCard"><strong>⭐ {profile.reputation}</strong><span>réputation</span></div>
+          <div className="reputationCard"><strong>⭐ {profile.reputation}</strong><span>réputation</span><a className="profileMessageButton" href={"/messages?user=" + profile.username}>💬 Message</a></div>
         </section>
         <div className="publicStats">
           <div><strong>{topics.length}</strong><span>sujets récents</span></div>
