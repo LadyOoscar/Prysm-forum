@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -89,8 +89,6 @@ function MessagesContent() {
     </div>
   </main>;
 }
-
-import { Suspense } from "react";
 
 export default function MessagesPage() {
   return <Suspense fallback={<main className="authPage"><div className="authCard"><p>Chargement…</p></div></main>}><MessagesContent /></Suspense>;
