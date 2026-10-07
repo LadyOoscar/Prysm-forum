@@ -3,6 +3,7 @@
 import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import PrysmNav from "@/components/PrysmNav";
 import MentionTextarea from "@/components/MentionTextarea";
 import ReactionBar from "@/components/ReactionBar";
 import StickerPicker from "@/components/StickerPicker";
@@ -116,11 +117,7 @@ function TopicContent() {
   if (!topic) return <main><div className="authPage"><div className="authCard"><h1>Sujet introuvable</h1><a href="/">Retour au forum</a></div></div></main>;
 
   return <main>
-    <header>
-      <div className="brand">PRYSM<span>✦</span></div>
-      <nav><a href="/">Forum</a><a>Rencontres</a><a href="/">Communautés</a><a href="/pantheon">Panthéon</a></nav>
-      <a className="profile" href="/profile">☾ <span>Mon profil</span></a>
-    </header>
+    <PrysmNav active="forum" />
     <div className="topicPage">
       <button className="backButton" onClick={() => router.push("/")}>← Retour au forum</button>
       <p className="eyebrow">{community?.icon} {community?.name ?? "COMMUNAUTÉ"}</p>
