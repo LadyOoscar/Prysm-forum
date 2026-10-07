@@ -23,7 +23,7 @@ export default function TopicPage() {
   const [message, setMessage] = useState("");
   const [votes, setVotes] = useState<Record<string, number>>({});
   const [myVotes, setMyVotes] = useState<Record<string, number>>({});
-  const [voting, setVoting] = useState<string | null>(null);
+  const [voting, setVoting] = useState<string | null>(null);\n  const [reportTarget, setReportTarget] = useState<{type: "topic" | "post"; id: string} | null>(null);\n  const [reportReason, setReportReason] = useState("");\n  const [reporting, setReporting] = useState(false);\n  const [reportMessage, setReportMessage] = useState("");
 
   async function load() {
     if (!id) return;
@@ -65,7 +65,7 @@ export default function TopicPage() {
     setVoting(null);
   }
 
-  async function submit(event: FormEvent<HTMLFormElement>) {
+  async function submitReport(event: FormEvent<HTMLFormElement>) {\n    event.preventDefault();\n    if (!reportTarget || reportReason.trim().length < 3) return;\n    setReporting(true);\n    setReportMessage("");\n    const { data: claims } = await supabase.auth.getClaims();\n    const userId = typeof claims?.claims?.sub === "string" ? claims.claims.sub : null;\n    if (!userId) { setReporting(false); router.push("/login"); return; }\n    const payload = reportTarget.type === "topic"\n      ? { reporter_id: userId, topic_id: reportTarget.id, reason: reportReason.trim() }\n      : { reporter_id: userId, post_id: reportTarget.id, reason: reportReason.trim() };\n    const { error } = await supabase.from("reports").insert(payload);\n    setReporting(false);\n    if (error) { setReportMessage("Impossible d’envoyer le signalement."); return; }\n    setReportMessage("Signalement envoyé aux modérateurs.");\n    setReportReason("");\n  }\n\n  function openReport(type: "topic" | "post", targetId: string) {\n    setReportMessage("");\n    setReportReason("");\n    setReportTarget({ type, id: targetId });\n  }\n\n  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
     if (reply.trim().length < 2 || !id) return;
@@ -92,10 +92,10 @@ export default function TopicPage() {
       <button className="backButton" onClick={() => router.push("/")}>← Retour au forum</button>
       <p className="eyebrow">{community?.icon} {community?.name ?? "COMMUNAUTÉ"}</p>
       <h1>{topic.title}</h1>
-      <article className="topicPost"><p className="topicMeta"><strong>{profiles[topic.author_id]?.display_name ?? "Membre"}</strong> · ⭐ {profiles[topic.author_id]?.reputation ?? 0} · publié le {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p><div className="topicContent">{topic.body}</div><div className="voteBar"><button className={myVotes[topic.id] === 1 ? "vote active" : "vote"} onClick={() => vote(topic.id, "topic", 1)}>▲</button><strong>{votes[topic.id] ?? 0}</strong><button className={myVotes[topic.id] === -1 ? "vote active" : "vote"} onClick={() => vote(topic.id, "topic", -1)}>▼</button></div></article>
+      <article className="topicPost"><p className="topicMeta"><strong>{profiles[topic.author_id]?.display_name ?? "Membre"}</strong> · ⭐ {profiles[topic.author_id]?.reputation ?? 0} · publié le {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p><div className="topicContent">{topic.body}</div><div className="postActions"><div className="voteBar"><button className={myVotes[topic.id] === 1 ? "vote active" : "vote"} onClick={() => vote(topic.id, "topic", 1)}>▲</button><strong>{votes[topic.id] ?? 0}</strong><button className={myVotes[topic.id] === -1 ? "vote active" : "vote"} onClick={() => vote(topic.id, "topic", -1)}>▼</button></div><button className="reportButton" onClick={() => openReport("topic", topic.id)}>⚑ Signaler</button></div></article>
       <section className="replies">
         <h2>{posts.length} réponse{posts.length !== 1 ? "s" : ""}</h2>
-        {posts.map((post, i) => <article className="reply" key={post.id}><div className="replyNumber">#{i + 1}</div><div><p className="topicMeta"><strong>{profiles[post.author_id]?.display_name ?? "Membre"}</strong> · ⭐ {profiles[post.author_id]?.reputation ?? 0} · {new Date(post.created_at).toLocaleDateString("fr-FR")}</p><p>{post.body}</p><div className="voteBar"><button className={myVotes[post.id] === 1 ? "vote active" : "vote"} onClick={() => vote(post.id, "post", 1)}>▲</button><strong>{votes[post.id] ?? 0}</strong><button className={myVotes[post.id] === -1 ? "vote active" : "vote"} onClick={() => vote(post.id, "post", -1)}>▼</button></div></div></article>)}
+        {posts.map((post, i) => <article className="reply" key={post.id}><div className="replyNumber">#{i + 1}</div><div><p className="topicMeta"><strong>{profiles[post.author_id]?.display_name ?? "Membre"}</strong> · ⭐ {profiles[post.author_id]?.reputation ?? 0} · {new Date(post.created_at).toLocaleDateString("fr-FR")}</p><p>{post.body}</p><div className="postActions"><div className="voteBar"><button className={myVotes[post.id] === 1 ? "vote active" : "vote"} onClick={() => vote(post.id, "post", 1)}>▲</button><strong>{votes[post.id] ?? 0}</strong><button className={myVotes[post.id] === -1 ? "vote active" : "vote"} onClick={() => vote(post.id, "post", -1)}>▼</button></div><button className="reportButton" onClick={() => openReport("post", post.id)}>⚑ Signaler</button></div></div></article>)}
       </section>
       <form className="replyForm" onSubmit={submit}>
         <h2>Répondre</h2>
