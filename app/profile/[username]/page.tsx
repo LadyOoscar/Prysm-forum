@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-type Profile = { id: string; username: string; display_name: string; bio: string; avatar_url: string | null; pronouns: string | null; reputation: number };
+type Profile = { id: string; username: string; display_name: string; bio: string; avatar_url: string | null; banner_url: string | null; pronouns: string | null; identity: string | null; interests: string[]; reputation: number };
 type Topic = { id: string; title: string; created_at: string; community_id: string };
 type Community = { name: string; icon: string; slug: string };
 
@@ -20,7 +20,7 @@ export default function PublicProfilePage() {
 
   useEffect(() => {
     async function load() {
-      const { data: p } = await supabase.from("profiles").select("id,username,display_name,bio,avatar_url,pronouns,reputation").eq("username", username).maybeSingle();
+      const { data: p } = await supabase.from("profiles").select("id,username,display_name,bio,avatar_url,banner_url,pronouns,identity,interests,reputation").eq("username", username).maybeSingle();
       if (!p) { setLoading(false); return; }
 
       const [{ data: topicRows }, { count }] = await Promise.all([
