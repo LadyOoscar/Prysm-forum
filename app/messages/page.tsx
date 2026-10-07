@@ -8,7 +8,6 @@ type Conversation = { id: string; updated_at: string; created_by: string; direct
 type Profile = { id: string; username: string; display_name: string; avatar_url: string | null };
 
 function MessagesContent() {
-  const supabase = createClient();
   const router = useRouter();
   const params = useSearchParams();
   const [me, setMe] = useState("");
@@ -21,6 +20,7 @@ function MessagesContent() {
 
   useEffect(() => {
     async function load() {
+      const supabase = createClient();
       const { data: claims } = await supabase.auth.getClaims();
       const id = claims?.claims?.sub;
       if (!id) { router.push("/login"); return; }
@@ -45,6 +45,7 @@ function MessagesContent() {
 
   async function startConversation(event: FormEvent) {
     event.preventDefault();
+    const supabase = createClient();
     setBusy(true); setMessage("");
     const target = username.trim().replace(/^@/, "").toLowerCase();
     const { data: person } = await supabase.from("profiles").select("id").eq("username", target).maybeSingle();
