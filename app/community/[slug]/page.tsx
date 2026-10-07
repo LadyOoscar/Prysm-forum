@@ -16,6 +16,7 @@ type Profile = { id: string; username: string; display_name: string; reputation:
 
 type Topic = {
   id: string;
+  author_id: string;
   title: string;
   body: string;
   created_at: string;
