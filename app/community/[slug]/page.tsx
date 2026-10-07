@@ -69,6 +69,22 @@ export default function CommunityPage() {
           .eq("topics.community_id", c.id),
       ]);
 
+      const { data: claims } = await supabase.auth.getClaims();
+      const userId = typeof claims?.claims?.sub === "string" ? claims.claims.sub : null;
+      const [{ count: membersTotal }, { data: membership }] = await Promise.all([
+        supabase.from("community_members").select("user_id", { count: "exact", head: true }).eq("community_id", c.id),
+        userId ? supabase.from("community_members").select("user_id").eq("community_id", c.id).eq("user_id", userId).maybeSingle() : Promise.resolve({ data: null }),
+      ]);
+      const authorIds = [...new Set((topicRows ?? []).map(t => t.author_id))];
+      const { data: authorRows } = authorIds.length ? await supabase.from("profiles").select("id,username,display_name,reputation,avatar_url").in("id", authorIds) : { data: [] };
+      const topicIds = (topicRows ?? []).map(t => t.id);
+      const { data: postRows } = topicIds.length ? await supabase.from("posts").select("topic_id").in("topic_id", topicIds) : { data: [] };
+      const counts: Record<string, number> = {};
+      for (const row of postRows ?? []) counts[row.topic_id] = (counts[row.topic_id] ?? 0) + 1;
+      setProfiles(Object.fromEntries((authorRows ?? []).map(p => [p.id, p])));
+      setReplyCounts(counts);
+      setMemberCount(membersTotal ?? 0);
+      setIsMember(Boolean(membership));
       setCommunity(c);
       setTopics(topicRows ?? []);
       setTopicCount(topicsTotal ?? 0);
