@@ -15,7 +15,6 @@ type Notification = {
 };
 
 export default function NotificationBell() {
-  const supabase = createClient();
   const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
