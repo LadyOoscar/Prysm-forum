@@ -36,12 +36,21 @@ export default function ReactionBar({ topicId, postId }: Props) {
     const { data: claims } = await supabase.auth.getClaims();
     const userId = claims?.claims?.sub;
     if (!userId) { setBusy(false); return; }
-    const filter = { user_id: userId, reaction, ...(topicId ? { topic_id: topicId } : { post_id: postId }) };
+
     if (mine.includes(reaction)) {
-      await supabase.from("reactions").delete().match(filter);
+      if (topicId) {
+        await supabase.from("reactions").delete().match({ user_id: userId, topic_id: topicId, reaction });
+      } else if (postId) {
+        await supabase.from("reactions").delete().match({ user_id: userId, post_id: postId, reaction });
+      }
     } else {
-      await supabase.from("reactions").insert(filter);
+      if (topicId) {
+        await supabase.from("reactions").insert({ user_id: userId, topic_id: topicId, reaction });
+      } else if (postId) {
+        await supabase.from("reactions").insert({ user_id: userId, post_id: postId, reaction } as any);
+      }
     }
+
     await load();
     setBusy(false);
   }
