@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import PrysmNav from "@/components/PrysmNav";
 
 type Profile = {
   id: string;
