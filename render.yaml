@@ -4,15 +4,15 @@ services:
     runtime: node
     plan: free
     region: frankfurt
-    branch: ui-redesign-v2
+    branch: main
     buildCommand: npm install && npm run build
     startCommand: npm start
-    autoDeploy: false
+    autoDeploy: true
     healthCheckPath: /
     envVars:
       - key: NODE_VERSION
         value: "20"
       - key: NEXT_PUBLIC_SUPABASE_URL
         sync: false
-      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+      - key: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
         sync: false
