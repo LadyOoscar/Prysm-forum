@@ -4,7 +4,7 @@ import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-type Conversation = { id: string; updated_at: string; direct_recipient_id: string };
+type Conversation = { id: string; updated_at: string; created_by: string; direct_recipient_id: string };
 type Profile = { id: string; username: string; display_name: string; avatar_url: string | null };
 
 function MessagesContent() {
@@ -30,7 +30,7 @@ function MessagesContent() {
       const ids = (memberships ?? []).map(row => row.conversation_id);
       if (!ids.length) { setLoading(false); return; }
 
-      const { data: rows } = await supabase.from("conversations").select("id,updated_at,direct_recipient_id").in("id", ids).order("updated_at", { ascending: false });
+      const { data: rows } = await supabase.from("conversations").select("id,updated_at,created_by,direct_recipient_id").in("id", ids).order("updated_at", { ascending: false });
       const convs = rows ?? [];
       setConversations(convs);
 
@@ -78,7 +78,8 @@ function MessagesContent() {
       {message && <p className="authMessage">{message}</p>}
       <section className="conversationList">
         {loading ? <p className="profileMuted">Chargement…</p> : conversations.length === 0 ? <div className="emptyCommunity"><p>Aucune conversation pour le moment.</p></div> : conversations.map(c => {
-          const other = profiles[c.direct_recipient_id];
+          const otherId = c.created_by === me ? c.direct_recipient_id : c.created_by;
+          const other = profiles[otherId];
           return <button className="conversationRow" key={c.id} onClick={() => router.push("/messages/" + c.id)}>
             <div className="mentionAvatar">{other?.avatar_url ? <img src={other.avatar_url} alt="" /> : (other?.display_name ?? "?").charAt(0).toUpperCase()}</div>
             <div><strong>{other?.display_name ?? "Membre"}</strong><small>@{other?.username ?? "inconnu"}</small></div>
