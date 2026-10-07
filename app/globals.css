@@ -187,3 +187,24 @@ nav .active{background:var(--surface-3);color:var(--text)}
   .welcomeBar .primary{width:100%}
   .topicIcon{width:36px;height:36px}
 }
+
+/* PRYSM mobile navigation */
+.mobileNav{display:none}
+@media(max-width:760px){
+  body{padding-bottom:72px}
+  .mobileNav{
+    display:grid;grid-template-columns:repeat(5,1fr);position:fixed;z-index:50;
+    left:10px;right:10px;bottom:10px;height:58px;padding:5px;
+    background:rgba(21,18,28,.94);border:1px solid var(--line);
+    border-radius:16px;box-shadow:0 18px 45px rgba(0,0,0,.4);
+    backdrop-filter:blur(14px)
+  }
+  .mobileNavItem{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+    border-radius:11px;color:var(--muted);font-size:17px;text-decoration:none
+  }
+  .mobileNavItem span{font-size:9px;letter-spacing:.02em}
+  .mobileNavItem:hover,.mobileNavItem.active{background:var(--accent-soft);color:var(--accent-strong)}
+  .headerTools .profile{padding:7px 9px}
+  .headerTools .profile span{display:none}
+}
