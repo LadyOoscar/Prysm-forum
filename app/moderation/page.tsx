@@ -20,6 +20,7 @@ export default function ModerationPage() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [stickers, setStickers] = useState<any[]>([]);
 
   useEffect(() => {
     async function load() {
@@ -37,6 +38,8 @@ export default function ModerationPage() {
         .order("created_at", { ascending: false }).limit(100);
       const loaded = (data ?? []) as Report[];
       setReports(loaded);
+      const { data: pendingStickers } = await supabase.from("stickers").select("id,name,tags,category,image_url,creator_id,created_at").eq("status","pending").order("created_at",{ascending:true}).limit(100);
+      setStickers(pendingStickers ?? []);
 
       const next: Record<string, Target> = {};
       for (const report of loaded) {
@@ -108,6 +111,14 @@ export default function ModerationPage() {
     setBusy(null);
   }
 
+  async function reviewSticker(id: string, status: "approved" | "rejected") {
+    setBusy(id);
+    const { error } = await supabase.from("stickers").update({ status, approved_at: status === "approved" ? new Date().toISOString() : null }).eq("id", id);
+    if (!error) setStickers(current => current.filter(s => s.id !== id));
+    else setMessage("Impossible de traiter ce sticker.");
+    setBusy(null);
+  }
+
   async function updateReport(report: Report, status: "reviewing" | "resolved" | "dismissed") {
     const { data: claims } = await supabase.auth.getClaims();
     const actorId = typeof claims?.claims?.sub === "string" ? claims.claims.sub : null;
@@ -131,6 +142,7 @@ export default function ModerationPage() {
       <p className="eyebrow">KAEL · JUSTICE</p><h1>Centre de modération</h1>
       <p className="moderationIntro">Les signalements sont examinés par des humains. Les outils de PRYSM assistent le tri, mais les sanctions importantes restent une décision humaine.</p>
       {message && <p className="authMessage">{message}</p>}
+      <section className="stickerModeration"><h2>🖼️ Stickers en attente</h2>{stickers.length === 0 ? <p className="authIntro">Aucun sticker à valider.</p> : <div className="stickerModerationGrid">{stickers.map(sticker => <article className="stickerReview" key={sticker.id}><img src={sticker.image_url} alt={sticker.name}/><strong>{sticker.name}</strong><small>{sticker.category} · {sticker.tags?.join(", ") || "sans tag"}</small><div><button className="moderationButton" disabled={busy===sticker.id} onClick={()=>reviewSticker(sticker.id,"approved")}>✓ Publier</button><button className="moderationButton dangerButton" disabled={busy===sticker.id} onClick={()=>reviewSticker(sticker.id,"rejected")}>✕ Refuser</button></div></article>)}</div>}</section>
       <section className="reportList">{reports.length === 0 ? <article className="emptyCommunity"><div className="communityHeroIcon">⚖️</div><h3>Aucun signalement.</h3><p>La salle de Kael est silencieuse.</p></article> : reports.map(report => {
         const target = targets[report.id];
         return <article className="reportItem" key={report.id}>
