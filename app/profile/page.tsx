@@ -11,6 +11,9 @@ type Profile = {
   avatar_url: string | null;
   pronouns: string | null;
   reputation: number;
+  banner_url: string | null;
+  identity: string | null;
+  interests: string[];
 };
 
 export default function ProfilePage() {
@@ -35,7 +38,7 @@ export default function ProfilePage() {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, username, display_name, bio, avatar_url, pronouns, reputation")
+        .select("id, username, display_name, bio, avatar_url, banner_url, pronouns, identity, interests, reputation")
         .eq("id", claimsData.claims.sub)
         .single();
 
@@ -76,10 +79,13 @@ export default function ProfilePage() {
         bio: profile.bio.slice(0, 500),
         pronouns: profile.pronouns?.trim().slice(0, 40) || null,
         avatar_url: avatarUrl,
+        banner_url: profile.banner_url,
+        identity: profile.identity?.trim().slice(0, 80) || null,
+        interests: [...new Set(profile.interests.map(item => item.trim()).filter(Boolean))].slice(0, 12),
         updated_at: new Date().toISOString(),
       })
       .eq("id", profile.id)
-      .select("id, username, display_name, bio, avatar_url, pronouns, reputation")
+      .select("id, username, display_name, bio, avatar_url, banner_url, pronouns, identity, interests, reputation")
       .single();
 
     if (error) {
@@ -130,6 +136,17 @@ export default function ProfilePage() {
           </label>
 
           <label>
+            Identité
+            <input value={profile.identity ?? ""} onChange={e => setProfile({...profile, identity: e.target.value})} maxLength={80} placeholder="ex. lesbienne, trans, non-binaire…" />
+          </label>
+
+          <label>
+            Centres d'intérêt
+            <input value={profile.interests.join(", ")} onChange={e => setProfile({...profile, interests: e.target.value.split(",").map(v => v.trim()).filter(Boolean).slice(0, 12)})} placeholder="jeux vidéo, fantasy, cuisine…" />
+            <small className="fieldHint">Sépare les centres d'intérêt par des virgules, jusqu'à 12.</small>
+          </label>
+
+          <label>
             Bio
             <textarea
               value={profile.bio}
@@ -144,6 +161,11 @@ export default function ProfilePage() {
           <label>
             Avatar
             <input type="url" value={profile.avatar_url ?? ""} onChange={e => setProfile({...profile, avatar_url: e.target.value})} placeholder="https://…" />
+          </label>
+
+          <label>
+            Bannière
+            <input type="url" value={profile.banner_url ?? ""} onChange={e => setProfile({...profile, banner_url: e.target.value})} placeholder="https://…" />
           </label>
 
           <label>
