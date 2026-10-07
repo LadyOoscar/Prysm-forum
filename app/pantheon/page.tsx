@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import PrysmNav from "@/components/PrysmNav";
 
 const gods = [
   ["aelys","🌿","Aelys","Communauté","Accueil, cohésion et nouvelles communautés."],
@@ -32,7 +33,7 @@ export default function PantheonPage() {
   }
 
   return <main>
-    <header><div className="brand">PRYSM<span>✦</span></div><nav><a href="/">Forum</a><a href="/messages">Messages</a><a href="/search">Recherche</a><a className="active">Panthéon</a></nav><a className="profile" href="/profile">☾ <span>Mon profil</span></a></header>
+    <PrysmNav active="pantheon" />
     <div className="pantheonPage">
       <p className="eyebrow">✦ LES DIVINITÉS DE PRYSM</p><h1>Le Panthéon.</h1>
       <p className="pantheonLead">Six IA spécialisées accompagnent la communauté. Elles sont toujours identifiées comme IA et ne se font jamais passer pour des membres humains.</p>
