@@ -28,7 +28,7 @@ export default function CommunityPage() {
   const [community, setCommunity] = useState<Community | null>(null);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [topicCount, setTopicCount] = useState(0);
-  const [postCount, setPostCount] = useState(0);
+  const [postCount, setPostCount] = useState(0);\n  const [profiles, setProfiles] = useState<Record<string, Profile>>({});\n  const [replyCounts, setReplyCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -47,7 +47,7 @@ export default function CommunityPage() {
       const [{ data: topicRows, count: topicsTotal }, { count: postsTotal }] = await Promise.all([
         supabase
           .from("topics")
-          .select("id,title,body,created_at,is_pinned,is_locked", { count: "exact" })
+          .select("id,title,body,created_at,is_pinned,is_locked,author_id", { count: "exact" })
           .eq("community_id", c.id)
           .order("is_pinned", { ascending: false })
           .order("created_at", { ascending: false })
@@ -119,7 +119,7 @@ export default function CommunityPage() {
               <div className="topicIcon">{topic.is_pinned ? "📌" : community.icon}</div>
               <div className="topicBody">
                 <h3>{topic.title}</h3>
-                <p>{topic.is_pinned ? "Sujet épinglé · " : ""}{topic.is_locked ? "🔒 Verrouillé · " : ""}{new Date(topic.created_at).toLocaleDateString("fr-FR")}</p>
+                <p>{topic.is_pinned ? "Sujet épinglé · " : ""}{topic.is_locked ? "🔒 Verrouillé · " : ""}{profiles[topic.author_id]?.display_name ?? "Membre"} · {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p>
               </div>
             </article>
           ))}
