@@ -107,6 +107,7 @@ export default function CommunityPage() {
     const { data: claimsData } = await supabase.auth.getClaims();
     const userId = typeof claimsData?.claims?.sub === "string" ? claimsData.claims.sub : null;
     if (!userId) {
+      setMembershipLoading(false);
       router.push("/login");
       return;
     }
