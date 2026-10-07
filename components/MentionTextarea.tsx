@@ -19,7 +19,6 @@ export default function MentionTextarea({
   maxLength?: number;
   rows?: number;
 }) {
-  const supabase = createClient();
   const router = useRouter();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
