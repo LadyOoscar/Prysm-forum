@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import PrysmNav from "@/components/PrysmNav";
 import MentionTextarea from "@/components/MentionTextarea";
-import PrysmNav from "@/components/PrysmNav";
 
 type Community = {
   id: string;
