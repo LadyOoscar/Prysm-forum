@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import PrysmNav from "@/components/PrysmNav";
 
 type Profile = {
   id: string;
@@ -17,7 +18,6 @@ type Profile = {
 };
 
 export default function ProfilePage() {
-  const supabase = createClient();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(true);
@@ -27,6 +27,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     async function load() {
+    const supabase = createClient();
       const { data: claimsData } = await supabase.auth.getClaims();
 
       if (!claimsData?.claims?.sub) {
@@ -52,9 +53,10 @@ export default function ProfilePage() {
     }
 
     load();
-  }, [supabase]);
+  }, []);
 
   async function saveProfile(event: React.FormEvent) {
+    const supabase = createClient();
     event.preventDefault();
     if (!profile) return;
 
@@ -99,6 +101,7 @@ export default function ProfilePage() {
   }
 
   async function signOut() {
+    const supabase = createClient();
     await supabase.auth.signOut();
     window.location.href = "/";
   }
@@ -112,8 +115,10 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="authPage">
-      <div className="authCard">
+    <main className="profilePage">
+      <PrysmNav active="forum" />
+      <div className="profileShell">
+        <div className="authCard">
         <a className="brand authBrand" href="/">PRYSM<span>✦</span></a>
         <p className="eyebrow">MON PROFIL</p>
         <h1>{profile.display_name || profile.username}</h1>
@@ -181,6 +186,7 @@ export default function ProfilePage() {
 
         <button className="authSwitch" onClick={signOut}>Se déconnecter</button>
         <a className="authSwitch" href="/">← Retour au forum</a>
+        </div>
       </div>
     </main>
   );

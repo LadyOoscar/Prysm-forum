@@ -10,7 +10,6 @@ type Profile = { id: string; username: string; display_name: string; avatar_url:
 export default function ConversationPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const supabase = createClient();
   const [me, setMe] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [other, setOther] = useState<Profile | null>(null);
@@ -20,6 +19,7 @@ export default function ConversationPage() {
   const [sending, setSending] = useState(false);
 
   async function load() {
+    const supabase = createClient();
     const { data: claims } = await supabase.auth.getClaims();
     const userId = claims?.claims?.sub;
     if (!userId) { router.push("/login"); return; }
@@ -53,6 +53,7 @@ export default function ConversationPage() {
   }, [id]);
 
   async function send(event: FormEvent) {
+    const supabase = createClient();
     event.preventDefault();
     if (!body.trim() || blocked || sending) return;
     setSending(true);
@@ -62,6 +63,7 @@ export default function ConversationPage() {
   }
 
   async function toggleBlock() {
+    const supabase = createClient();
     if (!other) return;
     if (blocked) {
       await supabase.from("user_blocks").delete().eq("blocker_id", me).eq("blocked_id", other.id);

@@ -19,7 +19,6 @@ export default function MentionTextarea({
   maxLength?: number;
   rows?: number;
 }) {
-  const supabase = createClient();
   const router = useRouter();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
@@ -42,6 +41,7 @@ export default function MentionTextarea({
 
     async function search() {
       setLoading(true);
+      const supabase = createClient();
       const { data } = await supabase
         .from("profiles")
         .select("id,username,display_name,avatar_url")

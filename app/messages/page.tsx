@@ -3,12 +3,12 @@
 import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import PrysmNav from "@/components/PrysmNav";
 
 type Conversation = { id: string; updated_at: string; created_by: string; direct_recipient_id: string };
 type Profile = { id: string; username: string; display_name: string; avatar_url: string | null };
 
 function MessagesContent() {
-  const supabase = createClient();
   const router = useRouter();
   const params = useSearchParams();
   const [me, setMe] = useState("");
@@ -21,6 +21,7 @@ function MessagesContent() {
 
   useEffect(() => {
     async function load() {
+      const supabase = createClient();
       const { data: claims } = await supabase.auth.getClaims();
       const id = claims?.claims?.sub;
       if (!id) { router.push("/login"); return; }
@@ -45,6 +46,7 @@ function MessagesContent() {
 
   async function startConversation(event: FormEvent) {
     event.preventDefault();
+    const supabase = createClient();
     setBusy(true); setMessage("");
     const target = username.trim().replace(/^@/, "").toLowerCase();
     const { data: person } = await supabase.from("profiles").select("id").eq("username", target).maybeSingle();
@@ -71,7 +73,7 @@ function MessagesContent() {
   }
 
   return <main className="messagesPage">
-    <header><div className="brand">PRYSM<span>✦</span></div><nav><a href="/">Forum</a><a className="active">Messages</a><a href="/search">Recherche</a></nav><a className="profile" href="/profile">☾ <span>Mon profil</span></a></header>
+    <PrysmNav active="messages" />
     <div className="messagesShell">
       <div className="messagesIntro"><p className="eyebrow">MESSAGERIE PRIVÉE</p><h1>Vos conversations.</h1><p>Des échanges entre membres, avec blocage intégré.</p></div>
       <form className="messageStartForm" onSubmit={startConversation}><input value={username} onChange={e => setUsername(e.target.value)} placeholder="@pseudo" /><button className="primary" disabled={busy}>{busy ? "Ouverture…" : "Nouvelle conversation"}</button></form>

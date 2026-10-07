@@ -3,6 +3,7 @@
 import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import PrysmNav from "@/components/PrysmNav";
 import MentionTextarea from "@/components/MentionTextarea";
 import ReactionBar from "@/components/ReactionBar";
 import StickerPicker from "@/components/StickerPicker";
@@ -16,7 +17,6 @@ function TopicContent() {
   const params = useSearchParams();
   const router = useRouter();
   const id = params.get("id");
-  const supabase = createClient();
   const [topic, setTopic] = useState<Topic | null>(null);
   const [community, setCommunity] = useState<{name:string;icon:string} | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -34,6 +34,7 @@ function TopicContent() {
   const [reportMessage, setReportMessage] = useState("");
 
   async function load() {
+    const supabase = createClient();
     if (!id) return;
     const { data: t } = await supabase.from("topics").select("id,title,body,created_at,community_id,author_id").eq("id", id).maybeSingle();
     if (!t) { setLoading(false); return; }
@@ -57,6 +58,7 @@ function TopicContent() {
   useEffect(() => { load(); }, [id]);
 
   async function vote(targetId: string, targetType: "topic" | "post", value: number) {
+    const supabase = createClient();
     if (voting) return;
     setVoting(targetId);
     const { data: claims } = await supabase.auth.getClaims();
@@ -72,6 +74,7 @@ function TopicContent() {
   }
 
   async function submitReport(event: FormEvent<HTMLFormElement>) {
+    const supabase = createClient();
     event.preventDefault();
     if (!reportTarget || reportReason.trim().length < 3) return;
     setReporting(true);
@@ -96,6 +99,7 @@ function TopicContent() {
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
+    const supabase = createClient();
     event.preventDefault();
     setMessage("");
     if (reply.trim().length < 2 || !id) return;
@@ -113,11 +117,7 @@ function TopicContent() {
   if (!topic) return <main><div className="authPage"><div className="authCard"><h1>Sujet introuvable</h1><a href="/">Retour au forum</a></div></div></main>;
 
   return <main>
-    <header>
-      <div className="brand">PRYSM<span>✦</span></div>
-      <nav><a href="/">Forum</a><a>Rencontres</a><a href="/">Communautés</a><a href="/pantheon">Panthéon</a></nav>
-      <a className="profile" href="/profile">☾ <span>Mon profil</span></a>
-    </header>
+    <PrysmNav active="forum" />
     <div className="topicPage">
       <button className="backButton" onClick={() => router.push("/")}>← Retour au forum</button>
       <p className="eyebrow">{community?.icon} {community?.name ?? "COMMUNAUTÉ"}</p>

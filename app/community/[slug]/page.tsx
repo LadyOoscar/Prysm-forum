@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import PrysmNav from "@/components/PrysmNav";
 
 type Community = {
   id: string;
@@ -30,7 +31,6 @@ type Topic = {
 export default function CommunityPage() {
   const { slug } = useParams<{ slug: string }>();
   const router = useRouter();
-  const supabase = createClient();
   const [community, setCommunity] = useState<Community | null>(null);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [topicCount, setTopicCount] = useState(0);
@@ -44,6 +44,7 @@ export default function CommunityPage() {
 
   useEffect(() => {
     async function load() {
+      const supabase = createClient();
       const { data: c } = await supabase
         .from("communities")
         .select("id,slug,name,icon,category,description,banner_url,rules")
@@ -101,6 +102,7 @@ export default function CommunityPage() {
 
   async function toggleMembership() {
     if (!community || membershipLoading) return;
+    const supabase = createClient();
     setMembershipLoading(true);
     const { data: claimsData } = await supabase.auth.getClaims();
     const userId = typeof claimsData?.claims?.sub === "string" ? claimsData.claims.sub : null;
@@ -125,11 +127,7 @@ export default function CommunityPage() {
 
   return (
     <main>
-      <header>
-        <div className="brand">PRYSM<span>✦</span></div>
-        <nav><a className="active" href="/">Forum</a><a>Rencontres</a><a href="/">Communautés</a><a href="/pantheon">Panthéon</a></nav>
-        <a className="profile" href="/profile">☾ <span>Mon profil</span></a>
-      </header>
+      <PrysmNav active="communities" />
 
       <div className="communityPage">
         <button className="backButton" onClick={() => router.push("/")}>← Retour au forum</button>

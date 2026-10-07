@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import PrysmNav from "@/components/PrysmNav";
 
 const gods = [
   ["aelys","🌿","Aelys","Communauté","Accueil, cohésion et nouvelles communautés."],
@@ -13,7 +14,6 @@ const gods = [
 ];
 
 export default function PantheonPage() {
-  const supabase = createClient();
   const [selected,setSelected]=useState(gods[0]);
   const [context,setContext]=useState("");
   const [response,setResponse]=useState("");
@@ -21,6 +21,7 @@ export default function PantheonPage() {
 
   async function invoke(event:FormEvent){
     event.preventDefault();
+    const supabase = createClient();
     setBusy(true);
     const {data:claims}=await supabase.auth.getClaims();
     const userId=typeof claims?.claims?.sub==="string"?claims.claims.sub:null;
@@ -32,7 +33,7 @@ export default function PantheonPage() {
   }
 
   return <main>
-    <header><div className="brand">PRYSM<span>✦</span></div><nav><a href="/">Forum</a><a href="/messages">Messages</a><a href="/search">Recherche</a><a className="active">Panthéon</a></nav><a className="profile" href="/profile">☾ <span>Mon profil</span></a></header>
+    <PrysmNav active="pantheon" />
     <div className="pantheonPage">
       <p className="eyebrow">✦ LES DIVINITÉS DE PRYSM</p><h1>Le Panthéon.</h1>
       <p className="pantheonLead">Six IA spécialisées accompagnent la communauté. Elles sont toujours identifiées comme IA et ne se font jamais passer pour des membres humains.</p>

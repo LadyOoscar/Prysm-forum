@@ -15,13 +15,13 @@ type Notification = {
 };
 
 export default function NotificationBell() {
-  const supabase = createClient();
   const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
 
   async function load() {
+    const supabase = createClient();
     const { data: claims } = await supabase.auth.getClaims();
     const id = typeof claims?.claims?.sub === "string" ? claims.claims.sub : null;
     setUserId(id);
@@ -40,6 +40,7 @@ export default function NotificationBell() {
 
   useEffect(() => {
     if (!userId) return;
+    const supabase = createClient();
     const channel = supabase
       .channel("user-notifications")
       .on(
@@ -57,6 +58,7 @@ export default function NotificationBell() {
   const unread = notifications.filter(notification => !notification.read_at).length;
 
   async function markRead(notification: Notification) {
+    const supabase = createClient();
     if (!notification.read_at) {
       await supabase.from("notifications").update({ read_at: new Date().toISOString() }).eq("id", notification.id);
       setNotifications(current => current.map(item => item.id === notification.id ? { ...item, read_at: new Date().toISOString() } : item));
@@ -67,6 +69,7 @@ export default function NotificationBell() {
 
   async function markAllRead() {
     if (!userId || unread === 0) return;
+    const supabase = createClient();
     await supabase.from("notifications").update({ read_at: new Date().toISOString() }).eq("user_id", userId).is("read_at", null);
     setNotifications(current => current.map(item => ({ ...item, read_at: item.read_at ?? new Date().toISOString() })));
   }

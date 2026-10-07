@@ -12,7 +12,6 @@ type Role = { role: "community_moderator" | "admin" | "founder"; community_id: s
 type Target = { author_id: string; community_id: string; is_locked?: boolean };
 
 export default function ModerationPage() {
-  const supabase = createClient();
   const router = useRouter();
   const [reports, setReports] = useState<Report[]>([]);
   const [role, setRole] = useState<Role | null>(null);
@@ -24,6 +23,7 @@ export default function ModerationPage() {
 
   useEffect(() => {
     async function load() {
+      const supabase = createClient();
       const { data: claims } = await supabase.auth.getClaims();
       const userId = typeof claims?.claims?.sub === "string" ? claims.claims.sub : null;
       if (!userId) { router.push("/login"); return; }
@@ -64,6 +64,7 @@ export default function ModerationPage() {
   }, [router]);
 
   async function log(action: string, report: Report, target: Target, actorId: string) {
+    const supabase = createClient();
     await supabase.from("moderation_logs").insert({
       actor_id: actorId, target_user_id: target.author_id, topic_id: report.topic_id,
       post_id: report.post_id, action, reason: report.reason, metadata: { report_id: report.id }
@@ -73,6 +74,7 @@ export default function ModerationPage() {
   async function moderateContent(report: Report, action: "lock" | "unlock" | "delete") {
     const target = targets[report.id]; if (!target) return;
     setBusy(report.id); setMessage("");
+    const supabase = createClient();
     let error = null;
     if (report.topic_id) {
       if (action === "delete") ({ error } = await supabase.from("topics").delete().eq("id", report.topic_id));
@@ -96,6 +98,7 @@ export default function ModerationPage() {
     const target = targets[report.id]; if (!target) return;
     if (type === "global_ban" && role?.role !== "admin" && role?.role !== "founder") return;
     setBusy(report.id); setMessage("");
+    const supabase = createClient();
     const { data: claims } = await supabase.auth.getClaims();
     const actorId = typeof claims?.claims?.sub === "string" ? claims.claims.sub : null;
     if (!actorId) { setBusy(null); return; }
@@ -113,6 +116,7 @@ export default function ModerationPage() {
 
   async function reviewSticker(id: string, status: "approved" | "rejected") {
     setBusy(id);
+    const supabase = createClient();
     const { error } = await supabase.from("stickers").update({ status, approved_at: status === "approved" ? new Date().toISOString() : null }).eq("id", id);
     if (!error) setStickers(current => current.filter(s => s.id !== id));
     else setMessage("Impossible de traiter ce sticker.");
@@ -120,6 +124,7 @@ export default function ModerationPage() {
   }
 
   async function updateReport(report: Report, status: "reviewing" | "resolved" | "dismissed") {
+    const supabase = createClient();
     const { data: claims } = await supabase.auth.getClaims();
     const actorId = typeof claims?.claims?.sub === "string" ? claims.claims.sub : null;
     if (!actorId) return;

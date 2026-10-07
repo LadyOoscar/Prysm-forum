@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import NotificationBell from "@/components/NotificationBell";
+import PrysmNav from "@/components/PrysmNav";
 import MentionTextarea from "@/components/MentionTextarea";
 
 type Community = {
@@ -28,7 +28,6 @@ const fallbackGods = [
 
 export default function Home() {
   const router = useRouter();
-  const supabase = createClient();
   const [communities, setCommunities] = useState<Community[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [profiles, setProfiles] = useState<Record<string, Profile>>({});
@@ -46,6 +45,7 @@ export default function Home() {
 
   useEffect(() => {
     async function loadForum() {
+      const supabase = createClient();
       const [{ data: communityRows }, { data: topicRows }] = await Promise.all([
         supabase
           .from("communities")
@@ -123,6 +123,7 @@ export default function Home() {
     }
 
     setPublishing(true);
+    const supabase = createClient();
     const { data: claims } = await supabase.auth.getClaims();
 
     if (!claims?.claims?.sub) {
@@ -160,20 +161,18 @@ export default function Home() {
 
   return (
     <main>
-      <header>
-        <div className="brand">PRYSM<span>✦</span></div>
-        <nav><a className="active">Forum</a><a href="/search">Recherche</a><a href="/messages">Messages</a><a>Rencontres</a><a href="/">Communautés</a><a href="/pantheon">Panthéon</a></nav>
-        <div className="headerTools"><NotificationBell /><a className="profile" href="/profile">☾ <span>Mon profil</span></a></div>
-      </header>
+      <PrysmNav active="forum" />
 
-      <section className="hero">
-        <div>
-          <p className="eyebrow">✦ LE FORUM QUI EST VIVANT</p>
-          <h1>Un espace pour<br/><em>être soi.</em></h1>
-          <p className="intro">Discuter, rire, débattre, rencontrer des gens et trouver sa communauté. PRYSM rassemble les couleurs qui font notre monde.</p>
-          <button className="primary" onClick={openComposer}>+ Créer un sujet</button>
+      <section className="welcomeBar">
+        <div className="welcomeCopy">
+          <span className="welcomeMark">✦</span>
+          <div>
+            <p className="eyebrow">BIENVENUE SUR PRYSM</p>
+            <h1>Qu’est-ce qui se passe aujourd’hui ?</h1>
+            <p>Retrouve tes communautés, découvre les discussions et participe à la conversation.</p>
+          </div>
         </div>
-        <div className="orb">✦<small>PRYSM</small></div>
+        <button className="primary" onClick={openComposer}>＋ Nouveau sujet</button>
       </section>
 
       <div className="layout">
@@ -252,6 +251,14 @@ export default function Home() {
           <div className="aiNote">Les divinités sont des IA clairement identifiées. Elles assistent la communauté sans se faire passer pour des membres humains.</div>
         </aside>
       </div>
+
+      <nav className="mobileNav" aria-label="Navigation principale">
+        <a className="mobileNavItem active" href="/">⌂<span>Forum</span></a>
+        <a className="mobileNavItem" href="/search">⌕<span>Recherche</span></a>
+        <a className="mobileNavItem" href="/messages">✉<span>Messages</span></a>
+        <a className="mobileNavItem" href="/pantheon">✦<span>Panthéon</span></a>
+        <a className="mobileNavItem" href="/profile">☾<span>Profil</span></a>
+      </nav>
 
       {open && (
         <div className="modal" onClick={() => setOpen(false)}>
