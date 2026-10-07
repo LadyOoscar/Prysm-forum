@@ -7,3 +7,29 @@
 .profileTags{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
 .profileTags span{padding:5px 9px;border-radius:999px;background:#261d30;border:1px solid #3a2e45;color:#c9a7d8;font-size:10px}
 .profileEditorCard{max-width:560px}
+
+.messagesPage{min-height:100vh;background:#0f0b15}
+.messagesShell,.conversationShell{max-width:900px;margin:0 auto;padding:55px 5vw 90px}
+.messagesIntro h1{font-size:42px;margin:5px 0 8px}
+.messagesIntro p:not(.eyebrow){color:#908698;line-height:1.6}
+.messageStartForm{display:flex;gap:10px;margin:30px 0}
+.messageStartForm input{flex:1;background:#17121f;border:1px solid #3a3044;border-radius:10px;color:#eee;padding:13px}
+.conversationList{display:grid;gap:8px;margin-top:20px}
+.conversationRow{display:flex;align-items:center;gap:12px;width:100%;padding:13px;background:#17121f;border:1px solid #30263a;border-radius:12px;color:#eee;text-align:left;cursor:pointer}
+.conversationRow:hover{border-color:#755681;background:#1b1524}
+.conversationRow>div:nth-child(2){display:grid;gap:3px;flex:1}
+.conversationRow small,.conversationPerson small{color:#81778a;font-size:10px}
+.conversationRow time{color:#716879;font-size:9px}
+.conversationHeader{display:flex;align-items:center;gap:12px;padding-bottom:18px;border-bottom:1px solid #30263a}
+.conversationPerson{display:flex;align-items:center;gap:10px;color:#eee;text-decoration:none;flex:1}
+.conversationPerson div:last-child{display:grid;gap:3px}
+.blockButton{border:1px solid #4b394f;background:#211723;color:#c7a9cb;border-radius:9px;padding:8px 11px;cursor:pointer}
+.messageThread{min-height:55vh;padding:25px 0;display:flex;flex-direction:column;gap:10px}
+.dmMessage{align-self:flex-start;max-width:75%;background:#211a28;border:1px solid #352b3c;border-radius:15px 15px 15px 5px;padding:10px 13px}
+.dmMessage.own{align-self:flex-end;background:#30213a;border-radius:15px 15px 5px 15px}
+.dmMessage p{margin:0;white-space:pre-wrap;line-height:1.5;font-size:12px}
+.dmMessage time{display:block;margin-top:5px;color:#776d80;font-size:8px}
+.messageComposer{display:flex;gap:10px;align-items:flex-end;border-top:1px solid #30263a;padding-top:15px}
+.messageComposer textarea{flex:1;min-height:70px;background:#17121f;border:1px solid #3a3044;border-radius:10px;color:#eee;padding:12px;resize:vertical}
+.profileMessageButton{display:block;margin-top:10px;color:#d3a8df;text-decoration:none;font-size:10px}
+@media(max-width:650px){.messagesIntro h1{font-size:32px}.messageStartForm,.messageComposer{flex-direction:column}.messageStartForm .primary,.messageComposer .primary{width:100%}.dmMessage{max-width:88%}}
