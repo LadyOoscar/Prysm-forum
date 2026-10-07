@@ -3,6 +3,7 @@
 import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import PrysmNav from "@/components/PrysmNav";
 
 type Conversation = { id: string; updated_at: string; created_by: string; direct_recipient_id: string };
 type Profile = { id: string; username: string; display_name: string; avatar_url: string | null };
@@ -72,7 +73,7 @@ function MessagesContent() {
   }
 
   return <main className="messagesPage">
-    <header><div className="brand">PRYSM<span>✦</span></div><nav><a href="/">Forum</a><a className="active">Messages</a><a href="/search">Recherche</a></nav><a className="profile" href="/profile">☾ <span>Mon profil</span></a></header>
+    <PrysmNav active="messages" />
     <div className="messagesShell">
       <div className="messagesIntro"><p className="eyebrow">MESSAGERIE PRIVÉE</p><h1>Vos conversations.</h1><p>Des échanges entre membres, avec blocage intégré.</p></div>
       <form className="messageStartForm" onSubmit={startConversation}><input value={username} onChange={e => setUsername(e.target.value)} placeholder="@pseudo" /><button className="primary" disabled={busy}>{busy ? "Ouverture…" : "Nouvelle conversation"}</button></form>
