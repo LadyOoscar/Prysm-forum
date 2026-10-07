@@ -44,6 +44,7 @@ export default function CommunityPage() {
 
   useEffect(() => {
     async function load() {
+      const supabase = createClient();
       const { data: c } = await supabase
         .from("communities")
         .select("id,slug,name,icon,category,description,banner_url,rules")
