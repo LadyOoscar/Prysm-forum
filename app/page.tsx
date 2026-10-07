@@ -41,6 +41,8 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [publishing, setPublishing] = useState(false);
   const [message, setMessage] = useState("");
+  const [feedMode, setFeedMode] = useState<"recent"|"popular"|"following">("recent");
+  const [followedIds, setFollowedIds] = useState<string[]>([]);
 
   useEffect(() => {
     async function loadForum() {
@@ -136,7 +138,11 @@ export default function Home() {
     router.push(`/topic?id=${data.id}`);
   }
 
-  const visibleTopics = topics.filter(topic => !selected || topic.community_id === selected.id);
+  const visibleTopics = topics.filter(topic => !selected || topic.community_id === selected.id).sort((a,b) => {
+    if (feedMode === "popular") return (replyCounts[b.id] ?? 0) - (replyCounts[a.id] ?? 0);
+    if (feedMode === "following") return (followedIds.includes(b.author_id) ? 1 : 0) - (followedIds.includes(a.author_id) ? 1 : 0);
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
 
   return (
     <main>
@@ -189,7 +195,7 @@ export default function Home() {
               <span className="eyebrow">SOUS-FORUM</span>
               <h2>{selected?.icon} {selected?.name ?? "Blabla"}</h2><button className="subforumLink" onClick={() => selected && router.push(`/community/${selected.slug}`)}>Voir le sous-forum →</button>
             </div>
-            <button className="filter">Les plus récents ▾</button>
+            <div className="feedFilters"><button className={feedMode === "recent" ? "filter activeFilter" : "filter"} onClick={() => setFeedMode("recent")}>Récents</button><button className={feedMode === "popular" ? "filter activeFilter" : "filter"} onClick={() => setFeedMode("popular")}>Populaires</button><button className={feedMode === "following" ? "filter activeFilter" : "filter"} onClick={() => setFeedMode("following")}>Suivis</button></div>
           </div>
 
           {loading ? (
