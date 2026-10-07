@@ -3,6 +3,7 @@
 import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import MentionTextarea from "@/components/MentionTextarea";
 
 type Topic = { id: string; title: string; body: string; created_at: string; community_id: string; author_id: string };
 type Post = { id: string; body: string; created_at: string; author_id: string };
@@ -125,7 +126,7 @@ function TopicContent() {
       </section>
       <form className="replyForm" onSubmit={submit}>
         <h2>Répondre</h2>
-        <textarea value={reply} onChange={e => setReply(e.target.value)} placeholder="Votre réponse…" maxLength={10000} required />
+        <MentionTextarea value={reply} onChange={setReply} placeholder="Votre réponse…"/>
         {message && <p className="authMessage">{message}</p>}
         <button className="primary" disabled={posting}>{posting ? "Publication…" : "Publier la réponse"}</button>
       </form>
