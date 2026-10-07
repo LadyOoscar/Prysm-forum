@@ -3,6 +3,8 @@
 import { FormEvent, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import PrysmNav from "@/components/PrysmNav";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 type Message = { id: string; sender_id: string; body: string; created_at: string; edited_at: string | null };
 type Profile = { id: string; username: string; display_name: string; avatar_url: string | null };
@@ -70,12 +72,11 @@ export default function ConversationPage() {
 
   if (loading) return <main className="authPage"><div className="authCard"><p>Chargement…</p></div></main>;
 
-  return <main className="messagesPage">
-    <header><div className="brand">PRYSM<span>✦</span></div><nav><a href="/">Forum</a><a className="active" href="/messages">Messages</a><a href="/search">Recherche</a></nav><a className="profile" href="/profile">☾ <span>Mon profil</span></a></header>
+  return <main className="messagesPage">\n    <PrysmNav active="messages" />
     <div className="conversationShell">
       <div className="conversationHeader">
         <button className="backButton" onClick={() => router.push("/messages")}>← Messages</button>
-        {other && <a href={"/profile/" + other.username} className="conversationPerson"><div className="mentionAvatar">{other.avatar_url ? <img src={other.avatar_url} alt="" /> : other.display_name.charAt(0).toUpperCase()}</div><div><strong>{other.display_name}</strong><small>@{other.username}</small></div></a>}
+        {other && <a href={"/profile/" + other.username} className="conversationPerson"><ProfileAvatar src={other.avatar_url} name={other.display_name} className="messageAvatar" /><div><strong>{other.display_name}</strong><small>@{other.username}</small></div></a>}
         <button className="blockButton" onClick={toggleBlock}>{blocked ? "Débloquer" : "Bloquer"}</button>
       </div>
       <section className="messageThread">
