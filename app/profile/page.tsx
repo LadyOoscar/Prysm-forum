@@ -17,7 +17,6 @@ type Profile = {
 };
 
 export default function ProfilePage() {
-  const supabase = createClient();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(true);
@@ -27,6 +26,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     async function load() {
+    const supabase = createClient();
       const { data: claimsData } = await supabase.auth.getClaims();
 
       if (!claimsData?.claims?.sub) {
@@ -52,9 +52,10 @@ export default function ProfilePage() {
     }
 
     load();
-  }, [supabase]);
+  }, []);
 
   async function saveProfile(event: React.FormEvent) {
+    const supabase = createClient();
     event.preventDefault();
     if (!profile) return;
 
@@ -99,6 +100,7 @@ export default function ProfilePage() {
   }
 
   async function signOut() {
+    const supabase = createClient();
     await supabase.auth.signOut();
     window.location.href = "/";
   }
