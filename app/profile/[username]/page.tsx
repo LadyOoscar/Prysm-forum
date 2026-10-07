@@ -59,8 +59,9 @@ export default function PublicProfilePage() {
           <div className="publicIdentity">
             <p className="eyebrow">MEMBRE PRYSM</p>
             <h1>{profile.display_name || profile.username}</h1>
-            <p className="username">@{profile.username}{profile.pronouns ? ` · ${profile.pronouns}` : ""}</p>
+            <p className="username">@{profile.username}{profile.pronouns ? ` · ${profile.pronouns}` : ""}{profile.identity ? ` · ${profile.identity}` : ""}</p>
             {profile.bio && <p className="publicBio">{profile.bio}</p>}
+            {profile.interests?.length > 0 && <div className="profileTags">{profile.interests.map(interest => <span key={interest}>#{interest}</span>)}</div>}
           </div>
           <div className="reputationCard"><strong>⭐ {profile.reputation}</strong><span>réputation</span></div>
         </section>
