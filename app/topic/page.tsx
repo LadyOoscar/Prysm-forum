@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -8,7 +8,7 @@ type Topic = { id: string; title: string; body: string; created_at: string; comm
 type Post = { id: string; body: string; created_at: string; author_id: string };
 type Profile = { id: string; display_name: string; username: string; reputation: number; avatar_url: string | null };
 
-export default function TopicPage() {
+function TopicContent() {
   const params = useSearchParams();
   const router = useRouter();
   const id = params.get("id");
@@ -37,7 +37,6 @@ export default function TopicPage() {
       supabase.from("communities").select("name,icon").eq("id", t.community_id).maybeSingle(),
       supabase.from("posts").select("id,body,created_at,author_id").eq("topic_id", id).order("created_at")
     ]);
-    const targetIds = [t.id, ...(p ?? []).map(post => post.id)];
     const { data: voteRows } = await supabase.from("votes").select("topic_id,post_id,value,user_id").or(`topic_id.eq.${t.id},post_id.in.(${(p ?? []).map(post => post.id).join(",") || "00000000-0000-0000-0000-000000000000"})`);
     const totals: Record<string, number> = {};
     const mine: Record<string, number> = {};
@@ -45,7 +44,6 @@ export default function TopicPage() {
     const { data: claims } = await supabase.auth.getClaims();
     if (claims?.claims?.sub) { for (const vote of voteRows ?? []) { const key = vote.topic_id ?? vote.post_id; if (key && vote.user_id === claims.claims.sub) mine[key] = vote.value; } }
     setVotes(totals); setMyVotes(mine);
-
     const authors = [...new Set([t.author_id, ...(p ?? []).map(post => post.author_id)])];
     const { data: profileRows } = await supabase.from("profiles").select("id,display_name,username,reputation,avatar_url").in("id", authors);
     setProfiles(Object.fromEntries((profileRows ?? []).map(profile => [profile.id, profile])));
@@ -132,5 +130,10 @@ export default function TopicPage() {
         <button className="primary" disabled={posting}>{posting ? "Publication…" : "Publier la réponse"}</button>
       </form>
     </div>
+    {reportTarget && <div className="modalBackdrop" onClick={() => setReportTarget(null)}><div className="modalCard reportCard" onClick={event => event.stopPropagation()}><h2>Signaler {reportTarget.type === "topic" ? "ce sujet" : "ce message"}</h2><p className="reportIntro">Décrivez brièvement le problème afin que les modérateurs puissent l’examiner.</p><form onSubmit={submitReport}><textarea value={reportReason} onChange={event => setReportReason(event.target.value)} minLength={3} maxLength={1000} placeholder="Motif du signalement…" required />{reportMessage && <p className="authMessage">{reportMessage}</p>}<div className="modalActions"><button type="button" className="secondary" onClick={() => setReportTarget(null)}>Annuler</button><button className="primary" disabled={reporting}>{reporting ? "Envoi…" : "Envoyer le signalement"}</button></div></form></div></div>}
   </main>;
+}
+
+export default function TopicPage() {
+  return <Suspense fallback={<main><div className="authPage"><div className="authCard"><p>Chargement…</p></div></div></main>}><TopicContent /></Suspense>;
 }
