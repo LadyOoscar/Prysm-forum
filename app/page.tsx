@@ -138,7 +138,7 @@ export default function Home() {
     router.push(`/topic?id=${data.id}`);
   }
 
-  const visibleTopics = topics.filter(topic => !selected || topic.community_id === selected.id).sort((a,b) => {
+  const visibleTopics = topics.filter(topic => (!selected || topic.community_id === selected.id) && (feedMode !== "following" || followedIds.includes(topic.author_id))).sort((a,b) => {
     if (feedMode === "popular") return (replyCounts[b.id] ?? 0) - (replyCounts[a.id] ?? 0);
     if (feedMode === "following") return (followedIds.includes(b.author_id) ? 1 : 0) - (followedIds.includes(a.author_id) ? 1 : 0);
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
