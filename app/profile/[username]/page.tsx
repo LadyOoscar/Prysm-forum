@@ -72,7 +72,7 @@ export default function PublicProfilePage() {
     <main>
       <header>
         <div className="brand">PRYSM<span>✦</span></div>
-        <nav><a href="/">Forum</a><a>Rencontres</a><a>Communautés</a><a>Panthéon</a></nav>
+        <nav><a href="/">Forum</a><a>Rencontres</a><a href="/">Communautés</a><a href="/pantheon">Panthéon</a></nav>
         <a className="profile" href="/profile">☾ <span>Mon profil</span></a>
       </header>
       <div className="publicProfilePage">
