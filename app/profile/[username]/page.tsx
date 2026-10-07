@@ -17,6 +17,9 @@ export default function PublicProfilePage() {
   const [communities, setCommunities] = useState<Record<string, Community>>({});
   const [postCount, setPostCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [me, setMe] = useState<string | null>(null);
+  const [following, setFollowing] = useState(false);
+  const [followers, setFollowers] = useState(0);
 
   useEffect(() => {
     async function load() {
@@ -33,6 +36,15 @@ export default function PublicProfilePage() {
         ? await supabase.from("communities").select("id,name,icon,slug").in("id", ids)
         : { data: [] };
 
+      const { data: claims } = await supabase.auth.getClaims();
+      const myId = typeof claims?.claims?.sub === "string" ? claims.claims.sub : null;
+      setMe(myId);
+      const [{ count: followerCount }, { data: followRow }] = await Promise.all([
+        supabase.from("user_follows").select("follower_id", { count: "exact", head: true }).eq("following_id", p.id),
+        myId ? supabase.from("user_follows").select("follower_id").eq("follower_id", myId).eq("following_id", p.id).maybeSingle() : Promise.resolve({ data: null }),
+      ]);
+      setFollowers(followerCount ?? 0);
+      setFollowing(Boolean(followRow));
       setProfile(p as Profile);
       setTopics(topicRows ?? []);
       setPostCount(count ?? 0);
@@ -41,6 +53,17 @@ export default function PublicProfilePage() {
     }
     load();
   }, [username]);
+
+  async function toggleFollow() {
+    if (!profile || !me || me === profile.id) return;
+    if (following) {
+      const { error } = await supabase.from("user_follows").delete().eq("follower_id", me).eq("following_id", profile.id);
+      if (!error) { setFollowing(false); setFollowers(v => Math.max(0, v - 1)); }
+    } else {
+      const { error } = await supabase.from("user_follows").insert({ follower_id: me, following_id: profile.id });
+      if (!error) { setFollowing(true); setFollowers(v => v + 1); }
+    }
+  }
 
   if (loading) return <main className="authPage"><div className="authCard"><p>Chargement du profil…</p></div></main>;
   if (!profile) return <main className="authPage"><div className="authCard"><a className="brand authBrand" href="/">PRYSM<span>✦</span></a><h1>Profil introuvable</h1><p className="authIntro">Ce membre n'existe pas ou son profil n'est plus disponible.</p><a className="authSwitch" href="/">← Retour au forum</a></div></main>;
@@ -63,7 +86,7 @@ export default function PublicProfilePage() {
             {profile.bio && <p className="publicBio">{profile.bio}</p>}
             {profile.interests?.length > 0 && <div className="profileTags">{profile.interests.map(interest => <span key={interest}>#{interest}</span>)}</div>}
           </div>
-          <div className="reputationCard"><strong>⭐ {profile.reputation}</strong><span>réputation</span><a className="profileMessageButton" href={"/messages?user=" + profile.username}>💬 Message</a></div>
+          <div className="reputationCard"><strong>⭐ {profile.reputation}</strong><span>réputation</span>{me !== profile.id && <><button className={following ? "secondaryButton profileFollowButton" : "primary profileFollowButton"} onClick={toggleFollow}>{following ? "✓ Suivi" : "＋ Suivre"}</button><a className="profileMessageButton" href={"/messages?user=" + profile.username}>💬 Message</a></>}</div>
         </section>
         <div className="publicStats">
           <div><strong>{topics.length}</strong><span>sujets récents</span></div>
