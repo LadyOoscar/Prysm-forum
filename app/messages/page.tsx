@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 type Conversation = { id: string; updated_at: string; direct_recipient_id: string };
 type Profile = { id: string; username: string; display_name: string; avatar_url: string | null };
 
-export default function MessagesPage() {
+function MessagesContent() {
   const supabase = createClient();
   const router = useRouter();
   const params = useSearchParams();
@@ -88,4 +88,10 @@ export default function MessagesPage() {
       </section>
     </div>
   </main>;
+}
+
+import { Suspense } from "react";
+
+export default function MessagesPage() {
+  return <Suspense fallback={<main className="authPage"><div className="authCard"><p>Chargement…</p></div></main>}><MessagesContent /></Suspense>;
 }
