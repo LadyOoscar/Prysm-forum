@@ -182,7 +182,7 @@ export default function Home() {
           <div className="feedHead">
             <div>
               <span className="eyebrow">SOUS-FORUM</span>
-              <h2>{selected?.icon} {selected?.name ?? "Blabla"}</h2>
+              <h2>{selected?.icon} {selected?.name ?? "Blabla"}</h2><button className="subforumLink" onClick={() => selected && router.push(`/community/${selected.slug}`)}>Voir le sous-forum →</button>
             </div>
             <button className="filter">Les plus récents ▾</button>
           </div>
