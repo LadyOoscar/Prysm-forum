@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import NotificationBell from "@/components/NotificationBell";
 
 type Community = {
   id: string;
@@ -141,7 +142,7 @@ export default function Home() {
       <header>
         <div className="brand">PRYSM<span>✦</span></div>
         <nav><a className="active">Forum</a><a>Rencontres</a><a>Communautés</a><a>Panthéon</a></nav>
-        <a className="profile" href="/profile">☾ <span>Mon profil</span></a>
+        <div className="headerTools"><NotificationBell /><a className="profile" href="/profile">☾ <span>Mon profil</span></a></div>
       </header>
 
       <section className="hero">
