@@ -31,6 +31,9 @@ export default function CommunityPage() {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [topicCount, setTopicCount] = useState(0);
   const [postCount, setPostCount] = useState(0);
+  const [memberCount, setMemberCount] = useState(0);
+  const [isMember, setIsMember] = useState(false);
+  const [membershipLoading, setMembershipLoading] = useState(false);
   const [profiles, setProfiles] = useState<Record<string, Profile>>({});
   const [replyCounts, setReplyCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
@@ -76,7 +79,7 @@ export default function CommunityPage() {
     return <main><div className="authPage"><div className="authCard"><p>Chargement du sous-forum…</p></div></div></main>;
   }
 
-  if (!community) {
+  async function toggleMembership() {\n    if (!community || membershipLoading) return;\n    setMembershipLoading(true);\n    const { data: claimsData } = await supabase.auth.getClaims();\n    const userId = typeof claimsData?.claims?.sub === "string" ? claimsData.claims.sub : null;\n    if (!userId) {\n      router.push("/login");\n      return;\n    }\n\n    if (isMember) {\n      const { error } = await supabase.from("community_members").delete().eq("community_id", community.id).eq("user_id", userId);\n      if (!error) { setIsMember(false); setMemberCount(value => Math.max(0, value - 1)); }\n    } else {\n      const { error } = await supabase.from("community_members").insert({ community_id: community.id, user_id: userId, role: "member" });\n      if (!error) { setIsMember(true); setMemberCount(value => value + 1); }\n    }\n    setMembershipLoading(false);\n  }\n\n  if (!community) {
     return <main><div className="authPage"><div className="authCard"><h1>Sous-forum introuvable</h1><a href="/">Retour au forum</a></div></div></main>;
   }
 
@@ -98,12 +101,12 @@ export default function CommunityPage() {
             <h1>{community.name}</h1>
             <p>Un espace de discussion de PRYSM. Partagez vos expériences, vos passions et vos idées avec la communauté.</p>
           </div>
-          <button className="primary" onClick={() => router.push(`/?community=${community.slug}`)}>+ Créer un sujet</button>
+          <div className="communityHeroActions"><button className={isMember ? "secondaryButton" : "primary"} onClick={toggleMembership} disabled={membershipLoading}>{membershipLoading ? "…" : isMember ? "✓ Membre" : "Rejoindre"}</button><button className="primary" onClick={() => router.push(`/?community=${community.slug}`)}>+ Créer un sujet</button></div>
         </section>
 
         <div className="communityStats">
           <div><strong>{topicCount}</strong><span>sujet{topicCount !== 1 ? "s" : ""}</span></div>
-          <div><strong>{postCount}</strong><span>message{postCount !== 1 ? "s" : ""}</span></div>
+          <div><strong>{postCount}</strong><span>message{postCount !== 1 ? "s" : ""}</span></div>\n          <div><strong>{memberCount}</strong><span>membre{memberCount !== 1 ? "s" : ""}</span></div>
         </div>
 
         <section className="communityTopics">
