@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import PrysmNav from "@/components/PrysmNav";
 import MentionTextarea from "@/components/MentionTextarea";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 type Community = {
   id: string;
@@ -228,7 +229,7 @@ export default function Home() {
 
               return (
                 <article className="topic" key={topic.id} onClick={() => router.push(`/topic?id=${topic.id}`)}>
-                  <div className="topicIcon">{community?.icon ?? "✦"}</div>
+                  <div className="topicIcon topicIdentity"><ProfileAvatar src={profiles[topic.author_id]?.avatar_url} name={profiles[topic.author_id]?.display_name || profiles[topic.author_id]?.username} className="topicAvatar" /><span>{community?.icon ?? "✦"}</span></div>
                   <div className="topicBody">
                     <h3>{topic.title}</h3>
                     <p>{community?.name ?? "Discussion"} · <button className="authorLink" onClick={event => { event.stopPropagation(); router.push(`/profile/${profiles[topic.author_id]?.username}`); }}>{profiles[topic.author_id]?.display_name ?? "Membre"}</button> · {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p>
