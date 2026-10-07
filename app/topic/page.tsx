@@ -5,7 +5,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 type Topic = { id: string; title: string; body: string; created_at: string; community_id: string; author_id: string };
-type Post = { id: string; body: string; created_at: string; author_id: string };\ntype Profile = { id: string; display_name: string; username: string; reputation: number; avatar_url: string | null };
+type Post = { id: string; body: string; created_at: string; author_id: string };
+type Profile = { id: string; display_name: string; username: string; reputation: number; avatar_url: string | null };
 
 export default function TopicPage() {
   const params = useSearchParams();
@@ -14,11 +15,15 @@ export default function TopicPage() {
   const supabase = createClient();
   const [topic, setTopic] = useState<Topic | null>(null);
   const [community, setCommunity] = useState<{name:string;icon:string} | null>(null);
-  const [posts, setPosts] = useState<Post[]>([]);\n  const [profiles, setProfiles] = useState<Record<string, Profile>>({});
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [profiles, setProfiles] = useState<Record<string, Profile>>({});
   const [reply, setReply] = useState("");
   const [loading, setLoading] = useState(true);
   const [posting, setPosting] = useState(false);
-  const [message, setMessage] = useState("");\n  const [votes, setVotes] = useState<Record<string, number>>({});\n  const [myVotes, setMyVotes] = useState<Record<string, number>>({});\n  const [voting, setVoting] = useState<string | null>(null);
+  const [message, setMessage] = useState("");
+  const [votes, setVotes] = useState<Record<string, number>>({});
+  const [myVotes, setMyVotes] = useState<Record<string, number>>({});
+  const [voting, setVoting] = useState<string | null>(null);
 
   async function load() {
     if (!id) return;
@@ -28,12 +33,39 @@ export default function TopicPage() {
       supabase.from("communities").select("name,icon").eq("id", t.community_id).maybeSingle(),
       supabase.from("posts").select("id,body,created_at,author_id").eq("topic_id", id).order("created_at")
     ]);
-    const targetIds = [t.id, ...(p ?? []).map(post => post.id)];\n    const { data: voteRows } = await supabase.from("votes").select("topic_id,post_id,value,user_id").or(`topic_id.eq.${t.id},post_id.in.(${(p ?? []).map(post => post.id).join(",") || "00000000-0000-0000-0000-000000000000"})`);\n    const totals: Record<string, number> = {};\n    const mine: Record<string, number> = {};\n    for (const vote of voteRows ?? []) { const key = vote.topic_id ?? vote.post_id; if (key) totals[key] = (totals[key] ?? 0) + vote.value; }\n    const { data: claims } = await supabase.auth.getClaims();\n    if (claims?.claims?.sub) { for (const vote of voteRows ?? []) { const key = vote.topic_id ?? vote.post_id; if (key && vote.user_id === claims.claims.sub) mine[key] = vote.value; } }\n    setVotes(totals); setMyVotes(mine);\n\n    const authors = [...new Set([t.author_id, ...(p ?? []).map(post => post.author_id)])];\n    const { data: profileRows } = await supabase.from("profiles").select("id,display_name,username,reputation,avatar_url").in("id", authors);\n    setProfiles(Object.fromEntries((profileRows ?? []).map(profile => [profile.id, profile])));\n    setTopic(t); setCommunity(c); setPosts(p ?? []); setLoading(false);
+    const targetIds = [t.id, ...(p ?? []).map(post => post.id)];
+    const { data: voteRows } = await supabase.from("votes").select("topic_id,post_id,value,user_id").or(`topic_id.eq.${t.id},post_id.in.(${(p ?? []).map(post => post.id).join(",") || "00000000-0000-0000-0000-000000000000"})`);
+    const totals: Record<string, number> = {};
+    const mine: Record<string, number> = {};
+    for (const vote of voteRows ?? []) { const key = vote.topic_id ?? vote.post_id; if (key) totals[key] = (totals[key] ?? 0) + vote.value; }
+    const { data: claims } = await supabase.auth.getClaims();
+    if (claims?.claims?.sub) { for (const vote of voteRows ?? []) { const key = vote.topic_id ?? vote.post_id; if (key && vote.user_id === claims.claims.sub) mine[key] = vote.value; } }
+    setVotes(totals); setMyVotes(mine);
+
+    const authors = [...new Set([t.author_id, ...(p ?? []).map(post => post.author_id)])];
+    const { data: profileRows } = await supabase.from("profiles").select("id,display_name,username,reputation,avatar_url").in("id", authors);
+    setProfiles(Object.fromEntries((profileRows ?? []).map(profile => [profile.id, profile])));
+    setTopic(t); setCommunity(c); setPosts(p ?? []); setLoading(false);
   }
 
   useEffect(() => { load(); }, [id]);
 
-  async function vote(targetId: string, targetType: "topic" | "post", value: number) {\n    if (voting) return;\n    setVoting(targetId);\n    const { data: claims } = await supabase.auth.getClaims();\n    if (!claims?.claims?.sub) { setVoting(null); router.push("/login"); return; }\n    const current = myVotes[targetId] ?? 0;\n    const target = targetType === "topic" ? { topic_id: targetId, post_id: null } : { topic_id: null, post_id: targetId };\n    let error = null;\n    if (current === value) { ({ error } = await supabase.from("votes").delete().match({ user_id: claims.claims.sub, ...target })); }\n    else if (current !== 0) { ({ error } = await supabase.from("votes").update({ value }).match({ user_id: claims.claims.sub, ...target })); }\n    else { ({ error } = await supabase.from("votes").insert({ user_id: claims.claims.sub, value, ...target })); }\n    if (!error) { const delta = current === value ? -current : value - current; setVotes(prev => ({ ...prev, [targetId]: (prev[targetId] ?? 0) + delta })); setMyVotes(prev => ({ ...prev, [targetId]: current === value ? 0 : value })); }\n    setVoting(null);\n  }\n\n  async function submit(event: FormEvent<HTMLFormElement>) {
+  async function vote(targetId: string, targetType: "topic" | "post", value: number) {
+    if (voting) return;
+    setVoting(targetId);
+    const { data: claims } = await supabase.auth.getClaims();
+    if (!claims?.claims?.sub) { setVoting(null); router.push("/login"); return; }
+    const current = myVotes[targetId] ?? 0;
+    const target = targetType === "topic" ? { topic_id: targetId, post_id: null } : { topic_id: null, post_id: targetId };
+    let error = null;
+    if (current === value) { ({ error } = await supabase.from("votes").delete().match({ user_id: claims.claims.sub, ...target })); }
+    else if (current !== 0) { ({ error } = await supabase.from("votes").update({ value }).match({ user_id: claims.claims.sub, ...target })); }
+    else { ({ error } = await supabase.from("votes").insert({ user_id: claims.claims.sub, value, ...target })); }
+    if (!error) { const delta = current === value ? -current : value - current; setVotes(prev => ({ ...prev, [targetId]: (prev[targetId] ?? 0) + delta })); setMyVotes(prev => ({ ...prev, [targetId]: current === value ? 0 : value })); }
+    setVoting(null);
+  }
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
     if (reply.trim().length < 2 || !id) return;
