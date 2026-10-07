@@ -24,11 +24,9 @@ export default function ConversationPage() {
     const userId = claims?.claims?.sub;
     if (!userId) { router.push("/login"); return; }
     setMe(userId);
-
     const { data: members } = await supabase.from("conversation_members").select("user_id").eq("conversation_id", id);
     const memberIds = (members ?? []).map(x => x.user_id);
     if (!memberIds.includes(userId)) { router.push("/messages"); return; }
-
     const otherId = memberIds.find(x => x !== userId);
     if (otherId) {
       const { data: person } = await supabase.from("profiles").select("id,username,display_name,avatar_url").eq("id", otherId).maybeSingle();
@@ -36,7 +34,6 @@ export default function ConversationPage() {
       const { data: blockRows } = await supabase.from("user_blocks").select("blocker_id,blocked_id").or("blocker_id.eq." + userId + ",blocked_id.eq." + userId);
       setBlocked((blockRows ?? []).some(b => (b.blocker_id === userId && b.blocked_id === otherId) || (b.blocker_id === otherId && b.blocked_id === userId)));
     }
-
     const { data: rows } = await supabase.from("messages").select("id,sender_id,body,created_at,edited_at").eq("conversation_id", id).order("created_at");
     setMessages(rows ?? []);
     setLoading(false);
@@ -46,6 +43,7 @@ export default function ConversationPage() {
 
   useEffect(() => {
     if (!id) return;
+    const supabase = createClient();
     const channel = supabase.channel("dm-" + id).on("postgres_changes", { event: "INSERT", schema: "public", table: "messages", filter: "conversation_id=eq." + id }, payload => {
       setMessages(current => current.some(m => m.id === payload.new.id) ? current : [...current, payload.new as Message]);
     }).subscribe();
@@ -65,11 +63,8 @@ export default function ConversationPage() {
   async function toggleBlock() {
     const supabase = createClient();
     if (!other) return;
-    if (blocked) {
-      await supabase.from("user_blocks").delete().eq("blocker_id", me).eq("blocked_id", other.id);
-    } else {
-      await supabase.from("user_blocks").insert({ blocker_id: me, blocked_id: other.id });
-    }
+    if (blocked) await supabase.from("user_blocks").delete().eq("blocker_id", me).eq("blocked_id", other.id);
+    else await supabase.from("user_blocks").insert({ blocker_id: me, blocked_id: other.id });
     setBlocked(!blocked);
   }
 
