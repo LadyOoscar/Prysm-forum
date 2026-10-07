@@ -79,7 +79,27 @@ export default function CommunityPage() {
     return <main><div className="authPage"><div className="authCard"><p>Chargement du sous-forum…</p></div></div></main>;
   }
 
-  async function toggleMembership() {\n    if (!community || membershipLoading) return;\n    setMembershipLoading(true);\n    const { data: claimsData } = await supabase.auth.getClaims();\n    const userId = typeof claimsData?.claims?.sub === "string" ? claimsData.claims.sub : null;\n    if (!userId) {\n      router.push("/login");\n      return;\n    }\n\n    if (isMember) {\n      const { error } = await supabase.from("community_members").delete().eq("community_id", community.id).eq("user_id", userId);\n      if (!error) { setIsMember(false); setMemberCount(value => Math.max(0, value - 1)); }\n    } else {\n      const { error } = await supabase.from("community_members").insert({ community_id: community.id, user_id: userId, role: "member" });\n      if (!error) { setIsMember(true); setMemberCount(value => value + 1); }\n    }\n    setMembershipLoading(false);\n  }\n\n  if (!community) {
+  async function toggleMembership() {
+    if (!community || membershipLoading) return;
+    setMembershipLoading(true);
+    const { data: claimsData } = await supabase.auth.getClaims();
+    const userId = typeof claimsData?.claims?.sub === "string" ? claimsData.claims.sub : null;
+    if (!userId) {
+      router.push("/login");
+      return;
+    }
+
+    if (isMember) {
+      const { error } = await supabase.from("community_members").delete().eq("community_id", community.id).eq("user_id", userId);
+      if (!error) { setIsMember(false); setMemberCount(value => Math.max(0, value - 1)); }
+    } else {
+      const { error } = await supabase.from("community_members").insert({ community_id: community.id, user_id: userId, role: "member" });
+      if (!error) { setIsMember(true); setMemberCount(value => value + 1); }
+    }
+    setMembershipLoading(false);
+  }
+
+  if (!community) {
     return <main><div className="authPage"><div className="authCard"><h1>Sous-forum introuvable</h1><a href="/">Retour au forum</a></div></div></main>;
   }
 
@@ -106,7 +126,8 @@ export default function CommunityPage() {
 
         <div className="communityStats">
           <div><strong>{topicCount}</strong><span>sujet{topicCount !== 1 ? "s" : ""}</span></div>
-          <div><strong>{postCount}</strong><span>message{postCount !== 1 ? "s" : ""}</span></div>\n          <div><strong>{memberCount}</strong><span>membre{memberCount !== 1 ? "s" : ""}</span></div>
+          <div><strong>{postCount}</strong><span>message{postCount !== 1 ? "s" : ""}</span></div>
+          <div><strong>{memberCount}</strong><span>membre{memberCount !== 1 ? "s" : ""}</span></div>
         </div>
 
         <section className="communityTopics">
