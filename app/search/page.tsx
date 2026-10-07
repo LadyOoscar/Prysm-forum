@@ -11,7 +11,7 @@ type Community = { id:string; slug:string; name:string; icon:string; category:st
 function SearchContent() {
   const router=useRouter();
   const params=useSearchParams();
-  const supabase=createClient();
+  
   const initial=params.get("q") ?? "";
   const [query,setQuery]=useState(initial);
   const [submitted,setSubmitted]=useState(initial);
@@ -27,6 +27,7 @@ function SearchContent() {
     let cancelled=false;
     async function search(){
       setLoading(true);
+      const supabase=createClient();
       const term=submitted.trim().replace(/,/g," ");
       const pattern=`%${term}%`;
       const [{data:topicRows},{data:profileRows},{data:communityRows}]=await Promise.all([
