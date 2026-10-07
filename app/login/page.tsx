@@ -19,21 +19,37 @@ export default function LoginPage() {
 
     if (mode === "login") {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) setMessage(error.message);
-      else window.location.href = "/";
-    } else {
-      const { data, error } = await supabase.auth.signUp({ email, password });
       if (error) {
         setMessage(error.message);
-      } else if (data.user) {
-        const cleanUsername = username.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 32);
-        const { error: profileError } = await supabase.from("profiles").insert({
-          id: data.user.id,
-          username: cleanUsername || "prysm-user",
-          display_name: username.trim() || "Nouveau membre",
-        });
-        if (profileError) setMessage(profileError.message);
-        else setMessage("Compte créé. Vérifie ton adresse e-mail si la confirmation est activée.");
+      } else {
+        window.location.href = "/profile";
+      }
+    } else {
+      const cleanUsername = username.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 32);
+
+      if (cleanUsername.length < 3) {
+        setMessage("Ton pseudo doit contenir au moins 3 caractères valides.");
+        setLoading(false);
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username: cleanUsername,
+            display_name: username.trim(),
+          },
+        },
+      });
+
+      if (error) {
+        setMessage(error.message);
+      } else if (data.session) {
+        window.location.href = "/profile";
+      } else {
+        setMessage("Compte créé. Vérifie ton adresse e-mail pour activer ton compte, puis connecte-toi.");
       }
     }
 
@@ -45,7 +61,7 @@ export default function LoginPage() {
       <div className="authCard">
         <a className="brand authBrand" href="/">PRYSM<span>✦</span></a>
         <p className="eyebrow">{mode === "login" ? "BIENVENUE" : "REJOINDRE PRYSM"}</p>
-        <h1>{mode === "login" ? "Ravi de te revoir." : "Entre dans le Cocon."}</h1>
+        <h1>{mode === "login" ? "Ravi de te revoir." : "Entre dans PRYSM."}</h1>
         <p className="authIntro">
           {mode === "login"
             ? "Retrouve tes communautés, tes discussions et ton identité PRYSM."
@@ -73,7 +89,10 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <button className="authSwitch" onClick={() => { setMode(mode === "login" ? "signup" : "login"); setMessage(""); }}>
+        <button className="authSwitch" onClick={() => {
+          setMode(mode === "login" ? "signup" : "login");
+          setMessage("");
+        }}>
           {mode === "login" ? "Pas encore de compte ? Créer un compte" : "Déjà membre ? Se connecter"}
         </button>
       </div>
