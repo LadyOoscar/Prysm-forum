@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import NotificationBell from "@/components/NotificationBell";
+import MentionTextarea from "@/components/MentionTextarea";
 
 type Community = {
   id: string;
@@ -141,7 +142,7 @@ export default function Home() {
     <main>
       <header>
         <div className="brand">PRYSM<span>✦</span></div>
-        <nav><a className="active">Forum</a><a>Rencontres</a><a>Communautés</a><a>Panthéon</a></nav>
+        <nav><a className="active">Forum</a><a href="/search">Recherche</a><a>Rencontres</a><a>Communautés</a><a>Panthéon</a></nav>
         <div className="headerTools"><NotificationBell /><a className="profile" href="/profile">☾ <span>Mon profil</span></a></div>
       </header>
 
@@ -261,7 +262,7 @@ export default function Home() {
 
               <label>
                 Message
-                <textarea value={body} onChange={event => setBody(event.target.value)} maxLength={10000} placeholder="Écrivez votre sujet…" required />
+                <MentionTextarea value={body} onChange={setBody} placeholder="Écrivez votre sujet…" />
               </label>
 
               {message && <p className="authMessage">{message}</p>}
