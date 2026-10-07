@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import PrysmNav from "@/components/PrysmNav";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 type Community = {
   id: string;
@@ -163,7 +164,7 @@ export default function CommunityPage() {
             </article>
           ) : topics.map(topic => (
             <article className="topic" key={topic.id} onClick={() => router.push(`/topic?id=${topic.id}`)}>
-              <div className="topicIcon">{topic.is_pinned ? "📌" : community.icon}</div>
+              <div className="topicIcon topicIdentity"><ProfileAvatar src={profiles[topic.author_id]?.avatar_url} name={profiles[topic.author_id]?.display_name || profiles[topic.author_id]?.username} className="topicAvatar" /><span>{topic.is_pinned ? "📌" : community.icon}</span></div>
               <div className="topicBody">
                 <h3>{topic.title}</h3>
                 <p>{topic.is_pinned ? "Sujet épinglé · " : ""}{topic.is_locked ? "🔒 Verrouillé · " : ""}{profiles[topic.author_id]?.display_name ?? "Membre"} · 💬 {replyCounts[topic.id] ?? 0} · {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p>
