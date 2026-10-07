@@ -23,7 +23,11 @@ export default function TopicPage() {
   const [message, setMessage] = useState("");
   const [votes, setVotes] = useState<Record<string, number>>({});
   const [myVotes, setMyVotes] = useState<Record<string, number>>({});
-  const [voting, setVoting] = useState<string | null>(null);\n  const [reportTarget, setReportTarget] = useState<{type: "topic" | "post"; id: string} | null>(null);\n  const [reportReason, setReportReason] = useState("");\n  const [reporting, setReporting] = useState(false);\n  const [reportMessage, setReportMessage] = useState("");
+  const [voting, setVoting] = useState<string | null>(null);
+  const [reportTarget, setReportTarget] = useState<{type: "topic" | "post"; id: string} | null>(null);
+  const [reportReason, setReportReason] = useState("");
+  const [reporting, setReporting] = useState(false);
+  const [reportMessage, setReportMessage] = useState("");
 
   async function load() {
     if (!id) return;
@@ -65,7 +69,31 @@ export default function TopicPage() {
     setVoting(null);
   }
 
-  async function submitReport(event: FormEvent<HTMLFormElement>) {\n    event.preventDefault();\n    if (!reportTarget || reportReason.trim().length < 3) return;\n    setReporting(true);\n    setReportMessage("");\n    const { data: claims } = await supabase.auth.getClaims();\n    const userId = typeof claims?.claims?.sub === "string" ? claims.claims.sub : null;\n    if (!userId) { setReporting(false); router.push("/login"); return; }\n    const payload = reportTarget.type === "topic"\n      ? { reporter_id: userId, topic_id: reportTarget.id, reason: reportReason.trim() }\n      : { reporter_id: userId, post_id: reportTarget.id, reason: reportReason.trim() };\n    const { error } = await supabase.from("reports").insert(payload);\n    setReporting(false);\n    if (error) { setReportMessage("Impossible d’envoyer le signalement."); return; }\n    setReportMessage("Signalement envoyé aux modérateurs.");\n    setReportReason("");\n  }\n\n  function openReport(type: "topic" | "post", targetId: string) {\n    setReportMessage("");\n    setReportReason("");\n    setReportTarget({ type, id: targetId });\n  }\n\n  async function submit(event: FormEvent<HTMLFormElement>) {
+  async function submitReport(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!reportTarget || reportReason.trim().length < 3) return;
+    setReporting(true);
+    setReportMessage("");
+    const { data: claims } = await supabase.auth.getClaims();
+    const userId = typeof claims?.claims?.sub === "string" ? claims.claims.sub : null;
+    if (!userId) { setReporting(false); router.push("/login"); return; }
+    const payload = reportTarget.type === "topic"
+      ? { reporter_id: userId, topic_id: reportTarget.id, reason: reportReason.trim() }
+      : { reporter_id: userId, post_id: reportTarget.id, reason: reportReason.trim() };
+    const { error } = await supabase.from("reports").insert(payload);
+    setReporting(false);
+    if (error) { setReportMessage("Impossible d’envoyer le signalement."); return; }
+    setReportMessage("Signalement envoyé aux modérateurs.");
+    setReportReason("");
+  }
+
+  function openReport(type: "topic" | "post", targetId: string) {
+    setReportMessage("");
+    setReportReason("");
+    setReportTarget({ type, id: targetId });
+  }
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
     if (reply.trim().length < 2 || !id) return;
