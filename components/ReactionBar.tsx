@@ -34,6 +34,7 @@ export default function ReactionBar({ topicId, postId }: Props) {
   async function toggle(reaction: string) {
     if (busy) return;
     setBusy(true);
+    const supabase = createClient();
     const { data: claims } = await supabase.auth.getClaims();
     const userId = claims?.claims?.sub;
     if (!userId) { setBusy(false); return; }
