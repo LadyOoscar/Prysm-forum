@@ -10,6 +10,9 @@ type Community = {
   name: string;
   icon: string;
   category: string;
+  description: string;
+  banner_url: string | null;
+  rules: string;
 };
 
 type Profile = { id: string; username: string; display_name: string; reputation: number; avatar_url: string | null };
@@ -43,7 +46,7 @@ export default function CommunityPage() {
     async function load() {
       const { data: c } = await supabase
         .from("communities")
-        .select("id,slug,name,icon,category")
+        .select("id,slug,name,icon,category,description,banner_url,rules")
         .eq("slug", slug)
         .maybeSingle();
 
@@ -115,12 +118,12 @@ export default function CommunityPage() {
       <div className="communityPage">
         <button className="backButton" onClick={() => router.push("/")}>← Retour au forum</button>
 
-        <section className="communityHero">
+        <section className="communityHero" style={community.banner_url ? {backgroundImage:`linear-gradient(#17121fe8,#17121ff5),url(${community.banner_url})`,backgroundSize:"cover",backgroundPosition:"center"} : undefined}>
           <div className="communityHeroIcon">{community.icon}</div>
           <div>
             <p className="eyebrow">{community.category}</p>
             <h1>{community.name}</h1>
-            <p>Un espace de discussion de PRYSM. Partagez vos expériences, vos passions et vos idées avec la communauté.</p>
+            <p>{community.description || "Un espace de discussion de PRYSM. Partagez vos expériences, vos passions et vos idées avec la communauté."}</p>
           </div>
           <div className="communityHeroActions"><button className={isMember ? "secondaryButton" : "primary"} onClick={toggleMembership} disabled={membershipLoading}>{membershipLoading ? "…" : isMember ? "✓ Membre" : "Rejoindre"}</button><button className="primary" onClick={() => router.push(`/?community=${community.slug}`)}>+ Créer un sujet</button></div>
         </section>
@@ -131,7 +134,7 @@ export default function CommunityPage() {
           <div><strong>{memberCount}</strong><span>membre{memberCount !== 1 ? "s" : ""}</span></div>
         </div>
 
-        <section className="communityTopics">
+        {community.rules && <section className="communityRules"><p className="eyebrow">RÈGLES</p><p>{community.rules}</p></section>}\n\n        <section className="communityTopics">
           <div className="feedHead">
             <div><span className="eyebrow">DISCUSSIONS</span><h2>Les sujets du sous-forum</h2></div>
             <button className="filter">Les plus récents ▾</button>
@@ -148,7 +151,7 @@ export default function CommunityPage() {
               <div className="topicIcon">{topic.is_pinned ? "📌" : community.icon}</div>
               <div className="topicBody">
                 <h3>{topic.title}</h3>
-                <p>{topic.is_pinned ? "Sujet épinglé · " : ""}{topic.is_locked ? "🔒 Verrouillé · " : ""}{profiles[topic.author_id]?.display_name ?? "Membre"} · {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p>
+                <p>{topic.is_pinned ? "Sujet épinglé · " : ""}{topic.is_locked ? "🔒 Verrouillé · " : ""}{profiles[topic.author_id]?.display_name ?? "Membre"} · 💬 {replyCounts[topic.id] ?? 0} · {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p>
               </div>
             </article>
           ))}
