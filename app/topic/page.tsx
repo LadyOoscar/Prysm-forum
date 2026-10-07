@@ -4,8 +4,8 @@ import { FormEvent, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-type Topic = { id: string; title: string; body: string; created_at: string; community_id: string };
-type Post = { id: string; body: string; created_at: string };
+type Topic = { id: string; title: string; body: string; created_at: string; community_id: string; author_id: string };
+type Post = { id: string; body: string; created_at: string; author_id: string };\ntype Profile = { id: string; display_name: string; username: string; reputation: number; avatar_url: string | null };
 
 export default function TopicPage() {
   const params = useSearchParams();
@@ -14,7 +14,7 @@ export default function TopicPage() {
   const supabase = createClient();
   const [topic, setTopic] = useState<Topic | null>(null);
   const [community, setCommunity] = useState<{name:string;icon:string} | null>(null);
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);\n  const [profiles, setProfiles] = useState<Record<string, Profile>>({});
   const [reply, setReply] = useState("");
   const [loading, setLoading] = useState(true);
   const [posting, setPosting] = useState(false);
@@ -22,13 +22,13 @@ export default function TopicPage() {
 
   async function load() {
     if (!id) return;
-    const { data: t } = await supabase.from("topics").select("id,title,body,created_at,community_id").eq("id", id).maybeSingle();
+    const { data: t } = await supabase.from("topics").select("id,title,body,created_at,community_id,author_id").eq("id", id).maybeSingle();
     if (!t) { setLoading(false); return; }
     const [{ data: c }, { data: p }] = await Promise.all([
       supabase.from("communities").select("name,icon").eq("id", t.community_id).maybeSingle(),
-      supabase.from("posts").select("id,body,created_at").eq("topic_id", id).order("created_at")
+      supabase.from("posts").select("id,body,created_at,author_id").eq("topic_id", id).order("created_at")
     ]);
-    setTopic(t); setCommunity(c); setPosts(p ?? []); setLoading(false);
+    const authors = [...new Set([t.author_id, ...(p ?? []).map(post => post.author_id)])];\n    const { data: profileRows } = await supabase.from("profiles").select("id,display_name,username,reputation,avatar_url").in("id", authors);\n    setProfiles(Object.fromEntries((profileRows ?? []).map(profile => [profile.id, profile])));\n    setTopic(t); setCommunity(c); setPosts(p ?? []); setLoading(false);
   }
 
   useEffect(() => { load(); }, [id]);
@@ -60,10 +60,10 @@ export default function TopicPage() {
       <button className="backButton" onClick={() => router.push("/")}>← Retour au forum</button>
       <p className="eyebrow">{community?.icon} {community?.name ?? "COMMUNAUTÉ"}</p>
       <h1>{topic.title}</h1>
-      <article className="topicPost"><p className="topicMeta">Publié le {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p><div className="topicContent">{topic.body}</div></article>
+      <article className="topicPost"><p className="topicMeta"><strong>{profiles[topic.author_id]?.display_name ?? "Membre"}</strong> · ⭐ {profiles[topic.author_id]?.reputation ?? 0} · publié le {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p><div className="topicContent">{topic.body}</div></article>
       <section className="replies">
         <h2>{posts.length} réponse{posts.length !== 1 ? "s" : ""}</h2>
-        {posts.map((post, i) => <article className="reply" key={post.id}><div className="replyNumber">#{i + 1}</div><div><p className="topicMeta">{new Date(post.created_at).toLocaleDateString("fr-FR")}</p><p>{post.body}</p></div></article>)}
+        {posts.map((post, i) => <article className="reply" key={post.id}><div className="replyNumber">#{i + 1}</div><div><p className="topicMeta"><strong>{profiles[post.author_id]?.display_name ?? "Membre"}</strong> · ⭐ {profiles[post.author_id]?.reputation ?? 0} · {new Date(post.created_at).toLocaleDateString("fr-FR")}</p><p>{post.body}</p></div></article>)}
       </section>
       <form className="replyForm" onSubmit={submit}>
         <h2>Répondre</h2>
