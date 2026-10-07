@@ -14,7 +14,7 @@ type Report = {
   created_at: string;
 };
 
-type Role = { role: "community_moderator" | "admin" | "founder"; community_id: string | null };
+type Role = { role: "community_moderator" | "admin" | "founder"; community_id: string | null };\ntype Target = { author_id: string; title?: string; body: string; community_id: string; is_locked?: boolean };
 
 export default function ModerationPage() {
   const supabase = createClient();
@@ -22,7 +22,7 @@ export default function ModerationPage() {
   const [reports, setReports] = useState<Report[]>([]);
   const [role, setRole] = useState<Role | null>(null);
   const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState("");\n  const [targets, setTargets] = useState<Record<string, Target>>({});\n  const [busy, setBusy] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -58,7 +58,7 @@ export default function ModerationPage() {
     load();
   }, []);
 
-  async function updateReport(report: Report, status: "reviewing" | "resolved" | "dismissed") {
+  async function moderateContent(report: Report, action: "lock" | "unlock" | "delete") {\n    const target = targets[report.id];\n    if (!target) return;\n    setBusy(report.id); setMessage("");\n    let error = null;\n    if (report.topic_id) {\n      if (action === "delete") ({ error } = await supabase.from("topics").delete().eq("id", report.topic_id));\n      else ({ error } = await supabase.from("topics").update({ is_locked: action === "lock" }).eq("id", report.topic_id));\n    } else if (report.post_id && action === "delete") {\n      ({ error } = await supabase.from("posts").delete().eq("id", report.post_id));\n    }\n    if (error) { setMessage("Action refusée ou impossible."); setBusy(null); return; }\n    const { data: claims } = await supabase.auth.getClaims();\n    const actorId = typeof claims?.claims?.sub === "string" ? claims.claims.sub : null;\n    if (actorId) await supabase.from("moderation_logs").insert({ actor_id: actorId, target_user_id: target.author_id, topic_id: report.topic_id, post_id: report.post_id, action: `content_${action}`, reason: report.reason, metadata: { report_id: report.id } });\n    setBusy(null);\n    setMessage(action === "delete" ? "Contenu supprimé." : action === "lock" ? "Sujet verrouillé." : "Sujet déverrouillé.");\n    if (action === "delete") setReports(current => current.filter(item => item.id !== report.id));\n    else setTargets(current => ({ ...current, [report.id]: { ...target, is_locked: action === "lock" } }));\n  }\n\n  async function sanction(report: Report, type: "community_ban" | "global_ban") {\n    const target = targets[report.id];\n    if (!target) return;\n    setBusy(report.id); setMessage("");\n    const { data: claims } = await supabase.auth.getClaims();\n    const actorId = typeof claims?.claims?.sub === "string" ? claims.claims.sub : null;\n    if (!actorId) { setBusy(null); return; }\n    const { error } = await supabase.from("user_sanctions").insert({ user_id: target.author_id, actor_id: actorId, type, community_id: type === "community_ban" ? target.community_id : null, reason: report.reason, expires_at: type === "global_ban" ? null : new Date(Date.now() + 7 * 86400000).toISOString() });\n    if (error) { setMessage("Sanction refusée."); setBusy(null); return; }\n    await supabase.from("moderation_logs").insert({ actor_id: actorId, target_user_id: target.author_id, topic_id: report.topic_id, post_id: report.post_id, action: type, reason: report.reason, metadata: { report_id: report.id, duration_days: type === "community_ban" ? 7 : null } });\n    setBusy(null); setMessage(type === "global_ban" ? "Bannissement global appliqué." : "Bannissement communautaire de 7 jours appliqué.");\n  }\n\n  async function updateReport(report: Report, status: "reviewing" | "resolved" | "dismissed") {
     setMessage("");
     const { data: claims } = await supabase.auth.getClaims();
     const actorId = typeof claims?.claims?.sub === "string" ? claims.claims.sub : null;
@@ -112,8 +112,8 @@ export default function ModerationPage() {
               <div className="reportTop"><span className={`reportStatus status-${report.status}`}>{report.status}</span><span>{new Date(report.created_at).toLocaleString("fr-FR")}</span></div>
               <h3>{report.topic_id ? "Sujet signalé" : "Réponse signalée"}</h3>
               <p>{report.reason}</p>
-              <div className="reportMeta">Signalement #{report.id.slice(0, 8)} · par {report.reporter_id.slice(0, 8)}</div>
-              <div className="reportActions">
+              <div className="reportMeta">Signalement #{report.id.slice(0, 8)} · par {report.reporter_id.slice(0, 8)}{targets[report.id] ? ` · auteur ${targets[report.id].author_id.slice(0, 8)}` : ""}</div>
+              <div className="reportActions">{targets[report.id] && <><button className="moderationButton" disabled={busy===report.id} onClick={() => moderateContent(report, targets[report.id].is_locked ? "unlock" : "lock")}>{targets[report.id].is_locked ? "Déverrouiller" : "Verrouiller"}</button><button className="moderationButton dangerButton" disabled={busy===report.id} onClick={() => moderateContent(report, "delete")}>Supprimer</button><button className="moderationButton" disabled={busy===report.id} onClick={() => sanction(report, "community_ban")}>Ban 7 j.</button>{(role.role === "admin" || role.role === "founder") && <button className="moderationButton dangerButton" disabled={busy===report.id} onClick={() => sanction(report, "global_ban")}>Ban global</button>}</>}
                 <button className="moderationButton" onClick={() => updateReport(report, "reviewing")}>En cours</button>
                 <button className="moderationButton" onClick={() => updateReport(report, "resolved")}>Résolu</button>
                 <button className="moderationButton" onClick={() => updateReport(report, "dismissed")}>Classé sans suite</button>
