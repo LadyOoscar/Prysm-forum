@@ -166,14 +166,16 @@ export default function Home() {
         <div className="headerTools"><NotificationBell /><a className="profile" href="/profile">☾ <span>Mon profil</span></a></div>
       </header>
 
-      <section className="hero">
-        <div>
-          <p className="eyebrow">✦ LE FORUM QUI EST VIVANT</p>
-          <h1>Un espace pour<br/><em>être soi.</em></h1>
-          <p className="intro">Discuter, rire, débattre, rencontrer des gens et trouver sa communauté. PRYSM rassemble les couleurs qui font notre monde.</p>
-          <button className="primary" onClick={openComposer}>+ Créer un sujet</button>
+      <section className="welcomeBar">
+        <div className="welcomeCopy">
+          <span className="welcomeMark">✦</span>
+          <div>
+            <p className="eyebrow">BIENVENUE SUR PRYSM</p>
+            <h1>Qu’est-ce qui se passe aujourd’hui ?</h1>
+            <p>Retrouve tes communautés, découvre les discussions et participe à la conversation.</p>
+          </div>
         </div>
-        <div className="orb">✦<small>PRYSM</small></div>
+        <button className="primary" onClick={openComposer}>＋ Nouveau sujet</button>
       </section>
 
       <div className="layout">
