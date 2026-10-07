@@ -12,6 +12,8 @@ type Community = {
   category: string;
 };
 
+type Profile = { id: string; username: string; display_name: string; reputation: number; avatar_url: string | null };
+
 type Topic = {
   id: string;
   title: string;
@@ -28,7 +30,9 @@ export default function CommunityPage() {
   const [community, setCommunity] = useState<Community | null>(null);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [topicCount, setTopicCount] = useState(0);
-  const [postCount, setPostCount] = useState(0);\n  const [profiles, setProfiles] = useState<Record<string, Profile>>({});\n  const [replyCounts, setReplyCounts] = useState<Record<string, number>>({});
+  const [postCount, setPostCount] = useState(0);
+  const [profiles, setProfiles] = useState<Record<string, Profile>>({});
+  const [replyCounts, setReplyCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
