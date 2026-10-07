@@ -14,7 +14,8 @@ type Community = {
   display_order: number;
 };
 
-type Topic = { id: string; title: string; body: string; community_id: string; author_id: string; created_at: string };\ntype Profile = { id: string; username: string; display_name: string; reputation: number; avatar_url: string | null };
+type Topic = { id: string; title: string; body: string; community_id: string; author_id: string; created_at: string };
+type Profile = { id: string; username: string; display_name: string; reputation: number; avatar_url: string | null };
 
 const fallbackGods = [
   ["⚖️", "Kael", "Justice", "Modération & équité"],
@@ -27,7 +28,9 @@ export default function Home() {
   const router = useRouter();
   const supabase = createClient();
   const [communities, setCommunities] = useState<Community[]>([]);
-  const [topics, setTopics] = useState<Topic[]>([]);\n  const [profiles, setProfiles] = useState<Record<string, Profile>>({});\n  const [replyCounts, setReplyCounts] = useState<Record<string, number>>({});
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [profiles, setProfiles] = useState<Record<string, Profile>>({});
+  const [replyCounts, setReplyCounts] = useState<Record<string, number>>({});
   const [selectedCommunity, setSelectedCommunity] = useState("blabla");
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
