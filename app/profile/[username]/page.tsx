@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import PrysmNav from "@/components/PrysmNav";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 type Profile = { id: string; username: string; display_name: string; bio: string; avatar_url: string | null; banner_url: string | null; pronouns: string | null; identity: string | null; interests: string[]; reputation: number };
 type Topic = { id: string; title: string; created_at: string; community_id: string };
@@ -39,10 +41,14 @@ export default function PublicProfilePage() {
       const { data: claims } = await supabase.auth.getClaims();
       const myId = typeof claims?.claims?.sub === "string" ? claims.claims.sub : null;
       setMe(myId);
+
       const [{ count: followerCount }, { data: followRow }] = await Promise.all([
         supabase.from("user_follows").select("follower_id", { count: "exact", head: true }).eq("following_id", p.id),
-        myId ? supabase.from("user_follows").select("follower_id").eq("follower_id", myId).eq("following_id", p.id).maybeSingle() : Promise.resolve({ data: null }),
+        myId && myId !== p.id
+          ? supabase.from("user_follows").select("follower_id").eq("follower_id", myId).eq("following_id", p.id).maybeSingle()
+          : Promise.resolve({ data: null }),
       ]);
+
       setFollowers(followerCount ?? 0);
       setFollowing(Boolean(followRow));
       setProfile(p as Profile);
@@ -57,6 +63,7 @@ export default function PublicProfilePage() {
   async function toggleFollow() {
     if (!profile || !me || me === profile.id) return;
     const supabase = createClient();
+
     if (following) {
       const { error } = await supabase.from("user_follows").delete().eq("follower_id", me).eq("following_id", profile.id);
       if (!error) { setFollowing(false); setFollowers(v => Math.max(0, v - 1)); }
@@ -67,19 +74,18 @@ export default function PublicProfilePage() {
   }
 
   if (loading) return <main className="authPage"><div className="authCard"><p>Chargement du profil…</p></div></main>;
-  if (!profile) return <main className="authPage"><div className="authCard"><a className="brand authBrand" href="/">PRYSM<span>✦</span></a><h1>Profil introuvable</h1><p className="authIntro">Ce membre n'existe pas ou son profil n'est plus disponible.</p><a className="authSwitch" href="/">← Retour au forum</a></div></main>;
+
+  if (!profile) {
+    return <main className="authPage"><div className="authCard"><a className="brand authBrand" href="/">PRYSM<span>✦</span></a><h1>Profil introuvable</h1><p className="authIntro">Ce membre n'existe pas ou son profil n'est plus disponible.</p><a className="authSwitch" href="/">← Retour au forum</a></div></main>;
+  }
 
   return (
     <main>
-      <header>
-        <div className="brand">PRYSM<span>✦</span></div>
-        <nav><a href="/">Forum</a><a>Rencontres</a><a href="/">Communautés</a><a href="/pantheon">Panthéon</a></nav>
-        <a className="profile" href="/profile">☾ <span>Mon profil</span></a>
-      </header>
+      <PrysmNav active="forum" />
       <div className="publicProfilePage">
         <button className="backButton" onClick={() => router.push("/")}>← Retour au forum</button>
         <section className="publicProfileHero">
-          <div className="publicAvatar">{profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : (profile.display_name || profile.username).charAt(0).toUpperCase()}</div>
+          <ProfileAvatar src={profile.avatar_url} name={profile.display_name || profile.username} className="publicProfileAvatar" />
           <div className="publicIdentity">
             <p className="eyebrow">MEMBRE PRYSM</p>
             <h1>{profile.display_name || profile.username}</h1>
@@ -87,12 +93,19 @@ export default function PublicProfilePage() {
             {profile.bio && <p className="publicBio">{profile.bio}</p>}
             {profile.interests?.length > 0 && <div className="profileTags">{profile.interests.map(interest => <span key={interest}>#{interest}</span>)}</div>}
           </div>
-          <div className="reputationCard"><strong>⭐ {profile.reputation}</strong><span>réputation</span>{me !== profile.id && <><button className={following ? "secondaryButton profileFollowButton" : "primary profileFollowButton"} onClick={toggleFollow}>{following ? "✓ Suivi" : "＋ Suivre"}</button><a className="profileMessageButton" href={"/messages?user=" + profile.username}>💬 Message</a></>}</div>
+          <div className="reputationCard">
+            <strong>⭐ {profile.reputation}</strong>
+            <span>{followers} abonné{followers !== 1 ? "s" : ""}</span>
+            {me !== profile.id && <><button className={following ? "secondaryButton profileFollowButton" : "primary profileFollowButton"} onClick={toggleFollow}>{following ? "✓ Suivi" : "＋ Suivre"}</button><a className="profileMessageButton" href={"/messages?user=" + encodeURIComponent(profile.username)}>💬 Message</a></>}
+          </div>
         </section>
+
         <div className="publicStats">
           <div><strong>{topics.length}</strong><span>sujets récents</span></div>
           <div><strong>{postCount}</strong><span>réponses</span></div>
+          <div><strong>{followers}</strong><span>abonnés</span></div>
         </div>
+
         <section className="publicActivity">
           <div className="feedHead"><div><span className="eyebrow">ACTIVITÉ</span><h2>Sujets récents</h2></div></div>
           {topics.length === 0 ? <article className="emptyCommunity"><p>Ce membre n'a encore créé aucun sujet.</p></article> : topics.map(topic => {

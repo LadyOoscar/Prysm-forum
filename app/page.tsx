@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import PrysmNav from "@/components/PrysmNav";
 import MentionTextarea from "@/components/MentionTextarea";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 type Community = {
   id: string;
@@ -228,7 +229,7 @@ export default function Home() {
 
               return (
                 <article className="topic" key={topic.id} onClick={() => router.push(`/topic?id=${topic.id}`)}>
-                  <div className="topicIcon">{community?.icon ?? "✦"}</div>
+                  <div className="topicIcon topicIdentity"><ProfileAvatar src={profiles[topic.author_id]?.avatar_url} name={profiles[topic.author_id]?.display_name || profiles[topic.author_id]?.username} className="topicAvatar" /><span>{community?.icon ?? "✦"}</span></div>
                   <div className="topicBody">
                     <h3>{topic.title}</h3>
                     <p>{community?.name ?? "Discussion"} · <button className="authorLink" onClick={event => { event.stopPropagation(); router.push(`/profile/${profiles[topic.author_id]?.username}`); }}>{profiles[topic.author_id]?.display_name ?? "Membre"}</button> · {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p>
@@ -251,14 +252,6 @@ export default function Home() {
           <div className="aiNote">Les divinités sont des IA clairement identifiées. Elles assistent la communauté sans se faire passer pour des membres humains.</div>
         </aside>
       </div>
-
-      <nav className="mobileNav" aria-label="Navigation principale">
-        <a className="mobileNavItem active" href="/">⌂<span>Forum</span></a>
-        <a className="mobileNavItem" href="/search">⌕<span>Recherche</span></a>
-        <a className="mobileNavItem" href="/messages">✉<span>Messages</span></a>
-        <a className="mobileNavItem" href="/pantheon">✦<span>Panthéon</span></a>
-        <a className="mobileNavItem" href="/profile">☾<span>Profil</span></a>
-      </nav>
 
       {open && (
         <div className="modal" onClick={() => setOpen(false)}>

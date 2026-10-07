@@ -10,7 +10,7 @@ export default function PrysmNav({ active = "forum" }: { active?: NavKey }) {
     ["forum", "Forum", "/"],
     ["search", "Recherche", "/search"],
     ["messages", "Messages", "/messages"],
-    ["communities", "Communautés", "/"],
+    ["communities", "Communautés", "/communities"],
     ["pantheon", "Panthéon", "/pantheon"],
   ] as const;
 
@@ -32,7 +32,7 @@ export default function PrysmNav({ active = "forum" }: { active?: NavKey }) {
         {items.map(([key, label, href]) => (
           <Link key={key} className={active === key ? "active" : ""} href={href}>
             <span className="mobileNavIcon">{key === "forum" ? "⌂" : key === "search" ? "⌕" : key === "messages" ? "✉" : key === "communities" ? "✦" : "☽"}</span>
-            <span>{key === "communities" ? "Cocon" : label}</span>
+            <span>{label}</span>
           </Link>
         ))}
       </nav>

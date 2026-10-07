@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import PrysmNav from "@/components/PrysmNav";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 type Profile = {
   id: string;
@@ -17,6 +18,15 @@ type Profile = {
   interests: string[];
 };
 
+function normalizeUsername(value: string) {
+  return value
+    .normalize("NFKC")
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}_-]/gu, "")
+    .slice(0, 32);
+}
+
 export default function ProfilePage() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [email, setEmail] = useState("");
@@ -27,10 +37,11 @@ export default function ProfilePage() {
 
   useEffect(() => {
     async function load() {
-    const supabase = createClient();
+      const supabase = createClient();
       const { data: claimsData } = await supabase.auth.getClaims();
+      const userId = typeof claimsData?.claims?.sub === "string" ? claimsData.claims.sub : null;
 
-      if (!claimsData?.claims?.sub) {
+      if (!userId) {
         window.location.href = "/login";
         return;
       }
@@ -39,16 +50,12 @@ export default function ProfilePage() {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, username, display_name, bio, avatar_url, banner_url, pronouns, identity, interests, reputation")
-        .eq("id", claimsData.claims.sub)
+        .select("id,username,display_name,bio,avatar_url,banner_url,pronouns,identity,interests,reputation")
+        .eq("id", userId)
         .single();
 
-      if (error || !data) {
-        setMessage("Impossible de charger ton profil.");
-      } else {
-        setProfile(data as Profile);
-      }
-
+      if (error || !data) setMessage("Impossible de charger ton profil.");
+      else setProfile(data as Profile);
       setLoading(false);
     }
 
@@ -56,44 +63,80 @@ export default function ProfilePage() {
   }, []);
 
   async function saveProfile(event: React.FormEvent) {
-    const supabase = createClient();
     event.preventDefault();
     if (!profile) return;
 
+    const supabase = createClient();
     setSaving(true);
     setMessage("");
 
-    let avatarUrl = profile.avatar_url;
-
-    const username = profile.username.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 32);
+    const username = normalizeUsername(profile.username);
+    const displayName = profile.display_name.trim().slice(0, 60);
 
     if (username.length < 3) {
-      setMessage("Le pseudo doit contenir au moins 3 caractères valides.");
+      setMessage("Le pseudo doit contenir au moins 3 caractères.");
       setSaving(false);
       return;
+    }
+
+    if (!displayName) {
+      setMessage("Le nom affiché ne peut pas être vide.");
+      setSaving(false);
+      return;
+    }
+
+    let avatarUrl = profile.avatar_url;
+
+    if (avatarFile) {
+      if (!avatarFile.type.startsWith("image/")) {
+        setMessage("Le fichier choisi n'est pas une image.");
+        setSaving(false);
+        return;
+      }
+
+      if (avatarFile.size > 5 * 1024 * 1024) {
+        setMessage("La photo doit faire 5 Mo maximum.");
+        setSaving(false);
+        return;
+      }
+
+      const extension = avatarFile.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `${profile.id}/avatar.${extension}`;
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(path, avatarFile, { upsert: true, contentType: avatarFile.type, cacheControl: "3600" });
+
+      if (uploadError) {
+        setMessage("Impossible d'envoyer la photo. Vérifie le fichier puis réessaie.");
+        setSaving(false);
+        return;
+      }
+
+      avatarUrl = supabase.storage.from("avatars").getPublicUrl(path).data.publicUrl;
     }
 
     const { data, error } = await supabase
       .from("profiles")
       .update({
         username,
-        display_name: profile.display_name.trim().slice(0, 60),
+        display_name: displayName,
         bio: profile.bio.slice(0, 500),
         pronouns: profile.pronouns?.trim().slice(0, 40) || null,
         avatar_url: avatarUrl,
-        banner_url: profile.banner_url,
+        banner_url: profile.banner_url?.trim() || null,
         identity: profile.identity?.trim().slice(0, 80) || null,
         interests: [...new Set(profile.interests.map(item => item.trim()).filter(Boolean))].slice(0, 12),
         updated_at: new Date().toISOString(),
       })
       .eq("id", profile.id)
-      .select("id, username, display_name, bio, avatar_url, banner_url, pronouns, identity, interests, reputation")
+      .select("id,username,display_name,bio,avatar_url,banner_url,pronouns,identity,interests,reputation")
       .single();
 
     if (error) {
-      setMessage(error.message.includes("duplicate") ? "Ce pseudo est déjà pris." : error.message);
+      setMessage(error.message.toLowerCase().includes("duplicate") ? "Ce pseudo est déjà pris." : "Impossible d'enregistrer le profil.");
     } else {
       setProfile(data as Profile);
+      setAvatarFile(null);
       setMessage("Profil enregistré.");
     }
 
@@ -106,9 +149,7 @@ export default function ProfilePage() {
     window.location.href = "/";
   }
 
-  if (loading) {
-    return <main className="authPage"><div className="authCard"><p className="authMessage">Chargement du profil…</p></div></main>;
-  }
+  if (loading) return <main className="authPage"><div className="authCard"><p className="authMessage">Chargement du profil…</p></div></main>;
 
   if (!profile) {
     return <main className="authPage"><div className="authCard"><a className="brand authBrand" href="/">PRYSM<span>✦</span></a><p className="authMessage">{message}</p></div></main>;
@@ -119,73 +160,46 @@ export default function ProfilePage() {
       <PrysmNav active="forum" />
       <div className="profileShell">
         <div className="authCard">
-        <a className="brand authBrand" href="/">PRYSM<span>✦</span></a>
-        <p className="eyebrow">MON PROFIL</p>
-        <h1>{profile.display_name || profile.username}</h1>
-        <p className="authIntro">Ton identité publique sur PRYSM. Tu peux la modifier à tout moment.</p>
+          <a className="brand authBrand" href="/">PRYSM<span>✦</span></a>
+          <p className="eyebrow">MON PROFIL</p>
+          <h1>{profile.display_name || profile.username}</h1>
+          <p className="authIntro">Ton identité publique sur PRYSM. Tu peux la modifier à tout moment.</p>
 
-        <div className="profileAvatarEditor">\n          <div className="publicAvatar">{profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : (profile.display_name || profile.username).charAt(0).toUpperCase()}</div>\n          <div>\n            <strong>Photo de profil</strong>\n            <p>JPG, PNG, GIF ou WebP · 5 Mo maximum</p>\n            <label className="fileButton">Choisir une image<input type="file" accept="image/*" onChange={e => setAvatarFile(e.target.files?.[0] ?? null)} /></label>\n            {avatarFile && <span className="fileName">{avatarFile.name}</span>}\n          </div>\n        </div>\n\n        <form onSubmit={saveProfile} className="authForm">
-          <label>
-            Pseudo
-            <input value={profile.username} onChange={e => setProfile({...profile, username: e.target.value})} minLength={3} maxLength={32} required />
-          </label>
+          <div className="profileAvatarEditor">
+            <ProfileAvatar src={profile.avatar_url} name={profile.display_name || profile.username} className="editorAvatar" />
+            <div>
+              <strong>Photo de profil</strong>
+              <p>JPG, PNG, GIF ou WebP · 5 Mo maximum</p>
+              <label className="fileButton">
+                Choisir une image
+                <input type="file" accept="image/jpeg,image/png,image/gif,image/webp" onChange={e => setAvatarFile(e.target.files?.[0] ?? null)} />
+              </label>
+              {avatarFile && <span className="fileName">{avatarFile.name}</span>}
+            </div>
+          </div>
 
-          <label>
-            Nom affiché
-            <input value={profile.display_name} onChange={e => setProfile({...profile, display_name: e.target.value})} maxLength={60} required />
-          </label>
+          <form onSubmit={saveProfile} className="authForm">
+            <label>Pseudo<input value={profile.username} onChange={e => setProfile({...profile, username: e.target.value})} minLength={3} maxLength={32} required /></label>
+            <label>Nom affiché<input value={profile.display_name} onChange={e => setProfile({...profile, display_name: e.target.value})} maxLength={60} required /></label>
+            <label>Pronoms<input value={profile.pronouns ?? ""} onChange={e => setProfile({...profile, pronouns: e.target.value})} maxLength={40} placeholder="ex. elle / iel" /></label>
+            <label>Identité<input value={profile.identity ?? ""} onChange={e => setProfile({...profile, identity: e.target.value})} maxLength={80} placeholder="ex. lesbienne, trans, non-binaire…" /></label>
+            <label>
+              Centres d'intérêt
+              <input value={profile.interests.join(", ")} onChange={e => setProfile({...profile, interests: e.target.value.split(",").map(v => v.trim()).filter(Boolean).slice(0, 12)})} placeholder="jeux vidéo, fantasy, cuisine…" />
+              <small className="fieldHint">Sépare les centres d'intérêt par des virgules, jusqu'à 12.</small>
+            </label>
+            <label>Bio<textarea value={profile.bio} onChange={e => setProfile({...profile, bio: e.target.value})} maxLength={500} rows={5} placeholder="Quelques mots sur toi…" /></label>
+            <label>URL d'avatar externe <input type="url" value={profile.avatar_url ?? ""} onChange={e => setProfile({...profile, avatar_url: e.target.value})} placeholder="https://…" /></label>
+            <label>URL de bannière externe <input type="url" value={profile.banner_url ?? ""} onChange={e => setProfile({...profile, banner_url: e.target.value})} placeholder="https://…" /></label>
+            <label>E-mail<input type="email" value={email} disabled /></label>
 
-          <label>
-            Pronoms
-            <input value={profile.pronouns ?? ""} onChange={e => setProfile({...profile, pronouns: e.target.value})} maxLength={40} placeholder="ex. elle / iel" />
-          </label>
+            <p className="authMessage">⭐ Réputation : {profile.reputation}</p>
+            {message && <p className="authMessage">{message}</p>}
+            <button className="primary" disabled={saving}>{saving ? "Enregistrement…" : "Enregistrer mon profil"}</button>
+          </form>
 
-          <label>
-            Identité
-            <input value={profile.identity ?? ""} onChange={e => setProfile({...profile, identity: e.target.value})} maxLength={80} placeholder="ex. lesbienne, trans, non-binaire…" />
-          </label>
-
-          <label>
-            Centres d'intérêt
-            <input value={profile.interests.join(", ")} onChange={e => setProfile({...profile, interests: e.target.value.split(",").map(v => v.trim()).filter(Boolean).slice(0, 12)})} placeholder="jeux vidéo, fantasy, cuisine…" />
-            <small className="fieldHint">Sépare les centres d'intérêt par des virgules, jusqu'à 12.</small>
-          </label>
-
-          <label>
-            Bio
-            <textarea
-              value={profile.bio}
-              onChange={e => setProfile({...profile, bio: e.target.value})}
-              maxLength={500}
-              rows={5}
-              style={{background:"#100c18",border:"1px solid #3a3044",color:"#eee",borderRadius:9,padding:12,resize:"vertical"}}
-              placeholder="Quelques mots sur toi…"
-            />
-          </label>
-
-          <label>
-            Avatar
-            <input type="url" value={profile.avatar_url ?? ""} onChange={e => setProfile({...profile, avatar_url: e.target.value})} placeholder="https://…" />
-          </label>
-
-          <label>
-            Bannière
-            <input type="url" value={profile.banner_url ?? ""} onChange={e => setProfile({...profile, banner_url: e.target.value})} placeholder="https://…" />
-          </label>
-
-          <label>
-            E-mail
-            <input type="email" value={email} disabled />
-          </label>
-
-          <p className="authMessage">⭐ Réputation : {profile.reputation}</p>
-          {message && <p className="authMessage">{message}</p>}
-
-          <button className="primary" disabled={saving}>{saving ? "Enregistrement…" : "Enregistrer mon profil"}</button>
-        </form>
-
-        <button className="authSwitch" onClick={signOut}>Se déconnecter</button>
-        <a className="authSwitch" href="/">← Retour au forum</a>
+          <button className="authSwitch" onClick={signOut}>Se déconnecter</button>
+          <a className="authSwitch" href="/">← Retour au forum</a>
         </div>
       </div>
     </main>
