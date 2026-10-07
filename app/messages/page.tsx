@@ -36,13 +36,13 @@ function MessagesContent() {
       setConversations(convs);
 
       const { data: memberRows } = await supabase.from("conversation_members").select("conversation_id,user_id").in("conversation_id", ids);
-      const allOtherIds = [...new Set((memberRows ?? []).map(row => row.user_id).filter(id => id !== me))];
+      const allOtherIds = [...new Set((memberRows ?? []).map(row => row.user_id).filter(memberId => memberId !== id))];
       const { data: people } = allOtherIds.length ? await supabase.from("profiles").select("id,username,display_name,avatar_url").in("id", allOtherIds) : { data: [] };
       setProfiles(Object.fromEntries((people ?? []).map(p => [p.id, p])));
       setLoading(false);
     }
     load();
-  }, [me]);
+  }, []);
 
   async function startConversation(event: FormEvent) {
     event.preventDefault();
