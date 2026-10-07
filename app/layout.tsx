@@ -1,0 +1,1 @@
+import "./globals.css"; import type {Metadata} from "next"; export const metadata:Metadata={title:"PRYSM • Forum queer",description:"Un espace queer pour discuter, rencontrer et partager."}; export default function RootLayout({children}:{children:React.ReactNode}){return <html lang="fr"><body>{children}</body></html>}
