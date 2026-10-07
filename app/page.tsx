@@ -3,8 +3,9 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import NotificationBell from "@/components/NotificationBell";
+import PrysmNav from "@/components/PrysmNav";
 import MentionTextarea from "@/components/MentionTextarea";
+import PrysmNav from "@/components/PrysmNav";
 
 type Community = {
   id: string;
@@ -161,11 +162,7 @@ export default function Home() {
 
   return (
     <main>
-      <header>
-        <div className="brand">PRYSM<span>✦</span></div>
-        <nav><a className="active">Forum</a><a href="/search">Recherche</a><a href="/messages">Messages</a><a>Rencontres</a><a href="/">Communautés</a><a href="/pantheon">Panthéon</a></nav>
-        <div className="headerTools"><NotificationBell /><a className="profile" href="/profile">☾ <span>Mon profil</span></a></div>
-      </header>
+      <PrysmNav active="forum" />
 
       <section className="welcomeBar">
         <div className="welcomeCopy">
