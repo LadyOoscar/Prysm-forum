@@ -4,9 +4,14 @@ import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import PrysmNav from "@/components/PrysmNav";
+import ProfileAvatar from "@/components/ProfileAvatar";
 
 type Conversation = { id: string; updated_at: string; created_by: string; direct_recipient_id: string };
 type Profile = { id: string; username: string; display_name: string; avatar_url: string | null };
+
+function normalizeUsername(value: string) {
+  return value.normalize("NFKC").trim().replace(/^@/, "").toLowerCase();
+}
 
 function MessagesContent() {
   const router = useRouter();
@@ -47,14 +52,22 @@ function MessagesContent() {
   async function startConversation(event: FormEvent) {
     event.preventDefault();
     const supabase = createClient();
-    setBusy(true); setMessage("");
-    const target = username.trim().replace(/^@/, "").toLowerCase();
+    setBusy(true);
+    setMessage("");
+
+    const target = normalizeUsername(username);
     const { data: person } = await supabase.from("profiles").select("id").eq("username", target).maybeSingle();
-    if (!person || person.id === me) { setMessage(!person ? "Membre introuvable." : "Tu ne peux pas t'envoyer un message à toi-même."); setBusy(false); return; }
+    if (!person || person.id === me) {
+      setMessage(!person ? "Membre introuvable." : "Tu ne peux pas t'envoyer un message à toi-même.");
+      setBusy(false);
+      return;
+    }
 
     const { data: blocked } = await supabase.from("user_blocks").select("blocker_id,blocked_id").or("blocker_id.eq." + me + ",blocked_id.eq." + me);
     if ((blocked ?? []).some(b => (b.blocker_id === me && b.blocked_id === person.id) || (b.blocker_id === person.id && b.blocked_id === me))) {
-      setMessage("Cette conversation est bloquée."); setBusy(false); return;
+      setMessage("Cette conversation est bloquée.");
+      setBusy(false);
+      return;
     }
 
     const { data: existingMemberships } = await supabase.from("conversation_members").select("conversation_id").eq("user_id", me);
@@ -67,7 +80,11 @@ function MessagesContent() {
     const { data: conversation, error } = await supabase.from("conversations").insert({ created_by: me, direct_recipient_id: person.id }).select("id").single();
     if (error || !conversation) { setMessage("Impossible de créer la conversation."); setBusy(false); return; }
 
-    const { error: memberError } = await supabase.from("conversation_members").insert([{ conversation_id: conversation.id, user_id: me }, { conversation_id: conversation.id, user_id: person.id }]);
+    const { error: memberError } = await supabase.from("conversation_members").insert([
+      { conversation_id: conversation.id, user_id: me },
+      { conversation_id: conversation.id, user_id: person.id },
+    ]);
+
     if (memberError) { setMessage("Impossible d'ouvrir la conversation."); setBusy(false); return; }
     router.push("/messages/" + conversation.id);
   }
@@ -83,7 +100,7 @@ function MessagesContent() {
           const otherId = c.created_by === me ? c.direct_recipient_id : c.created_by;
           const other = profiles[otherId];
           return <button className="conversationRow" key={c.id} onClick={() => router.push("/messages/" + c.id)}>
-            <div className="mentionAvatar">{other?.avatar_url ? <img src={other.avatar_url} alt="" /> : (other?.display_name ?? "?").charAt(0).toUpperCase()}</div>
+            <ProfileAvatar src={other?.avatar_url} name={other?.display_name} className="messageAvatar" />
             <div><strong>{other?.display_name ?? "Membre"}</strong><small>@{other?.username ?? "inconnu"}</small></div>
             <time>{new Date(c.updated_at).toLocaleDateString("fr-FR")}</time>
           </button>;
