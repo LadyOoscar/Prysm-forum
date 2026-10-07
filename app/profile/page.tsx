@@ -20,6 +20,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -72,7 +73,7 @@ export default function ProfilePage() {
         display_name: profile.display_name.trim().slice(0, 60),
         bio: profile.bio.slice(0, 500),
         pronouns: profile.pronouns?.trim().slice(0, 40) || null,
-        avatar_url: profile.avatar_url?.trim() || null,
+        avatar_url: avatarUrl,
         updated_at: new Date().toISOString(),
       })
       .eq("id", profile.id)
@@ -110,7 +111,7 @@ export default function ProfilePage() {
         <h1>{profile.display_name || profile.username}</h1>
         <p className="authIntro">Ton identité publique sur PRYSM. Tu peux la modifier à tout moment.</p>
 
-        <form onSubmit={saveProfile} className="authForm">
+        <div className="profileAvatarEditor">\n          <div className="publicAvatar">{profile.avatar_url ? <img src={profile.avatar_url} alt="" /> : (profile.display_name || profile.username).charAt(0).toUpperCase()}</div>\n          <div>\n            <strong>Photo de profil</strong>\n            <p>JPG, PNG, GIF ou WebP · 5 Mo maximum</p>\n            <label className="fileButton">Choisir une image<input type="file" accept="image/*" onChange={e => setAvatarFile(e.target.files?.[0] ?? null)} /></label>\n            {avatarFile && <span className="fileName">{avatarFile.name}</span>}\n          </div>\n        </div>\n\n        <form onSubmit={saveProfile} className="authForm">
           <label>
             Pseudo
             <input value={profile.username} onChange={e => setProfile({...profile, username: e.target.value})} minLength={3} maxLength={32} required />
