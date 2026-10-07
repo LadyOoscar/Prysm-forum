@@ -28,7 +28,6 @@ const fallbackGods = [
 
 export default function Home() {
   const router = useRouter();
-  const supabase = createClient();
   const [communities, setCommunities] = useState<Community[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [profiles, setProfiles] = useState<Record<string, Profile>>({});
@@ -46,6 +45,7 @@ export default function Home() {
 
   useEffect(() => {
     async function loadForum() {
+      const supabase = createClient();
       const [{ data: communityRows }, { data: topicRows }] = await Promise.all([
         supabase
           .from("communities")
@@ -123,6 +123,7 @@ export default function Home() {
     }
 
     setPublishing(true);
+    const supabase = createClient();
     const { data: claims } = await supabase.auth.getClaims();
 
     if (!claims?.claims?.sub) {
