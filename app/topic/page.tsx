@@ -77,9 +77,9 @@ export default function TopicPage() {
     const { data: claims } = await supabase.auth.getClaims();
     const userId = typeof claims?.claims?.sub === "string" ? claims.claims.sub : null;
     if (!userId) { setReporting(false); router.push("/login"); return; }
-    const payload = reportTarget.type === "topic"
-      ? { reporter_id: userId, topic_id: reportTarget.id, reason: reportReason.trim() }
-      : { reporter_id: userId, post_id: reportTarget.id, reason: reportReason.trim() };
+    const payload: { reporter_id: string; topic_id: string | null; post_id: string | null; reason: string } = reportTarget.type === "topic"
+      ? { reporter_id: userId, topic_id: reportTarget.id, post_id: null, reason: reportReason.trim() }
+      : { reporter_id: userId, topic_id: null, post_id: reportTarget.id, reason: reportReason.trim() };
     const { error } = await supabase.from("reports").insert(payload);
     setReporting(false);
     if (error) { setReportMessage("Impossible d’envoyer le signalement."); return; }
