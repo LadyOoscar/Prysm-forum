@@ -62,6 +62,20 @@ export default function Home() {
       setCommunities(communityRows ?? []);
       setTopics(topicRows ?? []);
 
+      const { data: claims } = await supabase.auth.getClaims();
+      const userId = typeof claims?.claims?.sub === "string" ? claims.claims.sub : null;
+      const authorIds = [...new Set((topicRows ?? []).map(t => t.author_id))];
+      const [{ data: authorRows }, { data: replyRows }, { data: followRows }] = await Promise.all([
+        authorIds.length ? supabase.from("profiles").select("id,username,display_name,reputation,avatar_url").in("id", authorIds) : { data: [] },
+        (topicRows ?? []).length ? supabase.from("posts").select("topic_id").in("topic_id", (topicRows ?? []).map(t => t.id)) : { data: [] },
+        userId ? supabase.from("user_follows").select("following_id").eq("follower_id", userId) : { data: [] },
+      ]);
+      setProfiles(Object.fromEntries((authorRows ?? []).map(p => [p.id, p])));
+      const nextCounts: Record<string, number> = {};
+      for (const row of replyRows ?? []) nextCounts[row.topic_id] = (nextCounts[row.topic_id] ?? 0) + 1;
+      setReplyCounts(nextCounts);
+      setFollowedIds((followRows ?? []).map(row => row.following_id));
+
       const defaultCommunity = communityRows?.find(c => c.slug === "blabla") ?? communityRows?.[0];
       if (defaultCommunity) {
         setSelectedCommunity(defaultCommunity.slug);
