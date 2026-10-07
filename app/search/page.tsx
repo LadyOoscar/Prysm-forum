@@ -3,6 +3,7 @@
 import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import PrysmNav from "@/components/PrysmNav";
 
 type Topic = { id:string; title:string; body:string; created_at:string; community_id:string; author_id:string };
 type Profile = { id:string; username:string; display_name:string; bio:string; avatar_url:string|null };
@@ -43,7 +44,7 @@ function SearchContent() {
 
   function submit(e:FormEvent){e.preventDefault();const q=query.trim();router.push(q?`/search?q=${encodeURIComponent(q)}`:"/search");setSubmitted(q);}
   return <main>
-    <header><div className="brand">PRYSM<span>✦</span></div><nav><a href="/">Forum</a><a className="active">Recherche</a><a>Rencontres</a><a>Communautés</a><a>Panthéon</a></nav><a className="profile" href="/profile">☾ <span>Mon profil</span></a></header>
+    <PrysmNav active="search" />
     <div className="searchPage">
       <button className="backButton" onClick={()=>router.push("/")}>← Retour au forum</button>
       <h1>Recherche</h1>
