@@ -16,12 +16,14 @@ export default function StickerPicker({ onSelect }: Props) {
   const [notice,setNotice]=useState("");
 
   async function load() {
+    const supabase = createClient();
     const { data } = await supabase.from("stickers").select("id,name,tags,image_url,usage_count").eq("status","approved").order("usage_count",{ascending:false}).limit(80);
     setStickers((data ?? []) as Sticker[]);
   }
   useEffect(()=>{ if(open) load(); },[open]);
 
   async function upload(file:File) {
+    const supabase = createClient();
     setNotice("");
     if (!file.type.startsWith("image/") || file.size > 5*1024*1024) {
       setNotice("Image PNG, JPG, GIF ou WebP de 5 Mo maximum.");
