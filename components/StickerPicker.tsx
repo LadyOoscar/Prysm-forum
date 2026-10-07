@@ -8,7 +8,7 @@ type Sticker = { id:string; name:string; tags:string[]; image_url:string; usage_
 type Props = { onSelect:(sticker:Sticker)=>void };
 
 export default function StickerPicker({ onSelect }: Props) {
-  const supabase = createClient();
+
   const [open,setOpen]=useState(false);
   const [stickers,setStickers]=useState<Sticker[]>([]);
   const [query,setQuery]=useState("");
