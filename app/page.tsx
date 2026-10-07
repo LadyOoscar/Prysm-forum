@@ -4,20 +4,8 @@ import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-type Community = {
-  id: string;
-  slug: string;
-  name: string;
-  icon: string;
-};
-
-type Topic = {
-  id: string;
-  title: string;
-  body: string;
-  community_id: string;
-  created_at: string;
-};
+type Community = { id: string; slug: string; name: string; icon: string };
+type Topic = { id: string; title: string; body: string; community_id: string; created_at: string };
 
 const fallbackGods = [
   ["⚖️", "Kael", "Justice", "Modération & équité"],
@@ -44,34 +32,23 @@ export default function Home() {
     async function loadForum() {
       const [{ data: communityRows }, { data: topicRows }] = await Promise.all([
         supabase.from("communities").select("id,slug,name,icon").order("name"),
-        supabase
-          .from("topics")
-          .select("id,title,body,community_id,created_at")
-          .order("created_at", { ascending: false })
-          .limit(12),
+        supabase.from("topics").select("id,title,body,community_id,created_at").order("created_at", { ascending: false }).limit(12),
       ]);
-
       setCommunities(communityRows ?? []);
       setTopics(topicRows ?? []);
-
-      const defaultCommunity =
-        communityRows?.find((community) => community.slug === "blabla") ?? communityRows?.[0];
+      const defaultCommunity = communityRows?.find(c => c.slug === "blabla") ?? communityRows?.[0];
       if (defaultCommunity) {
         setSelectedCommunity(defaultCommunity.slug);
         setCommunityId(defaultCommunity.id);
       }
       setLoading(false);
     }
-
     loadForum();
   }, []);
 
   function openComposer() {
-    setMessage("");
-    setTitle("");
-    setBody("");
-    const community =
-      communities.find((item) => item.slug === selectedCommunity) ?? communities[0];
+    setMessage(""); setTitle(""); setBody("");
+    const community = communities.find(c => c.slug === selectedCommunity) ?? communities[0];
     if (community) setCommunityId(community.id);
     setOpen(true);
   }
@@ -79,45 +56,24 @@ export default function Home() {
   async function createTopic(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
-
     if (title.trim().length < 3 || body.trim().length < 3 || !communityId) {
       setMessage("Ajoutez un titre, un message et une communauté.");
       return;
     }
-
     setPublishing(true);
     const { data: claims } = await supabase.auth.getClaims();
-
-    if (!claims?.claims?.sub) {
-      router.push("/login");
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from("topics")
-      .insert({
-        community_id: communityId,
-        author_id: claims.claims.sub,
-        title: title.trim(),
-        body: body.trim(),
-      })
-      .select("id")
-      .single();
-
+    if (!claims?.claims?.sub) { router.push("/login"); return; }
+    const { data, error } = await supabase.from("topics").insert({
+      community_id: communityId, author_id: claims.claims.sub, title: title.trim(), body: body.trim(),
+    }).select("id").single();
     setPublishing(false);
-
-    if (error) {
-      setMessage("Impossible de publier ce sujet pour le moment.");
-      return;
-    }
-
+    if (error) { setMessage("Impossible de publier ce sujet pour le moment."); return; }
     setOpen(false);
-    router.push(`/topic/${data.id}`);
+    router.push(`/topic?id=${data.id}`);
   }
 
-  const visibleTopics = topics.filter((topic) => {
-    if (!selectedCommunity) return true;
-    const community = communities.find((item) => item.slug === selectedCommunity);
+  const visibleTopics = topics.filter(topic => {
+    const community = communities.find(c => c.slug === selectedCommunity);
     return !community || topic.community_id === community.id;
   });
 
@@ -142,80 +98,62 @@ export default function Home() {
       <div className="layout">
         <aside>
           <div className="sideTitle">COMMUNAUTÉS <span>+</span></div>
-          {loading ? (
-            <div className="community">Chargement…</div>
-          ) : (
-            communities.map((community) => (
-              <button
-                className={community.slug === selectedCommunity ? "community selected" : "community"}
-                key={community.id}
-                onClick={() => setSelectedCommunity(community.slug)}
-              >
-                <span>{community.icon}</span>{community.name}
-              </button>
-            ))
-          )}
+          {loading ? <div className="community">Chargement…</div> : communities.map(community => (
+            <button className={community.slug === selectedCommunity ? "community selected" : "community"} key={community.id} onClick={() => setSelectedCommunity(community.slug)}>
+              <span>{community.icon}</span>{community.name}
+            </button>
+          ))}
         </aside>
 
         <section className="feed">
           <div className="feedHead">
-            <div>
-              <span className="eyebrow">COMMUNAUTÉ</span>
-              <h2>{communities.find((c) => c.slug === selectedCommunity)?.name ?? "Blabla"}</h2>
-            </div>
+            <div><span className="eyebrow">COMMUNAUTÉ</span><h2>{communities.find(c => c.slug === selectedCommunity)?.name ?? "Blabla"}</h2></div>
             <button className="filter">Les plus récents ▾</button>
           </div>
-
           {loading ? (
             <article className="topic"><div className="topicBody"><p>Chargement des discussions…</p></div></article>
           ) : visibleTopics.length === 0 ? (
             <article className="topic"><div className="topicBody"><h3>Cette communauté attend son premier sujet.</h3><p>Pourquoi ne pas lancer la discussion ?</p></div></article>
-          ) : (
-            visibleTopics.map((topic) => {
-              const community = communities.find((item) => item.id === topic.community_id);
-              return (
-                <article className="topic" key={topic.id} onClick={() => router.push(`/topic/${topic.id}`)}>
-                  <div className="topicIcon">{community?.icon ?? "✦"}</div>
-                  <div className="topicBody"><h3>{topic.title}</h3><p>{community?.name ?? "Discussion"} · {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p></div>
-                  <div className="stats"><span>💬</span><span>♡</span></div>
-                </article>
-              );
-            })
-          )}
+          ) : visibleTopics.map(topic => {
+            const community = communities.find(c => c.id === topic.community_id);
+            return <article className="topic" key={topic.id} onClick={() => router.push(`/topic?id=${topic.id}`)}>
+              <div className="topicIcon">{community?.icon ?? "✦"}</div>
+              <div className="topicBody"><h3>{topic.title}</h3><p>{community?.name ?? "Discussion"} · {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p></div>
+              <div className="stats"><span>💬</span><span>♡</span></div>
+            </article>;
+          })}
         </section>
 
         <aside className="pantheon">
           <div className="sideTitle">LE PANTHÉON <span>✦</span></div>
-          {fallbackGods.map((god) => <div className="god" key={god[1]}><div className="godIcon">{god[0]}</div><div><strong>{god[1]}</strong><small>{god[2]} · {god[3]}</small></div></div>)}
+          {fallbackGods.map(god => <div className="god" key={god[1]}><div className="godIcon">{god[0]}</div><div><strong>{god[1]}</strong><small>{god[2]} · {god[3]}</small></div></div>)}
           <div className="aiNote">Les divinités sont des IA clairement identifiées. Elles assistent la communauté sans se faire passer pour des membres humains.</div>
         </aside>
       </div>
 
-      {open && (
-        <div className="modal" onClick={() => setOpen(false)}>
-          <div className="modalCard" onClick={(event) => event.stopPropagation()}>
-            <button className="close" onClick={() => setOpen(false)}>×</button>
-            <p className="eyebrow">NOUVELLE DISCUSSION</p>
-            <h2>Qu'avez-vous envie de partager ?</h2>
-            <form className="authForm" onSubmit={createTopic}>
-              <label>Communauté
-                <select value={communityId} onChange={(event) => setCommunityId(event.target.value)} required>
-                  <option value="" disabled>Choisir une communauté</option>
-                  {communities.map((community) => <option key={community.id} value={community.id}>{community.icon} {community.name}</option>)}
-                </select>
-              </label>
-              <label>Titre
-                <input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={160} placeholder="Le titre de votre sujet" required />
-              </label>
-              <label>Message
-                <textarea value={body} onChange={(event) => setBody(event.target.value)} maxLength={10000} placeholder="Écrivez votre sujet…" required />
-              </label>
-              {message && <p className="authMessage">{message}</p>}
-              <button className="primary" type="submit" disabled={publishing}>{publishing ? "Publication…" : "Publier le sujet"}</button>
-            </form>
-          </div>
+      {open && <div className="modal" onClick={() => setOpen(false)}>
+        <div className="modalCard" onClick={event => event.stopPropagation()}>
+          <button className="close" onClick={() => setOpen(false)}>×</button>
+          <p className="eyebrow">NOUVELLE DISCUSSION</p>
+          <h2>Qu'avez-vous envie de partager ?</h2>
+          <form className="authForm" onSubmit={createTopic}>
+            <label>Communauté
+              <select value={communityId} onChange={event => setCommunityId(event.target.value)} required>
+                <option value="" disabled>Choisir une communauté</option>
+                {communities.map(community => <option key={community.id} value={community.id}>{community.icon} {community.name}</option>)}
+              </select>
+            </label>
+            <label>Titre
+              <input value={title} onChange={event => setTitle(event.target.value)} maxLength={160} placeholder="Le titre de votre sujet" required />
+            </label>
+            <label>Message
+              <textarea value={body} onChange={event => setBody(event.target.value)} maxLength={10000} placeholder="Écrivez votre sujet…" required />
+            </label>
+            {message && <p className="authMessage">{message}</p>}
+            <button className="primary" type="submit" disabled={publishing}>{publishing ? "Publication…" : "Publier le sujet"}</button>
+          </form>
         </div>
-      )}
+      </div>}
     </main>
   );
 }
