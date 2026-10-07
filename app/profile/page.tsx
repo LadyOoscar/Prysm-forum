@@ -58,6 +58,8 @@ export default function ProfilePage() {
     setSaving(true);
     setMessage("");
 
+    let avatarUrl = profile.avatar_url;
+
     const username = profile.username.trim().toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 32);
 
     if (username.length < 3) {
