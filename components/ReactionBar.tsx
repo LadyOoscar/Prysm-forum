@@ -8,12 +8,13 @@ const REACTIONS = ["❤️","👍","😂","😮","😢"];
 type Props = { topicId?: string; postId?: string };
 
 export default function ReactionBar({ topicId, postId }: Props) {
-  const supabase = createClient();
+
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [mine, setMine] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
 
   async function load() {
+    const supabase = createClient();
     const filter = topicId ? { topic_id: topicId } : { post_id: postId };
     const { data } = await supabase.from("reactions").select("reaction,user_id").match(filter);
     const next: Record<string, number> = {};
