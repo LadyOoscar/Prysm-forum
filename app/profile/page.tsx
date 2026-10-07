@@ -115,8 +115,10 @@ export default function ProfilePage() {
   }
 
   return (
-    <main className="authPage">
-      <div className="authCard">
+    <main className="profilePage">
+      <PrysmNav active="forum" />
+      <div className="profileShell">
+        <div className="authCard">
         <a className="brand authBrand" href="/">PRYSM<span>✦</span></a>
         <p className="eyebrow">MON PROFIL</p>
         <h1>{profile.display_name || profile.username}</h1>
@@ -184,6 +186,7 @@ export default function ProfilePage() {
 
         <button className="authSwitch" onClick={signOut}>Se déconnecter</button>
         <a className="authSwitch" href="/">← Retour au forum</a>
+        </div>
       </div>
     </main>
   );
