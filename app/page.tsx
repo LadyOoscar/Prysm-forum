@@ -253,14 +253,6 @@ export default function Home() {
         </aside>
       </div>
 
-      <nav className="mobileNav" aria-label="Navigation principale">
-        <a className="mobileNavItem active" href="/">⌂<span>Forum</span></a>
-        <a className="mobileNavItem" href="/search">⌕<span>Recherche</span></a>
-        <a className="mobileNavItem" href="/messages">✉<span>Messages</span></a>
-        <a className="mobileNavItem" href="/pantheon">✦<span>Panthéon</span></a>
-        <a className="mobileNavItem" href="/profile">☾<span>Profil</span></a>
-      </nav>
-
       {open && (
         <div className="modal" onClick={() => setOpen(false)}>
           <div className="modalCard" onClick={event => event.stopPropagation()}>
