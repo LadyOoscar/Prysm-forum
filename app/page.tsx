@@ -210,7 +210,7 @@ export default function Home() {
                   <div className="topicIcon">{community?.icon ?? "✦"}</div>
                   <div className="topicBody">
                     <h3>{topic.title}</h3>
-                    <p>{community?.name ?? "Discussion"} · {profiles[topic.author_id]?.display_name ?? "Membre"} · {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p>
+                    <p>{community?.name ?? "Discussion"} · <button className="authorLink" onClick={event => { event.stopPropagation(); router.push(`/profile/${profiles[topic.author_id]?.username}`); }}>{profiles[topic.author_id]?.display_name ?? "Membre"}</button> · {new Date(topic.created_at).toLocaleDateString("fr-FR")}</p>
                   </div>
                   <div className="stats"><span>💬 {replyCounts[topic.id] ?? 0}</span><span>⭐ {profiles[topic.author_id]?.reputation ?? 0}</span></div>
                 </article>
