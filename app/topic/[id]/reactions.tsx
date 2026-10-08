@@ -8,6 +8,10 @@ const reactions = [
   { key: "love", label: "❤️", name: "J’adore" },
   { key: "laugh", label: "😂", name: "Drôle" },
   { key: "support", label: "✨", name: "Soutien" },
+  { key: "disagree", label: "👎", name: "Pas d’accord" },
+  { key: "angry", label: "😤", name: "Agacé" },
+  { key: "cringe", label: "🙄", name: "Cringe" },
+  { key: "absurd", label: "🤦", name: "Absurde" },
 ] as const;
 
 type ReactionKey = (typeof reactions)[number]["key"];
@@ -70,8 +74,26 @@ export default function Reactions({ postId }: { postId: string }) {
     setBusy(null);
   }
 
-  return <div className="reactions" aria-label="Réactions"><small className="reaction-hint">Une réaction par message</small>{reactions.map((reaction) => {
-    const selected = mine.includes(reaction.key);
-    return <button className={selected ? "reaction selected" : "reaction"} key={reaction.key} type="button" onClick={() => toggle(reaction.key)} disabled={busy !== null} title={reaction.name} aria-pressed={selected}><span>{reaction.label}</span><strong>{counts[reaction.key] ?? 0}</strong></button>;
-  })}</div>;
+  return (
+    <div className="reactions" aria-label="Réactions">
+      <small className="reaction-hint">Une réaction par message • positives ou piquantes, à vous de choisir</small>
+      {reactions.map((reaction) => {
+        const selected = mine.includes(reaction.key);
+        return (
+          <button
+            className={selected ? "reaction selected" : "reaction"}
+            key={reaction.key}
+            type="button"
+            onClick={() => toggle(reaction.key)}
+            disabled={busy !== null}
+            title={reaction.name}
+            aria-pressed={selected}
+          >
+            <span>{reaction.label}</span>
+            <strong>{counts[reaction.key] ?? 0}</strong>
+          </button>
+        );
+      })}
+    </div>
+  );
 }
