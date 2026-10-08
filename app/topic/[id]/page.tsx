@@ -4,6 +4,7 @@ import { getSupabase } from "../../../lib/supabase";
 import ReplyBox from "./reply-box";
 import Reactions from "./reactions";
 import ReportButton from "./report-button";
+import { getReputationTitle } from "../../../lib/reputation";
 
 export const revalidate = 10;
 
@@ -12,7 +13,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
   const supabase = getSupabase();
   const { data: topic } = await supabase.from("forum_topics").select("id, title, locked, category_id, forum_categories:category_id(slug, name)").eq("id", id).maybeSingle();
   if (!topic) notFound();
-  const { data: posts, error } = await supabase.from("forum_posts").select("id, body, created_at, profiles:author_id(username, display_name, avatar_url)").eq("topic_id", id).order("created_at", { ascending: true });
+  const { data: posts, error } = await supabase.from("forum_posts").select("id, body, created_at, profiles:author_id(username, display_name, avatar_url, reputation)").eq("topic_id", id).order("created_at", { ascending: true });
   const category = Array.isArray(topic.forum_categories) ? topic.forum_categories[0] : topic.forum_categories;
 
   return (
@@ -34,7 +35,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
                       <div className="avatar">{(profile?.display_name || profile?.username || "?").slice(0, 1).toUpperCase()}</div>
                       <strong>{profile?.display_name || profile?.username || "Membre"}</strong>
                     </Link>
-                    <Link className="member-handle" href={profileHref}>@{profile?.username || "membre"}</Link>
+                    <Link className="member-handle" href={profileHref}>@{profile?.username || "membre"}</Link><span className="member-reputation"><strong>{profile?.reputation ?? 0}</strong> réputation · {getReputationTitle(profile?.reputation ?? 0)}</span>
                   </aside>
                   <div className="post-body">
                     <time>{new Date(post.created_at).toLocaleString("fr-FR")}</time>
