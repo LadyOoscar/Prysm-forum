@@ -50,15 +50,16 @@ export default function NotificationsPage() {
   }, []);
 
   async function markRead(id: string) {
-    await supabase.from("notifications").update({ read_at: new Date().toISOString() }).eq("id", id);
-    setItems((current) => current.map((item) => item.id === id ? { ...item, read_at: new Date().toISOString() } : item));
+    const now = new Date().toISOString();
+    await supabase.from("notifications").update({ read_at: now }).eq("id", id);
+    setItems((current) => current.map((item) => item.id === id ? { ...item, read_at: now } : item));
   }
 
   async function markAllRead() {
     const unread = items.filter((item) => !item.read_at);
     if (!unread.length) return;
-    await supabase.from("notifications").update({ read_at: new Date().toISOString() }).in("id", unread.map((item) => item.id));
     const now = new Date().toISOString();
+    await supabase.from("notifications").update({ read_at: now }).in("id", unread.map((item) => item.id));
     setItems((current) => current.map((item) => ({ ...item, read_at: item.read_at || now })));
   }
 
@@ -71,7 +72,7 @@ export default function NotificationsPage() {
       <section className="page-head compact">
         <p className="eyebrow">Centre d’alertes</p>
         <h1>Notifications.</h1>
-        <p className="lead">Les nouveaux messages et autres événements importants apparaissent ici en temps réel.</p>
+        <p className="lead">Les nouveaux messages, matchs et autres événements importants apparaissent ici en temps réel.</p>
       </section>
       <div className="notification-actions"><button className="button" onClick={markAllRead} disabled={!items.some((item) => !item.read_at)}>Tout marquer comme lu</button></div>
       {loading ? <div className="empty"><p>Chargement…</p></div> : items.length === 0 ? (
@@ -79,8 +80,9 @@ export default function NotificationsPage() {
       ) : (
         <section className="notification-list">
           {items.map((item) => {
-            const href = item.topic_id ? "/topic/" + item.topic_id : item.type === "message" && item.post_id ? "/messages" : null;
-            const content = <><strong>{item.type === "message" ? "Nouveau message" : "Notification"}</strong><p>{item.message}</p><time>{new Date(item.created_at).toLocaleString("fr-FR")}</time></>;
+            const href = item.type === "dating_match" ? "/rencontres/matchs" : item.topic_id ? "/topic/" + item.topic_id : item.type === "message" && item.post_id ? "/messages" : null;
+            const title = item.type === "dating_match" ? "Nouveau match" : item.type === "message" ? "Nouveau message" : "Notification";
+            const content = <><strong>{title}</strong><p>{item.message}</p><time>{new Date(item.created_at).toLocaleString("fr-FR")}</time></>;
             return href ? <Link className={"notification-row " + (!item.read_at ? "unread" : "")} href={href} key={item.id} onClick={() => void markRead(item.id)}>{content}</Link> : <button className={"notification-row notification-button " + (!item.read_at ? "unread" : "")} key={item.id} onClick={() => void markRead(item.id)}>{content}</button>;
           })}
         </section>
