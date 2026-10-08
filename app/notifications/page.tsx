@@ -80,8 +80,8 @@ export default function NotificationsPage() {
       ) : (
         <section className="notification-list">
           {items.map((item) => {
-            const href = item.type === "dating_match" ? "/rencontres/matchs" : item.topic_id ? "/topic/" + item.topic_id : item.type === "message" && item.post_id ? "/messages" : null;
-            const title = item.type === "dating_match" ? "Nouveau match" : item.type === "message" ? "Nouveau message" : "Notification";
+            const href = item.type === "dating_match" || item.type === "match" ? "/rencontres/matchs" : item.topic_id ? "/topic/" + item.topic_id : item.type === "message" || item.type === "direct_message" ? "/messages" : null;
+            const title = item.type === "level_up" ? "Niveau supérieur" : item.type === "dating_match" || item.type === "match" ? "Nouveau match" : item.type === "message" || item.type === "direct_message" ? "Nouveau message" : item.type === "reaction" ? "Nouvelle réaction" : item.type === "mention" ? "Nouvelle mention" : item.type === "followed_topic" || item.type === "follow" ? "Discussion suivie" : "Notification";
             const content = <><strong>{title}</strong><p>{item.message}</p><time>{new Date(item.created_at).toLocaleString("fr-FR")}</time></>;
             return href ? <Link className={"notification-row " + (!item.read_at ? "unread" : "")} href={href} key={item.id} onClick={() => void markRead(item.id)}>{content}</Link> : <button className={"notification-row notification-button " + (!item.read_at ? "unread" : "")} key={item.id} onClick={() => void markRead(item.id)}>{content}</button>;
           })}
