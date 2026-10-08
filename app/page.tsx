@@ -16,7 +16,7 @@ export default function HomePage() {
           <Link className="active" href="/">Accueil</Link>
           <Link href="/forum">Forum</Link>
           <Link href="/forum/rencontres">Rencontres</Link>
-          <Link href="/#messages">Messages</Link>
+          <Link href="/messages">Messages</Link>
           <Link href="/#profil">Profil</Link>
         </nav>
       </header>
