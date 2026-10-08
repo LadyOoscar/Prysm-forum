@@ -39,6 +39,7 @@ export default function AdminPage() {
     }
 
     setAllowed(true);
+    setCurrentUserId(user.id);
     const { data, error } = await supabase
       .from("profiles")
       .select("id, username, display_name, is_moderator, is_admin")
@@ -73,13 +74,10 @@ export default function AdminPage() {
       return;
     }
 
-    setMembers((current) => current.map((item) => item.id === member.id
-      ? {
-          ...item,
-          ...updates,
-        }
-      : item
-    ));
+    const updates: Partial<Member> = field === "is_admin"
+      ? { is_admin: value, ...(value ? { is_moderator: true } : {}) }
+      : { is_moderator: value };
+    setMembers((current) => current.map((item) => item.id === member.id ? { ...item, ...updates } : item));
     setMessage("Droits mis à jour.");
     setBusy(null);
   }
