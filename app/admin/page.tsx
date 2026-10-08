@@ -76,8 +76,7 @@ export default function AdminPage() {
     setMembers((current) => current.map((item) => item.id === member.id
       ? {
           ...item,
-          [field]: value,
-          ...(field === "is_admin" && value ? { is_moderator: true } : {}),
+          ...updates,
         }
       : item
     ));
