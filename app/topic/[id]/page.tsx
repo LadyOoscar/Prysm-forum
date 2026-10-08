@@ -6,6 +6,7 @@ import Reactions from "./reactions";
 import Votes from "./votes";
 import ReportButton from "./report-button";
 import Poll from "../poll";
+import FollowTopic from "../follow-topic";
 import { getReputationTitle } from "../../../lib/reputation";
 
 export const revalidate = 10;
@@ -26,7 +27,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
   return (
     <main className="shell">
       <header className="topbar"><Link className="brand" href="/">PRYSM</Link><nav><Link href="/">Accueil</Link><Link className="active" href="/forum">Forum</Link><Link href="/recherche">Recherche</Link><Link href="/profil">Profil</Link></nav></header>
-      <section className="page-head compact"><Link className="back" href={"/forum/"+(category?.slug || "")}>← {category?.name || "Section"}</Link><p className="eyebrow">Discussion</p><h1>{topic.title}</h1></section>
+      <section className="page-head compact"><Link className="back" href={"/forum/"+(category?.slug || "")}>← {category?.name || "Section"}</Link><p className="eyebrow">Discussion</p><h1>{topic.title}</h1><div className="section-actions"><FollowTopic topicId={topic.id} /></div></section>
       {error ? (
         <div className="notice error">Impossible de charger cette discussion.</div>
       ) : (
