@@ -180,3 +180,28 @@ input::placeholder,textarea::placeholder{color:#687092}input:focus,textarea:focu
 @media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}.post{grid-template-columns:1fr}.post-author{border-right:0;border-bottom:1px solid var(--line)}.messages-layout{grid-template-columns:1fr}}
 @media(max-width:760px){body{background-position:center top}.shell{width:min(100% - 22px,1180px)}.topbar{padding:15px 0;align-items:flex-start;gap:14px;flex-direction:column}.topbar nav{width:100%;overflow-x:auto;flex-wrap:nowrap}.topbar nav a{white-space:nowrap}.hero,.feature{grid-template-columns:1fr}.hero{padding:58px 0}.hero .prism{min-height:260px}.cards{grid-template-columns:1fr}.page-head{padding-top:50px}.section-heading{align-items:flex-start;flex-direction:column}.hot-section{padding:23px 18px}.hot-section:after{font-size:4.5rem;top:38px}.hot-row{grid-template-columns:32px 1fr}.controversy-score{display:none}.hot-main h3{white-space:normal}.profile-grid{grid-template-columns:1fr}.profile-summary{align-items:flex-start;flex-wrap:wrap}.avatar-upload{margin-left:0}.profile-actions .button{width:100%;text-align:center}}
 @media(max-width:600px){.search-form{flex-direction:column}.search-form .button{width:100%}.private-compose{flex-direction:column;align-items:stretch}.private-compose .button{width:100%}.forum-row,.topic-row{padding:17px}.post-body,.post-author{padding:18px}}
+
+/* PRYSM // PERFORMANCE PASS */
+body:before{display:none}
+body:after{display:none}
+.topbar{backdrop-filter:none;-webkit-backdrop-filter:none}
+.button,.card,.post,.profile-box,.reply-box,.report-panel,.moderation-card,.auth-card,.forum-row,.topic-row,.search-result,.conversation-row,.notification-row,.hot-section{box-shadow:none}
+.button:hover{transform:none;box-shadow:none}
+.forum-row:hover,.topic-row:hover{transform:none;box-shadow:none}
+.hot-row:hover,.search-result:hover{box-shadow:none}
+.prism{box-shadow:none}
+.prism-core{box-shadow:none}
+.card:before,.card:nth-child(2):before,.card:nth-child(3):before,.card:nth-child(4):before{box-shadow:none}
+.hot-section{box-shadow:none}
+.avatar{box-shadow:none}
+.reaction.selected{box-shadow:none}
+input:focus,textarea:focus,select:focus{box-shadow:0 0 0 2px rgba(69,239,255,.1)}
+@media(max-width:760px){
+  body{background-attachment:scroll}
+  .topbar{box-shadow:none}
+  .hot-section:after{display:none}
+  .hot-section:before{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+}
