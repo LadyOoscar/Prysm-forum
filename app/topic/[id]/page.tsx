@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getSupabase } from "../../../lib/supabase";
 import ReplyBox from "./reply-box";
 import Reactions from "./reactions";
+import Votes from "./votes";
 import ReportButton from "./report-button";
 import { getReputationTitle } from "../../../lib/reputation";
 
@@ -40,6 +41,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
                   <div className="post-body">
                     <time>{new Date(post.created_at).toLocaleString("fr-FR")}</time>
                     <p>{post.body}</p>
+                    <Votes postId={post.id} />
                     <Reactions postId={post.id} />
                     <ReportButton postId={post.id} />
                   </div>
