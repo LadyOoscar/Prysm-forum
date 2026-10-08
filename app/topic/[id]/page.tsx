@@ -5,6 +5,7 @@ import ReplyBox from "./reply-box";
 import Reactions from "./reactions";
 import Votes from "./votes";
 import ReportButton from "./report-button";
+import Poll from "../poll";
 import { getReputationTitle } from "../../../lib/reputation";
 
 export const revalidate = 10;
@@ -15,6 +16,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
   const { data: topic } = await supabase.from("forum_topics").select("id, title, locked, category_id, forum_categories:category_id(slug, name)").eq("id", id).maybeSingle();
   if (!topic) notFound();
   const { data: posts, error } = await supabase.from("forum_posts").select("id, body, created_at, author_id, profiles:author_id(username, display_name, avatar_url, reputation)").eq("topic_id", id).order("created_at", { ascending: true });
+  const { data: poll } = await supabase.from("forum_polls").select("id").eq("topic_id", id).maybeSingle();
   const authorIds = [...new Set((posts ?? []).map((post:any) => post.author_id).filter(Boolean))];
   const { data: badgeRows } = authorIds.length ? await supabase.from("profile_badges").select("profile_id, badge_id, badges:badge_id(name, icon, tone)").in("profile_id", authorIds) : { data: [] };
   const badgesByProfile = new Map<string, any[]>();
@@ -29,6 +31,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
         <div className="notice error">Impossible de charger cette discussion.</div>
       ) : (
         <>
+          {poll?.id && <Poll pollId={poll.id} />}
           <section className="post-list">
             {(posts ?? []).map((post) => {
               const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles;
