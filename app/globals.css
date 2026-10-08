@@ -1,46 +1,26 @@
 :root {
-  --bg: #090a0f;
-  --panel: #11131b;
-  --panel2: #171a24;
-  --text: #f1f3f8;
-  --muted: #9da4b5;
-  --line: #282d3b;
-  --accent: #a98cff;
-  --accent2: #69d5ff;
+  --bg: #090a0f; --panel: #11131b; --panel2: #171a24; --text: #f1f3f8;
+  --muted: #9da4b5; --line: #282d3b; --accent: #a98cff; --accent2: #69d5ff;
 }
-
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body {
-  margin: 0;
-  background:
-    radial-gradient(circle at 80% 10%, rgba(169,140,255,.12), transparent 30rem),
-    radial-gradient(circle at 15% 35%, rgba(105,213,255,.07), transparent 26rem),
-    var(--bg);
-  color: var(--text);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
+body { margin: 0; background: radial-gradient(circle at 80% 10%, rgba(169,140,255,.12), transparent 30rem), radial-gradient(circle at 15% 35%, rgba(105,213,255,.07), transparent 26rem), var(--bg); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
 a { color: inherit; text-decoration: none; }
 .shell { width: min(1180px, calc(100% - 32px)); margin: auto; }
-.topbar {
-  height: 76px; display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 1px solid var(--line);
-}
+.topbar { min-height: 76px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
 .brand { font-size: 1.35rem; font-weight: 900; letter-spacing: .18em; }
 nav { display: flex; gap: 8px; }
 nav a { color: var(--muted); padding: 10px 13px; border-radius: 10px; font-size: .92rem; }
 nav a:hover, nav a.active { color: var(--text); background: var(--panel2); }
-.hero {
-  min-height: 570px; display: grid; grid-template-columns: 1.25fr .75fr; gap: 60px;
-  align-items: center; padding: 90px 0;
-}
+.hero { min-height: 570px; display: grid; grid-template-columns: 1.25fr .75fr; gap: 60px; align-items: center; padding: 90px 0; }
 .eyebrow { margin: 0 0 12px; color: var(--accent2); text-transform: uppercase; letter-spacing: .14em; font-size: .72rem; font-weight: 800; }
 h1 { font-size: clamp(3rem, 7vw, 6rem); line-height: .92; letter-spacing: -.06em; margin: 0 0 28px; }
 h1 span { color: var(--accent); }
 .lead { max-width: 650px; color: var(--muted); font-size: 1.08rem; line-height: 1.7; }
 .actions { display: flex; gap: 12px; margin-top: 30px; flex-wrap: wrap; }
-.button { border: 1px solid var(--line); padding: 13px 17px; border-radius: 12px; background: var(--panel); }
+.button { display: inline-block; border: 1px solid var(--line); padding: 13px 17px; border-radius: 12px; background: var(--panel); }
 .button.primary { border-color: transparent; background: var(--accent); color: #100d18; font-weight: 800; }
+.button.disabled { opacity: .55; cursor: default; }
 .prism { min-height: 360px; border: 1px solid var(--line); border-radius: 28px; background: linear-gradient(145deg, #141722, #0d0e14); display: grid; place-items: center; position: relative; overflow: hidden; }
 .prism-core { width: 180px; height: 180px; transform: rotate(45deg); border: 1px solid rgba(169,140,255,.7); background: linear-gradient(135deg, rgba(169,140,255,.28), rgba(105,213,255,.05)); box-shadow: 0 0 90px rgba(169,140,255,.2); }
 .prism p { position: absolute; bottom: 24px; left: 24px; color: var(--muted); font-size: .75rem; line-height: 1.8; text-transform: uppercase; letter-spacing: .12em; }
@@ -48,20 +28,46 @@ h1 span { color: var(--accent); }
 .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 28px; }
 h2 { font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1; letter-spacing: -.04em; margin: 0; max-width: 780px; }
 .status { border: 1px solid var(--line); padding: 7px 10px; border-radius: 999px; color: var(--muted); font-size: .68rem; letter-spacing: .12em; }
-.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.card { padding: 25px; min-height: 190px; background: rgba(17,19,27,.78); border: 1px solid var(--line); border-radius: 18px; }
-.card span { color: var(--accent); font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; }
-.card h3 { font-size: 1.35rem; margin: 35px 0 10px; }
+.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.card { padding: 25px; min-height: 205px; background: rgba(17,19,27,.78); border: 1px solid var(--line); border-radius: 18px; transition: transform .15s, border-color .15s; }
+.card:hover { transform: translateY(-3px); border-color: #4b5265; }
+.card span, .forum-kicker { color: var(--accent); font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; }
+.card h3 { font-size: 1.2rem; margin: 35px 0 10px; }
 .card p, .feature p { color: var(--muted); line-height: 1.65; }
+.card strong { display: block; margin-top: 20px; font-size: .82rem; }
 .feature { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; padding: 70px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .feature p { align-self: end; max-width: 520px; }
 footer { padding: 35px 0 60px; color: #666d7e; font-size: .78rem; }
-@media (max-width: 760px) {
-  .topbar { height: auto; padding: 18px 0; align-items: flex-start; gap: 18px; flex-direction: column; }
-  nav { width: 100%; overflow-x: auto; }
-  nav a { white-space: nowrap; }
-  .hero, .feature { grid-template-columns: 1fr; }
-  .hero { padding: 60px 0; }
-  .cards { grid-template-columns: 1fr; }
-  .prism { min-height: 280px; }
-}
+
+.page-head { padding: 80px 0 42px; }
+.page-head.compact { padding-top: 52px; }
+.page-head h1 { font-size: clamp(3rem, 7vw, 5rem); margin-bottom: 18px; }
+.page-head .lead { margin: 0; max-width: 700px; }
+.back { display: inline-block; color: var(--muted); margin-bottom: 28px; font-size: .86rem; }
+.forum-list, .topic-list { display: grid; gap: 12px; padding-bottom: 80px; }
+.forum-row, .topic-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 26px; border: 1px solid var(--line); border-radius: 18px; background: rgba(17,19,27,.8); transition: border-color .15s, transform .15s; }
+.forum-row:hover, .topic-row:hover { border-color: #4b5265; transform: translateX(2px); }
+.forum-row h2, .topic-row h2 { font-size: 1.45rem; margin: 7px 0 8px; }
+.forum-row p, .topic-row p { margin: 0; color: var(--muted); line-height: 1.5; }
+.arrow { color: var(--accent); font-size: 1.35rem; }
+.topic-icon { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px; background: var(--panel2); color: var(--accent); flex: none; }
+.topic-main { flex: 1; }
+.topic-row { justify-content: flex-start; }
+.topic-row .arrow { margin-left: auto; }
+.empty { padding: 70px 25px; text-align: center; border: 1px dashed var(--line); border-radius: 18px; margin-bottom: 80px; }
+.empty-symbol { font-size: 2.2rem; color: var(--accent); margin-bottom: 12px; }
+.empty h2 { font-size: 1.7rem; margin: 0 auto 10px; }
+.empty p { color: var(--muted); margin-bottom: 24px; }
+.notice { padding: 18px; border-radius: 12px; margin-bottom: 50px; }
+.notice.error { border: 1px solid #55333d; background: #1c1116; color: #e9aeb9; }
+.post-list { display: grid; gap: 12px; padding-bottom: 80px; }
+.post { display: grid; grid-template-columns: 190px 1fr; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: rgba(17,19,27,.8); }
+.post-author { padding: 24px; background: rgba(23,26,36,.6); border-right: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px; }
+.post-author span { color: var(--muted); font-size: .78rem; }
+.avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #0d0d14; display: grid; place-items: center; font-weight: 900; margin-bottom: 12px; }
+.post-body { padding: 24px; }
+.post-body time { color: var(--muted); font-size: .72rem; }
+.post-body p { white-space: pre-wrap; line-height: 1.75; margin: 18px 0 0; }
+
+@media (max-width: 900px) { .cards { grid-template-columns: repeat(2, 1fr); } .post { grid-template-columns: 1fr; } .post-author { border-right: 0; border-bottom: 1px solid var(--line); } }
+@media (max-width: 760px) { .topbar { padding: 18px 0; align-items: flex-start; gap: 18px; flex-direction: column; } nav { width: 100%; overflow-x: auto; } nav a { white-space: nowrap; } .hero, .feature { grid-template-columns: 1fr; } .hero { padding: 60px 0; } .cards { grid-template-columns: 1fr; } .prism { min-height: 280px; } .page-head { padding-top: 55px; } }
