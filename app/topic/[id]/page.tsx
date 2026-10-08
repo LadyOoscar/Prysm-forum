@@ -17,7 +17,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
   const supabase = getSupabase();
   const { data: topic } = await supabase.from("forum_topics").select("id, title, locked, pinned, category_id, forum_categories:category_id(slug, name)").eq("id", id).maybeSingle();
   if (!topic) notFound();
-  const { data: posts, error } = await supabase.from("forum_posts").select("id, body, created_at, author_id, profiles:author_id(username, display_name, avatar_url, reputation)").eq("topic_id", id).order("created_at", { ascending: true });
+  const { data: posts, error } = await supabase.from("forum_posts").select("id, body, created_at, author_id, profiles:author_id(username, display_name, avatar_url, reputation, is_admin, is_moderator)").eq("topic_id", id).order("created_at", { ascending: true });
   const { data: poll } = await supabase.from("forum_polls").select("id").eq("topic_id", id).maybeSingle();
   const authorIds = [...new Set((posts ?? []).map((post:any) => post.author_id).filter(Boolean))];
   const { data: badgeRows } = authorIds.length ? await supabase.from("profile_badges").select("profile_id, badge_id, badges:badge_id(name, icon, tone)").in("profile_id", authorIds) : { data: [] };
@@ -43,7 +43,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
                   <aside className="post-author">
                     <Link href={profileHref}>
                       <div className="avatar">{(profile?.display_name || profile?.username || "?").slice(0, 1).toUpperCase()}</div>
-                      <strong>{profile?.display_name || profile?.username || "Membre"}</strong>
+                      <span className={profile?.is_admin ? "role-name role-admin" : profile?.is_moderator ? "role-name role-moderator" : "role-name"}>{profile?.display_name || profile?.username || "Membre"}</span>
                     </Link>
                     <Link className="member-handle" href={profileHref}>@{profile?.username || "membre"}</Link><span className="member-reputation"><strong>{profile?.reputation ?? 0}</strong> réputation · {getReputationTitle(profile?.reputation ?? 0)}</span><div className="member-badges">{(badgesByProfile.get(post.author_id) ?? []).map((badge:any)=><span className={badge?.tone === "negative" ? "profile-badge negative" : "profile-badge"} key={badge?.name}>{badge?.icon} {badge?.name}</span>)}</div>
                   </aside>
