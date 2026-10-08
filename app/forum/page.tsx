@@ -11,7 +11,7 @@ type HotTopic = {
   votes: number;
   postCount: number;
   updatedAt: string;
-  intensity: "HOT" | "TENDANCE" | "ACTIF";
+  intensity: string;
 };
 
 export default async function ForumPage() {
