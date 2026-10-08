@@ -69,15 +69,17 @@ export default function StickerCreator() {
     if (cleanName.length < 2 || cleanName.length > 40) return setError("Le nom doit contenir entre 2 et 40 caractères.");
     setSaving(true);
     try {
-      const { data: auth } = await supabase.auth.getUser();
+      const { data: auth, error: authError } = await supabase.auth.getUser();
+      if (authError) {
+        throw new Error("Session Supabase invalide : " + authError.message);
+      }
       if (!auth.user) {
-        window.location.href = "/auth";
-        return;
+        throw new Error("Aucune session utilisateur détectée. Reconnecte-toi à PRYSM puis réessaie.");
       }
       const info = fileInfo(file);
       const path = auth.user.id + "/" + crypto.randomUUID() + "." + info.extension;
       const { error: uploadError } = await supabase.storage.from("stickers").upload(path, file, { contentType: info.contentType, upsert: false });
-      if (uploadError) throw uploadError;
+      if (uploadError) throw new Error("Upload Storage : " + uploadError.message);
       const { data: publicData } = supabase.storage.from("stickers").getPublicUrl(path);
       const { error: insertError } = await supabase.from("stickers").insert({
         creator_id: auth.user.id,
@@ -92,7 +94,7 @@ export default function StickerCreator() {
       });
       if (insertError) {
         await supabase.storage.from("stickers").remove([path]);
-        throw insertError;
+        throw new Error("Enregistrement du sticker : " + insertError.message);
       }
       setMessage("Sticker envoyé ! Il sera visible dans la galerie après validation.");
       setName("");
@@ -101,7 +103,12 @@ export default function StickerCreator() {
       if (inputRef.current) inputRef.current.value = "";
       await loadMine();
     } catch (err) {
-      const detail = err instanceof Error ? err.message : "";
+      const detail =
+        err instanceof Error
+          ? err.message
+          : typeof err === "object" && err !== null && "message" in err
+            ? String((err as { message?: unknown }).message ?? "")
+            : String(err ?? "");
       setError(detail || "Impossible de créer le sticker. Vérifie que tu es bien connecté et réessaie.");
     } finally {
       setSaving(false);
