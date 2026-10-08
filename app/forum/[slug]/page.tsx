@@ -12,7 +12,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
 
   const { data: topics, error } = await supabase
     .from("forum_topics")
-    .select("id, title, pinned, locked, created_at, updated_at, profiles:author_id(username, display_name, reputation)")
+    .select("id, title, pinned, locked, created_at, updated_at, profiles:author_id(username, display_name, reputation, is_admin, is_moderator)")
     .eq("category_id", category.id)
     .order("pinned", { ascending: false })
     .order("updated_at", { ascending: false });
@@ -37,7 +37,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
         <div className="topic-icon">{topic.pinned ? "★" : topic.locked ? "▣" : "◇"}</div>
         <div className="topic-main">
           <h2>{topic.title}</h2>
-          <p>par {profile?.display_name || profile?.username || "membre"} · {new Date(topic.updated_at).toLocaleDateString("fr-FR")}</p>
+          <p>par {profile?.is_admin ? <span className="role-name role-admin">{profile?.display_name || profile?.username || "membre"}</span> : profile?.is_moderator ? <span className="role-name role-moderator">{profile?.display_name || profile?.username || "membre"}</span> : (profile?.display_name || profile?.username || "membre")} · {new Date(topic.updated_at).toLocaleDateString("fr-FR")}</p>
           <small className="topic-reputation">{activity} · {postCount} message{postCount > 1 ? "s" : ""} · {voteCount} vote{voteCount > 1 ? "s" : ""} · {profile?.reputation ?? 0} réputation</small>
         </div>
         <span className="arrow">→</span>
