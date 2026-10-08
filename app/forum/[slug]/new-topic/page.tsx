@@ -3,7 +3,7 @@ import { FormEvent,useEffect,useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { createSupabaseBrowser } from "../../../../lib/supabase-browser";
-import MentionInput from "../../../../components/mention-input";
+import MentionInput from "../../../components/mention-input";
 function friendlyError(message:string){if(message.includes("ANTI_SPAM_DUPLICATE"))return "Ce sujet ressemble trop à une publication récente. Modifie le titre ou le message avant de réessayer.";if(message.includes("RATE_LIMIT_EXCEEDED")||message.includes("rate limit")||message.includes("check_rate_limit"))return "Tu publies trop rapidement. Attends un peu avant de créer un nouveau sujet.";return message;}
 export default function NewTopic(){const {slug}=useParams<{slug:string}>();const supabase=createSupabaseBrowser();const [categoryId,setCategoryId]=useState("");const [title,setTitle]=useState("");const [body,setBody]=useState("");const [pollQuestion,setPollQuestion]=useState("");const [pollOptions,setPollOptions]=useState(["",""]);const [multiplePoll,setMultiplePoll]=useState(false);const [error,setError]=useState("");const [loading,setLoading]=useState(false);
 useEffect(()=>{supabase.from("forum_categories").select("id").eq("slug",slug).maybeSingle().then(({data})=>setCategoryId(data?.id||""));},[slug]);
