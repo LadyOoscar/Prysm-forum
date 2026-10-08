@@ -255,3 +255,20 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 2px rgba(69,239,255,.1)
 .moderator-action-card:hover{border-color:#62d98b}
 @media(max-width:900px){.admin-action-grid,.moderator-action-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.admin-action-grid,.moderator-action-grid{grid-template-columns:1fr}}
+
+
+/* PRYSM // STICKERS */
+.sticker-picker{position:relative;margin-top:2px}
+.sticker-toggle{border:1px solid #414878;background:#111535;color:#b8c0df;border-radius:3px;padding:8px 11px;cursor:pointer;font-family:"Rajdhani",sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.06em}
+.sticker-toggle:hover{border-color:var(--cyan);color:#fff}
+.sticker-panel{position:absolute;left:0;bottom:calc(100% + 7px);z-index:30;width:min(360px,calc(100vw - 44px));padding:12px;border:1px solid #4b4f91;background:#0b0e28}
+.sticker-panel-head{display:flex;justify-content:space-between;gap:10px;margin-bottom:10px;color:#fff;font-size:.76rem}
+.sticker-panel-head span{color:#737c9e;font-size:.62rem}
+.sticker-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.sticker-card{display:grid;place-items:center;gap:3px;min-height:72px;padding:7px;border:1px solid #303660;border-radius:3px;background:#101535;color:#fff;cursor:pointer}
+.sticker-card:hover{border-color:var(--cyan);background:#171c48}
+.sticker-card>span{font-size:1.8rem;line-height:1.1}
+.sticker-card small{color:#737c9e;font-size:.57rem}
+.inline-sticker{display:inline-block;margin:0 2px;padding:1px 5px;border:1px solid #4b4f91;border-radius:5px;background:#111535;font-size:1.45em;line-height:1.25;vertical-align:middle}
+.private-compose .sticker-picker{align-self:flex-end}
+@media(max-width:600px){.sticker-panel{position:fixed;left:11px;right:11px;bottom:76px;width:auto}.sticker-grid{grid-template-columns:repeat(4,1fr)}.sticker-card{min-height:65px}.private-compose .sticker-picker{align-self:stretch}}
