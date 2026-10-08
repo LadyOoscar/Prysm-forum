@@ -108,11 +108,22 @@ function TopicContent() {
     const userId = typeof claims?.claims?.sub === "string" ? claims.claims.sub : null;
     if (!userId) { setReporting(false); router.push("/login"); return; }
 
-    const payload = reportTarget.type === "topic"
-      ? { reporter_id: userId, topic_id: reportTarget.id, post_id: null, reason: reportReason.trim() }
-      : { reporter_id: userId, topic_id: null, post_id: reportTarget.id, reason: reportReason.trim() };
+    const reportData = {
+      reporter_id: userId,
+      reason: reportReason.trim(),
+    };
 
-    const { error } = await supabase.from("reports").insert(payload);
+    const { error } = reportTarget.type === "topic"
+      ? await supabase.from("reports").insert({
+          ...reportData,
+          topic_id: reportTarget.id,
+          post_id: null,
+        })
+      : await supabase.from("reports").insert({
+          ...reportData,
+          topic_id: null,
+          post_id: reportTarget.id,
+        });
     setReporting(false);
     if (error) { setReportMessage("Impossible d’envoyer le signalement."); return; }
     setReportMessage("Signalement envoyé aux modérateurs.");
