@@ -85,3 +85,5 @@ footer { padding: 35px 0 60px; color: #666d7e; font-size: .78rem; }
 .topic-reputation{display:block;margin-top:5px;color:var(--muted);font-size:.68rem}
 
 .reaction-hint{display:block;width:100%;margin-bottom:4px;color:var(--muted);font-size:.62rem}
+
+.votes{display:flex;align-items:center;gap:7px;margin-top:20px;padding-top:14px;border-top:1px solid var(--line);width:max-content}.vote{width:32px;height:30px;border:1px solid var(--line);border-radius:8px;background:#0d0f16;color:var(--muted);cursor:pointer;font:inherit;display:grid;place-items:center;transition:border-color .15s,background .15s,color .15s}.vote:hover{border-color:#4b5265;color:var(--text)}.vote.selected.vote-up{border-color:#69d5a0;background:rgba(105,213,160,.12);color:#69d5a0}.vote.selected.vote-down{border-color:#e58b9a;background:rgba(229,139,154,.12);color:#e58b9a}.vote:disabled{cursor:wait;opacity:.7}.vote-score{min-width:42px;text-align:center;font-size:.85rem;font-weight:900}.vote-score.positive{color:#69d5a0}.vote-score.negative{color:#e58b9a}.votes small{color:var(--muted);font-size:.65rem;margin-left:2px}
