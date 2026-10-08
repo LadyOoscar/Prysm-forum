@@ -9,7 +9,7 @@ import Poll from "../poll";
 import FollowTopic from "../follow-topic";
 import ForumModerationActions from "../../components/forum-moderation-actions";
 import { getReputationTitle } from "../../../lib/reputation";
-import { renderStickerText } from "../../components/sticker-picker";
+import { StickerText } from "../../components/sticker-picker";
 
 export const revalidate = 10;
 
@@ -50,7 +50,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
                   </aside>
                   <div className="post-body">
                     <time>{new Date(post.created_at).toLocaleString("fr-FR")}</time>
-                    <p>{renderStickerText(post.body)}</p>
+                    <p><StickerText text={post.body} /></p>
                     <Votes postId={post.id} />
                     <Reactions postId={post.id} />
                     <ReportButton postId={post.id} />
