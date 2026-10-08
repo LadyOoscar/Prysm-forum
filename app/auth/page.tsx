@@ -16,7 +16,7 @@ export default function AuthPage() {
   async function submit(e:FormEvent){
     e.preventDefault(); setLoading(true); setMessage("");
     if(mode==="signup"){
-      const {error}=await supabase.auth.signUp({email,password,options:{data:{username,display_name:username}}});
+      const {error}=await supabase.auth.signUp({email,password,options:{data:{username,display_name:username},emailRedirectTo:`${window.location.origin}/auth/callback?next=/profil`}});
       setMessage(error ? error.message : "Compte créé. Vérifie ton e-mail si la confirmation est activée.");
     } else {
       const {error}=await supabase.auth.signInWithPassword({email,password});
