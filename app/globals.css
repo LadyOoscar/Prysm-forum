@@ -85,3 +85,9 @@ footer { padding: 35px 0 60px; color: #666d7e; font-size: .78rem; }
 .report-actions{display:flex;justify-content:flex-end;gap:8px}
 .report-actions .button{padding:9px 12px}
 .report-message{margin:0;color:var(--muted);font-size:.78rem}
+
+.moderation-list{display:grid;gap:14px;padding-bottom:80px}
+.moderation-card{padding:22px;border:1px solid var(--line);border-radius:18px;background:rgba(17,19,27,.8)}
+.moderation-meta{display:flex;justify-content:space-between;gap:15px;align-items:center}.moderation-meta strong{text-transform:uppercase;color:var(--accent);font-size:.75rem;letter-spacing:.1em}.moderation-meta span{color:var(--muted);font-size:.72rem}
+.reported-body{margin:18px 0 10px;line-height:1.65;white-space:pre-wrap}.report-detail{padding:12px;border-radius:10px;background:#0d0f16;color:var(--muted);font-size:.85rem}
+.moderation-actions{display:flex;justify-content:flex-end;margin-top:14px}.moderation-actions select{padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:#0d0f16;color:var(--text);font:inherit}
