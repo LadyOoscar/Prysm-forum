@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSupabase } from "../../../lib/supabase";
+import ReplyBox from "./reply-box";
 
 export const revalidate = 10;
 

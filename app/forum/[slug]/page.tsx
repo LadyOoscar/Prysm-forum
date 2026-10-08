@@ -50,10 +50,10 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
           <div className="empty-symbol">◇</div>
           <h2>La section est encore silencieuse.</h2>
           <p>Le premier sujet pourra bientôt ouvrir la conversation.</p>
-          <span className="button disabled">Nouveau sujet · bientôt</span>
+          <Link className="button primary" href={`/forum/${slug}/new-topic`}>Nouveau sujet</Link>
         </div>
       ) : (
-        <section className="topic-list">
+        <div className="section-actions"><Link className="button primary" href={`/forum/${slug}/new-topic`}>+ Nouveau sujet</Link></div>\n        <section className="topic-list">
           {(topics ?? []).map((topic) => {
             const profile = Array.isArray(topic.profiles) ? topic.profiles[0] : topic.profiles;
             return (
