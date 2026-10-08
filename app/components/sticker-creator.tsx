@@ -80,6 +80,15 @@ export default function StickerCreator() {
       const path = auth.user.id + "/" + crypto.randomUUID() + "." + info.extension;
       const { error: uploadError } = await supabase.storage.from("stickers").upload(path, file, { contentType: info.contentType, upsert: false });
       if (uploadError) throw new Error("Upload Storage : " + uploadError.message);
+      const { data: roleRows } = await supabase
+        .from("moderation_roles")
+        .select("role")
+        .eq("user_id", auth.user.id);
+      const canSelfApprove = (roleRows ?? []).some(row =>
+        ["admin", "founder", "community_moderator"].includes(row.role)
+      );
+      const stickerStatus = canSelfApprove ? "approved" : "pending";
+
       const { data: publicData } = supabase.storage.from("stickers").getPublicUrl(path);
       const { error: insertError } = await supabase.from("stickers").insert({
         creator_id: auth.user.id,
@@ -90,13 +99,18 @@ export default function StickerCreator() {
         mime_type: info.contentType,
         width: null,
         height: null,
-        status: "pending",
+        status: stickerStatus,
+        ...(canSelfApprove ? { approved_at: new Date().toISOString() } : {}),
       });
       if (insertError) {
         await supabase.storage.from("stickers").remove([path]);
         throw new Error("Enregistrement du sticker : " + insertError.message);
       }
-      setMessage("Sticker envoyé ! Il sera visible dans la galerie après validation.");
+      setMessage(
+        canSelfApprove
+          ? "Sticker créé et approuvé automatiquement. Il est disponible dans la galerie !"
+          : "Sticker envoyé ! Il sera visible dans la galerie après validation."
+      );
       setName("");
       setFile(null);
       setPreview("");
