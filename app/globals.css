@@ -13,8 +13,8 @@ html{scroll-behavior:smooth;background:var(--bg)}
 body{
   margin:0;color:var(--ink);font-family:"DM Sans",sans-serif;font-size:16px;line-height:1.5;
   background:
-    linear-gradient(rgba(7,8,25,.57),rgba(7,8,25,.82)),
-    url("/prysm-mascot-wallpaper.svg") center top/cover fixed no-repeat;
+    radial-gradient(circle at 82% 12%,rgba(255,79,195,.12),transparent 28%),
+    linear-gradient(145deg,#08091a,#0d1030 60%,#08091a);
 }
 body:before{
   content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
@@ -178,5 +178,5 @@ input::placeholder,textarea::placeholder{color:#687092}input:focus,textarea:focu
 .reputation-line{margin:6px 0 0!important;color:#8f97b8;font-size:.76rem}.reputation-line strong,.member-reputation strong{color:var(--gold);font-weight:800}.member-reputation{display:block;margin-top:6px;color:#737c9e;font-size:.66rem;line-height:1.35}.topic-reputation{display:block;margin-top:4px;color:#737c9e;font-size:.66rem}
 
 @media(max-width:900px){.cards{grid-template-columns:repeat(2,1fr)}.post{grid-template-columns:1fr}.post-author{border-right:0;border-bottom:1px solid var(--line)}.messages-layout{grid-template-columns:1fr}}
-@media(max-width:760px){body{background-position:60% top}.shell{width:min(100% - 22px,1180px)}.topbar{padding:15px 0;align-items:flex-start;gap:14px;flex-direction:column}.topbar nav{width:100%;overflow-x:auto;flex-wrap:nowrap}.topbar nav a{white-space:nowrap}.hero,.feature{grid-template-columns:1fr}.hero{padding:58px 0}.hero .prism{min-height:260px}.cards{grid-template-columns:1fr}.page-head{padding-top:50px}.section-heading{align-items:flex-start;flex-direction:column}.hot-section{padding:23px 18px}.hot-section:after{font-size:4.5rem;top:38px}.hot-row{grid-template-columns:32px 1fr}.controversy-score{display:none}.hot-main h3{white-space:normal}.profile-grid{grid-template-columns:1fr}.profile-summary{align-items:flex-start;flex-wrap:wrap}.avatar-upload{margin-left:0}.profile-actions .button{width:100%;text-align:center}}
+@media(max-width:760px){body{background-position:center top}.shell{width:min(100% - 22px,1180px)}.topbar{padding:15px 0;align-items:flex-start;gap:14px;flex-direction:column}.topbar nav{width:100%;overflow-x:auto;flex-wrap:nowrap}.topbar nav a{white-space:nowrap}.hero,.feature{grid-template-columns:1fr}.hero{padding:58px 0}.hero .prism{min-height:260px}.cards{grid-template-columns:1fr}.page-head{padding-top:50px}.section-heading{align-items:flex-start;flex-direction:column}.hot-section{padding:23px 18px}.hot-section:after{font-size:4.5rem;top:38px}.hot-row{grid-template-columns:32px 1fr}.controversy-score{display:none}.hot-main h3{white-space:normal}.profile-grid{grid-template-columns:1fr}.profile-summary{align-items:flex-start;flex-wrap:wrap}.avatar-upload{margin-left:0}.profile-actions .button{width:100%;text-align:center}}
 @media(max-width:600px){.search-form{flex-direction:column}.search-form .button{width:100%}.private-compose{flex-direction:column;align-items:stretch}.private-compose .button{width:100%}.forum-row,.topic-row{padding:17px}.post-body,.post-author{padding:18px}}
