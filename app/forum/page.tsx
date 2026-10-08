@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getSupabase } from "../../lib/supabase";
 
-export const revalidate = 30;
+export const revalidate = 60;
 
 type HotTopic = {
   id: string;
@@ -24,7 +24,7 @@ export default async function ForumPage() {
       .from("forum_topics")
       .select("id, title, category_id, updated_at")
       .order("updated_at", { ascending: false })
-      .limit(100),
+      .limit(40),
   ]);
 
   let hotTopics: HotTopic[] = [];
@@ -109,9 +109,9 @@ export default async function ForumPage() {
           </div>
           <p className="hot-intro">Les discussions qui font le plus réagir en ce moment. Les sujets où les avis s’affrontent remontent naturellement.</p>
           <div className="hot-list">
-            {hotTopics.map((topic) => (
+            {hotTopics.map((topic, index) => (
               <Link className="hot-row" href={`/topic/${topic.id}`} key={topic.id}>
-                <div className="hot-rank">#{hotTopics.indexOf(topic) + 1}</div>
+                <div className="hot-rank">#{index + 1}</div>
                 <div className="hot-main">
                   <span>{topic.categoryName}</span>
                   <h3>{topic.title}</h3>
