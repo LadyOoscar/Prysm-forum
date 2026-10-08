@@ -9,7 +9,7 @@ const reactions = [
   { key: "laugh", label: "😂", name: "Drôle" },
   { key: "support", label: "✨", name: "Soutien" },
   { key: "disagree", label: "👎", name: "Pas d’accord" },
-  { key: "angry", label: "😤", name: "Agacé" },
+  { key: "cuck", label: "🫵", name: "Cuck" },
   { key: "cringe", label: "🙄", name: "Cringe" },
   { key: "absurd", label: "🤦", name: "Absurde" },
 ] as const;
