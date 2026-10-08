@@ -240,3 +240,18 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 2px rgba(69,239,255,.1)
 .role-name{font-weight:800}
 .role-admin{color:#ff9d2e!important;text-shadow:0 0 10px rgba(255,157,46,.22)}
 .role-moderator{color:#62d98b!important;text-shadow:0 0 10px rgba(98,217,139,.18)}
+
+/* PRYSM // ADMIN & MODERATOR ACTION CENTERS */
+.admin-action-grid,.moderator-action-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 30px}
+.admin-action-card,.moderator-action-card{display:flex;flex-direction:column;gap:7px;min-height:145px;padding:18px;border:1px solid var(--line);border-radius:4px;background:linear-gradient(180deg,rgba(21,25,65,.96),rgba(13,16,43,.96));color:inherit}
+.admin-action-card:hover{border-color:#ff9d2e}
+.admin-action-card.locked{opacity:.82}
+.admin-action-icon,.moderator-action-card>span{font-size:1.35rem}
+.admin-action-card strong,.moderator-action-card strong{font-family:"Space Grotesk",sans-serif}
+.admin-action-card small,.moderator-action-card small{color:var(--muted);line-height:1.45}
+.admin-section-head{margin:10px 0 20px;padding-top:15px;border-top:1px solid var(--line)}
+.admin-section-head h2{margin:0 0 7px}
+.admin-section-head p:not(.eyebrow){color:var(--muted);margin:0;max-width:720px}
+.moderator-action-card:hover{border-color:#62d98b}
+@media(max-width:900px){.admin-action-grid,.moderator-action-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.admin-action-grid,.moderator-action-grid{grid-template-columns:1fr}}
