@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { createSupabaseBrowser } from "../../lib/supabase-browser";
 
@@ -13,11 +13,27 @@ export default function AuthPage() {
   const [message,setMessage]=useState("");
   const [loading,setLoading]=useState(false);
 
+  useEffect(() => {
+    const error = new URLSearchParams(window.location.search).get("error");
+    if (error === "confirmation") {
+      setMessage("Le lien de confirmation est invalide ou expiré. Demande un nouveau lien puis réessaie.");
+    }
+  }, []);
+
   async function submit(e:FormEvent){
     e.preventDefault(); setLoading(true); setMessage("");
     if(mode==="signup"){
-      const {error}=await supabase.auth.signUp({email,password,options:{data:{username,display_name:username},emailRedirectTo:`${window.location.origin}/auth/callback?next=/profil`}});
-      setMessage(error ? error.message : "Compte créé. Vérifie ton e-mail si la confirmation est activée.");
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+      const redirectTo = `${siteUrl}/auth/callback?next=/profil`;
+      const {error}=await supabase.auth.signUp({
+        email,
+        password,
+        options:{
+          data:{username,display_name:username},
+          emailRedirectTo: redirectTo,
+        },
+      });
+      setMessage(error ? error.message : "Compte créé. Vérifie ton e-mail pour confirmer ton adresse.");
     } else {
       const {error}=await supabase.auth.signInWithPassword({email,password});
       if(error) setMessage(error.message); else window.location.href="/profil";
