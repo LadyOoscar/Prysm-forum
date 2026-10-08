@@ -18,7 +18,7 @@ export default function ProfilPage() {
   const [loading,setLoading]=useState(true); const [saving,setSaving]=useState(false); const [uploading,setUploading]=useState(false); const [message,setMessage]=useState("");
 
   useEffect(()=>{async function load(){const {data}=await supabase.auth.getUser();if(!data.user){window.location.href="/auth";return;}setEmail(data.user.email||"");
-    const {data:p}=await supabase.from("profiles").select("username,display_name,bio,pronouns,identity,interests,age,location,orientation,looking_for,dating_enabled,profile_visibility,undefined").eq("id",data.user.id).maybeSingle();
+    const {data:p}=await supabase.from("profiles").select("username,display_name,bio,pronouns,identity,interests,age,location,orientation,looking_for,dating_enabled,profile_visibility,avatar_url,reputation,xp,level,title").eq("id",data.user.id).maybeSingle();
     if(p){const next=p as Profile;setProfile(next);setForm({display_name:next.display_name||"",bio:next.bio||"",pronouns:next.pronouns||"",identity:next.identity||"",interests:(next.interests||[]).join(", "),age:next.age?.toString()||"",location:next.location||"",orientation:next.orientation||"",looking_for:next.looking_for||"",dating_enabled:next.dating_enabled,profile_visibility:next.profile_visibility||"public"});}setLoading(false);}void load()},[]);
 
   function updateField(field:string,value:string|boolean){setForm(current=>({...current,[field]:value}));}
@@ -31,13 +31,13 @@ export default function ProfilPage() {
     const {error}=await supabase.storage.from("avatars").upload(path,file,{contentType:file.type,upsert:false,cacheControl:"3600"});
     if(error){setMessage("Impossible d’envoyer la photo pour le moment.");setUploading(false);return;}
     const {data:publicData}=supabase.storage.from("avatars").getPublicUrl(path);
-    const {data:updated,error:updateError}=await supabase.from("profiles").update({avatar_url:publicData.publicUrl,updated_at:new Date().toISOString()}).eq("id",data.user.id).select("username,display_name,bio,pronouns,identity,interests,age,location,orientation,looking_for,dating_enabled,profile_visibility,undefined").single();
+    const {data:updated,error:updateError}=await supabase.from("profiles").update({avatar_url:publicData.publicUrl,updated_at:new Date().toISOString()}).eq("id",data.user.id).select("username,display_name,bio,pronouns,identity,interests,age,location,orientation,looking_for,dating_enabled,profile_visibility,avatar_url,reputation,xp,level,title").single();
     if(updateError){await supabase.storage.from("avatars").remove([path]);setMessage("La photo a été envoyée mais n’a pas pu être enregistrée.");}else{setProfile(updated as Profile);setMessage("Photo de profil mise à jour.");}
     setUploading(false);
   }
   async function removeAvatar(){
     setMessage(""); const {data}=await supabase.auth.getUser(); if(!data.user||!profile?.avatar_url)return; setUploading(true);
-    const {data:updated,error}=await supabase.from("profiles").update({avatar_url:null,updated_at:new Date().toISOString()}).eq("id",data.user.id).select("username,display_name,bio,pronouns,identity,interests,age,location,orientation,looking_for,dating_enabled,profile_visibility,undefined").single();
+    const {data:updated,error}=await supabase.from("profiles").update({avatar_url:null,updated_at:new Date().toISOString()}).eq("id",data.user.id).select("username,display_name,bio,pronouns,identity,interests,age,location,orientation,looking_for,dating_enabled,profile_visibility,avatar_url,reputation,xp,level,title").single();
     if(error){setMessage("Impossible de retirer la photo.");setUploading(false);return;}
     setProfile(updated as Profile); setMessage("Photo de profil retirée."); setUploading(false);
   }
