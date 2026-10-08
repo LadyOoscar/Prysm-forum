@@ -2,7 +2,7 @@
 import {useEffect,useMemo,useState} from "react";
 import Link from "next/link";
 import {createSupabaseBrowser} from "../../lib/supabase-browser";
-import DatingFavorite from "../../components/dating-favorite";
+import DatingFavorite from "../components/dating-favorite";
 type Profile={id:string;username:string;display_name:string;bio:string;avatar_url:string|null;age:number|null;location:string|null;identity:string|null;orientation:string|null;looking_for:string|null;interests:string[]};
 export default function RencontresPage(){const supabase=createSupabaseBrowser();const [profiles,setProfiles]=useState<Profile[]>([]);const [liked,setLiked]=useState<Set<string>>(new Set());const [userId,setUserId]=useState("");const [loading,setLoading]=useState(true);const [error,setError]=useState("");const [ageMin,setAgeMin]=useState("");const [ageMax,setAgeMax]=useState("");const [location,setLocation]=useState("");const [identity,setIdentity]=useState("");const [lookingFor,setLookingFor]=useState("");const [interest,setInterest]=useState("");
 useEffect(()=>{async function load(){const {data:auth}=await supabase.auth.getUser();if(!auth.user){window.location.href="/auth";return;}setUserId(auth.user.id);const {data:p,error:e}=await supabase.from("profiles").select("id,username,display_name,bio,avatar_url,age,location,identity,orientation,looking_for,interests").eq("dating_enabled",true).neq("id",auth.user.id).order("updated_at",{ascending:false}).limit(100);if(e){setError("Impossible de charger les profils.");setLoading(false);return;}setProfiles((p??[]) as Profile[]);const {data:l}=await supabase.from("dating_likes").select("liked_id").eq("liker_id",auth.user.id);setLiked(new Set((l??[]).map(x=>x.liked_id)));setLoading(false)}void load()},[]);
