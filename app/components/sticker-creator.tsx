@@ -12,10 +12,7 @@ type Sticker = {
 };
 
 function extension(type: string) {
-  if (type === "image/png") return "png";
-  if (type === "image/gif") return "gif";
-  if (type === "image/webp") return "webp";
-  return "jpg";
+  return type === "image/png" ? "png" : "webp";
 }
 
 async function squareCrop(file: File): Promise<{ blob: Blob; width: number; height: number }> {
