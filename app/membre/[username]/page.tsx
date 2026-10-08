@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSupabase } from "../../../lib/supabase";
 import BlockButton from "./block-button";
+import DatingFavorite from "../../../components/dating-favorite";
+import CompatibilityScore from "../../../components/compatibility-score";
 import { getReputationTitle } from "../../../lib/reputation";
 
 export const revalidate = 30;
@@ -25,7 +27,7 @@ export default async function PublicProfilePage({params}:{params:Promise<{userna
     <section className="page-head compact"><Link className="back" href="/forum">← Retour au forum</Link><p className="eyebrow">Profil public</p><div className="public-profile-hero"><div className="public-avatar">{person.avatar_url?<img src={person.avatar_url} alt=""/>:initials}</div><div><h1>{person.display_name||person.username}</h1><p className="public-username">@{person.username}</p><p className="reputation-line"><strong>{person.reputation}</strong> réputation · {getReputationTitle(person.reputation)}</p><div className="public-badges">{(badgeRows ?? []).map((row:any)=><span className={"profile-badge " + (row.badges?.tone === "negative" ? "negative" : "")} title={row.badges?.description || "Badge PRYSM"} key={row.badge_id}>{row.badges?.icon} {row.badges?.name}</span>)}</div></div></div></section>
     <section className="public-profile-grid">
       <article className="profile-box public-profile-card"><span className="profile-label">À propos</span><p className="public-bio">{person.bio||"Cette personne n’a pas encore écrit de présentation."}</p><div className="public-details">{person.pronouns&&<div><span>Pronoms</span><strong>{person.pronouns}</strong></div>}{person.identity&&<div><span>Identité</span><strong>{person.identity}</strong></div>}{person.age!==null&&<div><span>Âge</span><strong>{person.age} ans</strong></div>}{person.location&&<div><span>Région</span><strong>{person.location}</strong></div>}{person.orientation&&<div><span>Orientation</span><strong>{person.orientation}</strong></div>}{person.looking_for&&<div><span>Recherche</span><strong>{person.looking_for}</strong></div>}</div></article>
-      <aside className="profile-box public-profile-card"><span className="profile-label">Centres d’intérêt</span>{person.interests?.length?<div className="interest-list">{person.interests.map(i=><span className="interest-tag" key={i}>{i}</span>)}</div>:<p className="public-muted">Aucun centre d’intérêt renseigné.</p>}<div className="profile-presence"><span className={person.dating_enabled?"presence-dot active":"presence-dot"}/>{person.dating_enabled?"Profil ouvert aux rencontres":"Rencontres désactivées"}</div><div style={{marginTop:18}}><BlockButton username={person.username}/></div></aside>
+      <aside className="profile-box public-profile-card"><span className="profile-label">Centres d’intérêt</span>{person.interests?.length?<div className="interest-list">{person.interests.map(i=><span className="interest-tag" key={i}>{i}</span>)}</div>:<p className="public-muted">Aucun centre d’intérêt renseigné.</p>}<div className="profile-presence"><span className={person.dating_enabled?"presence-dot active":"presence-dot"}/>{person.dating_enabled?"Profil ouvert aux rencontres":"Rencontres désactivées"}</div><div style={{marginTop:18,display:"flex",gap:8,flexWrap:"wrap"}}><BlockButton username={person.username}/>{person.dating_enabled&&<DatingFavorite profileId={person.id}/>}</div><CompatibilityScore profileId={person.id}/></aside>
     </section>
   </main>;
 }
