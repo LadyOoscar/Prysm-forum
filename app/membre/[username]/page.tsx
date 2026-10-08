@@ -36,6 +36,28 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   return (
     <main className="shell">
+      <style>{`
+        .public-profile-hero{display:flex;align-items:center;gap:20px}
+        .public-avatar{width:82px;height:82px;border-radius:50%;display:grid;place-items:center;overflow:hidden;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0d0d14;font-size:2rem;font-weight:900;flex:none}
+        .public-avatar img{width:100%;height:100%;object-fit:cover}
+        .public-profile-hero h1{font-size:clamp(2.6rem,6vw,4.8rem);margin:0 0 8px}
+        .public-username{margin:0;color:var(--muted);font-size:.9rem}
+        .public-profile-grid{display:grid;grid-template-columns:1.4fr .8fr;gap:14px;padding-bottom:80px}
+        .public-profile-card{margin:0}
+        .profile-label{display:block;color:var(--accent);font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;font-weight:800;margin-bottom:18px}
+        .public-bio{white-space:pre-wrap;line-height:1.75;color:var(--text)!important;margin:0 0 26px!important}
+        .public-details{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+        .public-details div{padding:14px;border:1px solid var(--line);border-radius:12px;background:#0d0f16}
+        .public-details span{display:block;color:var(--muted);font-size:.72rem;margin-bottom:5px}
+        .public-details strong{font-size:.9rem}
+        .interest-list{display:flex;gap:8px;flex-wrap:wrap}
+        .interest-tag{padding:7px 10px;border:1px solid var(--line);border-radius:999px;background:#0d0f16;color:var(--text);font-size:.78rem}
+        .public-muted{color:var(--muted)!important}
+        .profile-presence{display:flex;align-items:center;gap:8px;margin-top:28px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:.78rem}
+        .presence-dot{width:8px;height:8px;border-radius:50%;background:#4b5265}
+        .presence-dot.active{background:#69d5ff;box-shadow:0 0 10px rgba(105,213,255,.5)}
+        @media(max-width:700px){.public-profile-grid{grid-template-columns:1fr}.public-details{grid-template-columns:1fr}.public-profile-hero{align-items:flex-start}}
+      `}</style>
       <header className="topbar">
         <Link className="brand" href="/">PRYSM</Link>
         <nav>
@@ -62,7 +84,6 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         <article className="profile-box public-profile-card">
           <span className="profile-label">À propos</span>
           <p className="public-bio">{person.bio || "Cette personne n’a pas encore écrit de présentation."}</p>
-
           <div className="public-details">
             {person.pronouns && <div><span>Pronoms</span><strong>{person.pronouns}</strong></div>}
             {person.identity && <div><span>Identité</span><strong>{person.identity}</strong></div>}
