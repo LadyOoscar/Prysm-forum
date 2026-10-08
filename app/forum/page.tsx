@@ -105,9 +105,9 @@ export default async function ForumPage() {
               <p className="eyebrow">🔥 Ça chauffe</p>
               <h2>Sujets brûlants</h2>
             </div>
-            <span className="status">CONTROVERSE</span>
+            <span className="status">ÇA DIVISE</span>
           </div>
-          <p className="hot-intro">Les discussions les plus disputées du moment. Plus les votes sont nombreux et partagés, plus le sujet remonte.</p>
+          <p className="hot-intro">Les discussions qui font le plus réagir en ce moment. Les sujets où les avis s’affrontent remontent naturellement.</p>
           <div className="hot-list">
             {hotTopics.map((topic) => (
               <Link className="hot-row" href={`/topic/${topic.id}`} key={topic.id}>
