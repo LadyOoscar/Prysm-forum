@@ -7,6 +7,7 @@ import Votes from "./votes";
 import ReportButton from "./report-button";
 import Poll from "../poll";
 import FollowTopic from "../follow-topic";
+import ForumModerationActions from "../../components/forum-moderation-actions";
 import { getReputationTitle } from "../../../lib/reputation";
 
 export const revalidate = 10;
@@ -14,7 +15,7 @@ export const revalidate = 10;
 export default async function TopicPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const supabase = getSupabase();
-  const { data: topic } = await supabase.from("forum_topics").select("id, title, locked, category_id, forum_categories:category_id(slug, name)").eq("id", id).maybeSingle();
+  const { data: topic } = await supabase.from("forum_topics").select("id, title, locked, pinned, category_id, forum_categories:category_id(slug, name)").eq("id", id).maybeSingle();
   if (!topic) notFound();
   const { data: posts, error } = await supabase.from("forum_posts").select("id, body, created_at, author_id, profiles:author_id(username, display_name, avatar_url, reputation)").eq("topic_id", id).order("created_at", { ascending: true });
   const { data: poll } = await supabase.from("forum_polls").select("id").eq("topic_id", id).maybeSingle();
@@ -27,7 +28,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
   return (
     <main className="shell">
       <header className="topbar"><Link className="brand" href="/">PRYSM</Link><nav><Link href="/">Accueil</Link><Link className="active" href="/forum">Forum</Link><Link href="/recherche">Recherche</Link><Link href="/profil">Profil</Link></nav></header>
-      <section className="page-head compact"><Link className="back" href={"/forum/"+(category?.slug || "")}>← {category?.name || "Section"}</Link><p className="eyebrow">Discussion</p><h1>{topic.title}</h1><div className="section-actions"><FollowTopic topicId={topic.id} /></div></section>
+      <section className="page-head compact"><Link className="back" href={"/forum/"+(category?.slug || "")}>← {category?.name || "Section"}</Link><p className="eyebrow">Discussion</p><h1>{topic.title}</h1><div className="section-actions"><FollowTopic topicId={topic.id} /><ForumModerationActions topicId={topic.id} locked={topic.locked} pinned={topic.pinned} /></div></section>
       {error ? (
         <div className="notice error">Impossible de charger cette discussion.</div>
       ) : (
@@ -52,6 +53,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
                     <Votes postId={post.id} />
                     <Reactions postId={post.id} />
                     <ReportButton postId={post.id} />
+                    <ForumModerationActions postId={post.id} />
                   </div>
                 </article>
               );
