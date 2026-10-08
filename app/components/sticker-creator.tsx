@@ -12,34 +12,22 @@ type Sticker = {
 };
 
 function extension(type: string) {
-  return type === "image/png" ? "png" : "webp";
+  if (type === "image/png") return "png";
+  if (type === "image/gif") return "gif";
+  if (type === "image/jpeg") return "jpg";
+  return "webp";
 }
 
-async function squareCrop(file: File): Promise<{ blob: Blob; width: number; height: number; contentType: string }> {
+async function prepareSticker(file: File): Promise<{ blob: Blob; width: number | null; height: number | null; contentType: string }> {
   const objectUrl = URL.createObjectURL(file);
   try {
-    const source = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const dimensions = await new Promise<{ width: number | null; height: number | null }>((resolve) => {
       const image = new Image();
-      image.onload = () => resolve(image);
-      image.onerror = () => reject(new Error("Le navigateur n'arrive pas à lire cette image."));
+      image.onload = () => resolve({ width: image.naturalWidth || null, height: image.naturalHeight || null });
+      image.onerror = () => resolve({ width: null, height: null });
       image.src = objectUrl;
     });
-    const size = Math.min(source.naturalWidth, source.naturalHeight);
-    if (!size) throw new Error("L'image est invalide ou vide.");
-    const sx = Math.floor((source.naturalWidth - size) / 2);
-    const sy = Math.floor((source.naturalHeight - size) / 2);
-    const canvas = document.createElement("canvas");
-    const output = Math.min(512, size);
-    canvas.width = output;
-    canvas.height = output;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("Impossible de préparer l'image.");
-    ctx.clearRect(0, 0, output, output);
-    ctx.drawImage(source, sx, sy, size, size, 0, 0, output, output);
-    const contentType = file.type === "image/png" ? "image/png" : "image/webp";
-    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, contentType, .9));
-    if (!blob) throw new Error("Impossible de préparer l'image.");
-    return { blob, width: output, height: output, contentType };
+    return { blob: file, width: dimensions.width, height: dimensions.height, contentType: file.type };
   } finally {
     URL.revokeObjectURL(objectUrl);
   }
@@ -97,8 +85,8 @@ export default function StickerCreator() {
         window.location.href = "/auth";
         return;
       }
-      const prepared = await squareCrop(file);
-      const ext = prepared.contentType === "image/png" ? "png" : "webp";
+      const prepared = await prepareSticker(file);
+      const ext = extension(prepared.contentType);
       const path = auth.user.id + "/" + crypto.randomUUID() + "." + ext;
       const { error: uploadError } = await supabase.storage.from("stickers").upload(path, prepared.blob, { contentType: prepared.contentType, upsert: false });
       if (uploadError) throw uploadError;
@@ -138,7 +126,7 @@ export default function StickerCreator() {
         <div>
           <p className="eyebrow">Nouveau sticker</p>
           <h2>Ton image, format PRYSM ✨</h2>
-          <p className="sticker-help">L'image est centrée et recadrée en carré, jusqu'à 512 × 512 px. Les PNG transparents sont conservés.</p>
+          <p className="sticker-help">PRYSM conserve ton image telle quelle. PNG, JPG, GIF et WebP sont acceptés jusqu’à 5 Mo.</p>
         </div>
         <form className="sticker-creator-form" onSubmit={submit}>
           <div className="sticker-upload-zone" onClick={() => inputRef.current?.click()}>
