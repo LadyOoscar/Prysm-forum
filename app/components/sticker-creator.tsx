@@ -15,23 +15,34 @@ function extension(type: string) {
   return type === "image/png" ? "png" : "webp";
 }
 
-async function squareCrop(file: File): Promise<{ blob: Blob; width: number; height: number }> {
-  const source = await createImageBitmap(file);
-  const size = Math.min(source.width, source.height);
-  const sx = Math.floor((source.width - size) / 2);
-  const sy = Math.floor((source.height - size) / 2);
-  const canvas = document.createElement("canvas");
-  const output = Math.min(512, size);
-  canvas.width = output;
-  canvas.height = output;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("Impossible de préparer l'image.");
-  ctx.clearRect(0, 0, output, output);
-  ctx.drawImage(source, sx, sy, size, size, 0, 0, output, output);
-  source.close();
-  const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, file.type === "image/png" ? "image/png" : "image/webp", .9));
-  if (!blob) throw new Error("Impossible de préparer l'image.");
-  return { blob, width: output, height: output };
+async function squareCrop(file: File): Promise<{ blob: Blob; width: number; height: number; contentType: string }> {
+  const objectUrl = URL.createObjectURL(file);
+  try {
+    const source = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error("Le navigateur n'arrive pas à lire cette image."));
+      image.src = objectUrl;
+    });
+    const size = Math.min(source.naturalWidth, source.naturalHeight);
+    if (!size) throw new Error("L'image est invalide ou vide.");
+    const sx = Math.floor((source.naturalWidth - size) / 2);
+    const sy = Math.floor((source.naturalHeight - size) / 2);
+    const canvas = document.createElement("canvas");
+    const output = Math.min(512, size);
+    canvas.width = output;
+    canvas.height = output;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Impossible de préparer l'image.");
+    ctx.clearRect(0, 0, output, output);
+    ctx.drawImage(source, sx, sy, size, size, 0, 0, output, output);
+    const contentType = file.type === "image/png" ? "image/png" : "image/webp";
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, contentType, .9));
+    if (!blob) throw new Error("Impossible de préparer l'image.");
+    return { blob, width: output, height: output, contentType };
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
 }
 
 export default function StickerCreator() {
@@ -87,9 +98,9 @@ export default function StickerCreator() {
         return;
       }
       const prepared = await squareCrop(file);
-      const ext = extension(file.type);
+      const ext = prepared.contentType === "image/png" ? "png" : "webp";
       const path = auth.user.id + "/" + crypto.randomUUID() + "." + ext;
-      const { error: uploadError } = await supabase.storage.from("stickers").upload(path, prepared.blob, { contentType: file.type === "image/png" ? "image/png" : "image/webp", upsert: false });
+      const { error: uploadError } = await supabase.storage.from("stickers").upload(path, prepared.blob, { contentType: prepared.contentType, upsert: false });
       if (uploadError) throw uploadError;
       const { data: publicData } = supabase.storage.from("stickers").getPublicUrl(path);
       const { error: insertError } = await supabase.from("stickers").insert({
@@ -98,7 +109,7 @@ export default function StickerCreator() {
         category,
         tags: [category.toLowerCase()],
         image_url: publicData.publicUrl,
-        mime_type: file.type,
+        mime_type: prepared.contentType,
         width: prepared.width,
         height: prepared.height,
         status: "pending",
@@ -114,7 +125,8 @@ export default function StickerCreator() {
       if (inputRef.current) inputRef.current.value = "";
       await loadMine();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Impossible de créer le sticker.");
+      const detail = err instanceof Error ? err.message : "";
+      setError(detail || "Impossible de créer le sticker. Vérifie que tu es bien connecté et réessaie.");
     } finally {
       setSaving(false);
     }
