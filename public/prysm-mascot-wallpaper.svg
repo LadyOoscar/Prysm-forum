@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#17131d"/><stop offset=".52" stop-color="#25172b"/><stop offset="1" stop-color="#10242b"/></linearGradient>
+  <radialGradient id="glow" cx=".5" cy=".45" r=".7"><stop stop-color="#ff2d86" stop-opacity=".25"/><stop offset="1" stop-color="#ff2d86" stop-opacity="0"/></radialGradient>
+  <filter id="shadow"><feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#000" flood-opacity=".35"/></filter>
+  <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.2" fill="#fff" opacity=".08"/></pattern>
+</defs>
+<rect width="1600" height="1000" fill="url(#bg)"/>
+<rect width="1600" height="1000" fill="url(#glow)"/>
+<rect width="1600" height="1000" fill="url(#dots)"/>
+
+<!-- cozy community room -->
+<path d="M0 780 Q300 690 590 770 T1120 760 T1600 735 V1000 H0Z" fill="#101017" opacity=".85"/>
+<path d="M0 145 H430 V650 H0Z" fill="#3b253d"/>
+<path d="M1170 120 H1600 V680 H1170Z" fill="#17343b"/>
+<g opacity=".9">
+  <rect x="75" y="205" width="255" height="180" rx="10" fill="#f6f1e8"/>
+  <path d="M105 345 L155 265 L215 330 L265 245 L310 345Z" fill="#ff2d86"/>
+  <text x="105" y="240" font-family="sans-serif" font-size="25" font-weight="800" fill="#17151b">PRYSM</text>
+  <rect x="1270" y="195" width="235" height="160" rx="10" fill="#f6f1e8"/>
+  <circle cx="1330" cy="255" r="34" fill="#16a7d9"/>
+  <path d="M1380 315 Q1435 230 1490 315" fill="none" stroke="#6f4bf2" stroke-width="22"/>
+</g>
+
+<!-- shelves -->
+<g fill="#09090d">
+ <rect x="40" y="555" width="390" height="22" rx="6"/><rect x="75" y="575" width="16" height="145"/><rect x="390" y="575" width="16" height="145"/>
+ <rect x="1170" y="555" width="390" height="22" rx="6"/><rect x="1205" y="575" width="16" height="145"/><rect x="1520" y="575" width="16" height="145"/>
+</g>
+<g>
+ <rect x="90" y="490" width="28" height="65" fill="#ff7048"/><rect x="125" y="475" width="24" height="80" fill="#b7df3f"/>
+ <rect x="160" y="505" width="30" height="50" fill="#6f4bf2"/><rect x="205" y="470" width="25" height="85" fill="#16a7d9"/>
+ <rect x="250" y="495" width="29" height="60" fill="#ff2d86"/>
+ <rect x="1220" y="485" width="28" height="70" fill="#6f4bf2"/><rect x="1260" y="505" width="30" height="50" fill="#ff2d86"/>
+ <rect x="1305" y="470" width="24" height="85" fill="#b7df3f"/><rect x="1345" y="495" width="29" height="60" fill="#16a7d9"/>
+ <rect x="1390" y="480" width="28" height="75" fill="#ff7048"/>
+</g>
+
+<!-- mascot shadow -->
+<ellipse cx="1020" cy="865" rx="310" ry="65" fill="#000" opacity=".45"/>
+
+<!-- FEMININE PLUSH SHARK MASCOT -->
+<g transform="translate(690 145)" filter="url(#shadow)">
+  <!-- tail -->
+  <path d="M115 570 C20 535 8 425 82 388 C55 474 118 474 172 438 C205 515 188 563 115 570Z" fill="#5da9c9" stroke="#10151b" stroke-width="10"/>
+  <!-- body -->
+  <path d="M160 140 C275 55 520 88 620 205 C685 281 677 425 605 555 C548 656 370 702 245 632 C145 575 90 454 112 327 C127 243 151 176 160 140Z" fill="#72b8d3" stroke="#10151b" stroke-width="12"/>
+  <!-- belly -->
+  <path d="M270 290 C337 251 463 262 515 330 C562 392 544 508 479 564 C421 614 322 603 272 548 C222 492 217 354 270 290Z" fill="#f7f2e8" stroke="#10151b" stroke-width="7"/>
+  <!-- dorsal fin -->
+  <path d="M345 119 L425 20 L468 154Z" fill="#5da9c9" stroke="#10151b" stroke-width="11"/>
+  <!-- side fins -->
+  <path d="M165 365 L42 415 L173 467Z" fill="#5da9c9" stroke="#10151b" stroke-width="10"/>
+  <path d="M585 353 L720 382 L594 445Z" fill="#5da9c9" stroke="#10151b" stroke-width="10"/>
+  <!-- face -->
+  <ellipse cx="285" cy="238" rx="18" ry="25" fill="#10151b"/>
+  <ellipse cx="470" cy="238" rx="18" ry="25" fill="#10151b"/>
+  <path d="M272 202 Q284 181 305 195" fill="none" stroke="#10151b" stroke-width="8" stroke-linecap="round"/>
+  <path d="M450 195 Q471 181 492 202" fill="none" stroke="#10151b" stroke-width="8" stroke-linecap="round"/>
+  <path d="M340 265 Q378 292 417 265" fill="none" stroke="#10151b" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="265" cy="277" r="13" fill="#ff8ebd" opacity=".75"/><circle cx="490" cy="277" r="13" fill="#ff8ebd" opacity=".75"/>
+  <!-- bow -->
+  <path d="M380 155 C332 118 286 127 293 168 C300 205 352 184 380 164Z" fill="#ff2d86" stroke="#10151b" stroke-width="8"/>
+  <path d="M380 155 C428 118 474 127 467 168 C460 205 408 184 380 164Z" fill="#ff2d86" stroke="#10151b" stroke-width="8"/>
+  <circle cx="380" cy="161" r="16" fill="#b7df3f" stroke="#10151b" stroke-width="7"/>
+  <!-- jacket -->
+  <path d="M205 455 Q375 390 560 460 L600 615 Q420 704 205 612Z" fill="#6f4bf2" stroke="#10151b" stroke-width="11"/>
+  <path d="M380 425 L380 650" stroke="#ff2d86" stroke-width="15"/>
+  <path d="M240 492 L335 455 L360 505 L270 548Z" fill="#b7df3f" stroke="#10151b" stroke-width="7"/>
+  <text x="268" y="522" font-family="sans-serif" font-size="24" font-weight="900" fill="#10151b">PRYSM</text>
+  <path d="M430 485 L505 465 L540 520 L455 536Z" fill="#ff7048" stroke="#10151b" stroke-width="7"/>
+  <!-- little paws -->
+  <path d="M230 580 Q175 618 210 656 Q258 675 282 613Z" fill="#72b8d3" stroke="#10151b" stroke-width="9"/>
+  <path d="M530 590 Q585 620 555 662 Q508 682 480 615Z" fill="#72b8d3" stroke="#10151b" stroke-width="9"/>
+</g>
+
+<!-- foreground objects -->
+<g transform="translate(170 790)">
+ <rect width="235" height="90" rx="10" fill="#f6f1e8" stroke="#101017" stroke-width="7"/>
+ <text x="25" y="42" font-family="sans-serif" font-size="20" font-weight="800" fill="#17151b">FORUM • RENCONTRES</text>
+ <text x="25" y="68" font-family="sans-serif" font-size="15" fill="#6f4bf2">une communauté, pas un catalogue</text>
+</g>
+<g transform="translate(1280 785)">
+ <circle cx="40" cy="40" r="40" fill="#b7df3f" stroke="#101017" stroke-width="7"/>
+ <path d="M22 40 L35 53 L60 25" fill="none" stroke="#101017" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+</svg>
