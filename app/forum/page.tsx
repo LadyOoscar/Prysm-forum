@@ -9,7 +9,9 @@ type HotTopic = {
   categoryName: string;
   controversy: number;
   votes: number;
+  postCount: number;
   updatedAt: string;
+  intensity: "HOT" | "TENDANCE" | "ACTIF";
 };
 
 export default async function ForumPage() {
@@ -32,51 +34,45 @@ export default async function ForumPage() {
   if (topics?.length) {
     const topicIds = topics.map((topic) => topic.id);
     const categoryById = new Map((categories ?? []).map((category) => [category.id, category]));
-
-    const { data: posts } = await supabase
-      .from("forum_posts")
-      .select("id, topic_id")
+    const { data: stats } = await supabase
+      .from("forum_topic_stats")
+      .select("topic_id, post_count, vote_count, up_votes, down_votes, last_post_at")
       .in("topic_id", topicIds);
 
-    const postIds = (posts ?? []).map((post) => post.id);
-    const postTopic = new Map((posts ?? []).map((post) => [post.id, post.topic_id]));
+    const statsByTopic = new Map((stats ?? []).map((stat) => [stat.topic_id, stat]));
+    const now = Date.now();
 
-    if (postIds.length) {
-      const { data: votes } = await supabase
-        .from("forum_votes")
-        .select("post_id, value")
-        .in("post_id", postIds);
+    hotTopics = topics
+      .map((topic) => {
+        const stat = statsByTopic.get(topic.id);
+        const up = stat?.up_votes ?? 0;
+        const down = stat?.down_votes ?? 0;
+        const votes = up + down;
+        const postCount = stat?.post_count ?? 0;
+        const balance = votes ? 1 - Math.abs(up - down) / votes : 0;
+        const controversy = Math.round(votes * balance);
+        const lastActivity = new Date(stat?.last_post_at ?? topic.updated_at).getTime();
+        const hoursSinceActivity = Math.max(0, (now - lastActivity) / 36e5);
+        const intensity = controversy >= 5 || (votes >= 3 && hoursSinceActivity <= 24)
+          ? "HOT"
+          : postCount >= 6 || votes >= 2
+            ? "TENDANCE"
+            : "ACTIF";
 
-      const stats = new Map<string, { up: number; down: number }>();
-
-      for (const vote of votes ?? []) {
-        const topicId = postTopic.get(vote.post_id);
-        if (!topicId) continue;
-        const current = stats.get(topicId) ?? { up: 0, down: 0 };
-        if (vote.value === 1) current.up += 1;
-        else current.down += 1;
-        stats.set(topicId, current);
-      }
-
-      hotTopics = topics
-        .map((topic) => {
-          const stat = stats.get(topic.id) ?? { up: 0, down: 0 };
-          const total = stat.up + stat.down;
-          const balance = total ? 1 - Math.abs(stat.up - stat.down) / total : 0;
-          const controversy = Math.round(total * balance);
-          return {
-            id: topic.id,
-            title: topic.title,
-            categoryName: categoryById.get(topic.category_id)?.name ?? "Forum",
-            controversy,
-            votes: total,
-            updatedAt: topic.updated_at,
-          };
-        })
-        .filter((topic) => topic.votes > 0)
-        .sort((a, b) => b.controversy - a.controversy || b.votes - a.votes)
-        .slice(0, 6);
-    }
+        return {
+          id: topic.id,
+          title: topic.title,
+          categoryName: categoryById.get(topic.category_id)?.name ?? "Forum",
+          controversy,
+          votes,
+          postCount,
+          updatedAt: topic.updated_at,
+          intensity,
+        };
+      })
+      .filter((topic) => topic.postCount > 1)
+      .sort((a, b) => b.controversy - a.controversy || b.postCount - a.postCount || b.votes - a.votes)
+      .slice(0, 6);
   }
 
   return (
@@ -107,15 +103,15 @@ export default async function ForumPage() {
             </div>
             <span className="status">ÇA DIVISE</span>
           </div>
-          <p className="hot-intro">Les discussions qui font le plus réagir en ce moment. Les sujets où les avis s’affrontent remontent naturellement.</p>
+          <p className="hot-intro">Les discussions qui font le plus réagir en ce moment. Activité, réponses et désaccords alimentent le classement.</p>
           <div className="hot-list">
             {hotTopics.map((topic, index) => (
               <Link className="hot-row" href={`/topic/${topic.id}`} key={topic.id}>
                 <div className="hot-rank">#{index + 1}</div>
                 <div className="hot-main">
-                  <span>{topic.categoryName}</span>
+                  <span>{topic.categoryName} · {topic.intensity}</span>
                   <h3>{topic.title}</h3>
-                  <small>{topic.votes} vote{topic.votes > 1 ? "s" : ""} · mis à jour le {new Date(topic.updatedAt).toLocaleDateString("fr-FR")}</small>
+                  <small>{topic.postCount} message{topic.postCount > 1 ? "s" : ""} · {topic.votes} vote{topic.votes > 1 ? "s" : ""} · mis à jour le {new Date(topic.updatedAt).toLocaleDateString("fr-FR")}</small>
                 </div>
                 <strong className="controversy-score">{topic.controversy}<small> intensité</small></strong>
               </Link>
