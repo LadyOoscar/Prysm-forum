@@ -7,13 +7,14 @@ import { getReputationTitle } from "../../../lib/reputation";
 export const revalidate = 30;
 
 type PublicProfile = {
+  id:string;
   username:string; display_name:string; bio:string; avatar_url:string|null; pronouns:string|null; identity:string|null;
   interests:string[]; age:number|null; location:string|null; orientation:string|null; looking_for:string|null; dating_enabled:boolean; reputation:number; created_at:string;
 };
 
 export default async function PublicProfilePage({params}:{params:Promise<{username:string}>}) {
   const {username}=await params;
-  const {data:profile}=await getSupabase().from("profiles").select("username, display_name, bio, avatar_url, pronouns, identity, interests, age, location, orientation, looking_for, dating_enabled, reputation, created_at").eq("username",username).maybeSingle();
+  const {data:profile}=await getSupabase().from("profiles").select("id, username, display_name, bio, avatar_url, pronouns, identity, interests, age, location, orientation, looking_for, dating_enabled, reputation, created_at").eq("username",username).maybeSingle();
   if(!profile) notFound();
   const person=profile as PublicProfile;
   const { data: badgeRows } = await getSupabase().from("profile_badges").select("badge_id, badges:badge_id(name, icon, tone, description)").eq("profile_id", profile.id).order("awarded_at", { ascending: false });
