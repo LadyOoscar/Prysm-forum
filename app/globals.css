@@ -83,3 +83,5 @@ footer { padding: 35px 0 60px; color: #666d7e; font-size: .78rem; }
 .reputation-line{margin:7px 0 0!important;color:var(--muted);font-size:.78rem}.reputation-line strong{color:var(--accent);font-weight:900}.member-reputation{display:block;margin-top:7px;color:var(--muted);font-size:.68rem;line-height:1.35}.member-reputation strong{color:var(--accent);font-weight:900}
 
 .topic-reputation{display:block;margin-top:5px;color:var(--muted);font-size:.68rem}
+
+.reaction-hint{display:block;width:100%;margin-bottom:4px;color:var(--muted);font-size:.62rem}
