@@ -20,15 +20,15 @@ export default function Poll({ pollId }: Props) {
   async function load() {
     const { data: p } = await supabase.from("forum_polls").select("question,multiple_choice").eq("id",pollId).maybeSingle();
     const { data: o } = await supabase.from("forum_poll_options").select("id,label,position").eq("poll_id",pollId).order("position");
-    const { data: v } = await supabase.from("forum_poll_votes").select("option_id").eq("poll_id",pollId);
+    const { data: v } = await supabase.from("forum_poll_results").select("option_id,vote_count").eq("poll_id",pollId);
     if (p) { setQuestion(p.question); setMultiple(p.multiple_choice); }
     setOptions((o ?? []) as Option[]);
     const counts:Record<string,number> = {};
-    for (const row of v ?? []) counts[row.option_id] = (counts[row.option_id] ?? 0) + 1;
+    for (const row of v ?? []) counts[row.option_id] = row.vote_count ?? 0;
     setVotes(counts);
     const { data:{user} } = await supabase.auth.getUser();
     if (user) {
-      const own = (v ?? []).filter((row:any) => false);
+      
       const { data: mine } = await supabase.from("forum_poll_votes").select("option_id").eq("poll_id",pollId).eq("user_id",user.id);
       setSelected((mine ?? []).map((row:any)=>row.option_id));
       setVoted(Boolean(mine?.length));
