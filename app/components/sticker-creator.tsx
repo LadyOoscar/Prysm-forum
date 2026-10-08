@@ -11,26 +11,12 @@ type Sticker = {
   category: string;
 };
 
-function extension(type: string) {
-  if (type === "image/png") return "png";
-  if (type === "image/gif") return "gif";
-  if (type === "image/jpeg") return "jpg";
-  return "webp";
-}
-
-async function prepareSticker(file: File): Promise<{ blob: Blob; width: number | null; height: number | null; contentType: string }> {
-  const objectUrl = URL.createObjectURL(file);
-  try {
-    const dimensions = await new Promise<{ width: number | null; height: number | null }>((resolve) => {
-      const image = new Image();
-      image.onload = () => resolve({ width: image.naturalWidth || null, height: image.naturalHeight || null });
-      image.onerror = () => resolve({ width: null, height: null });
-      image.src = objectUrl;
-    });
-    return { blob: file, width: dimensions.width, height: dimensions.height, contentType: file.type };
-  } finally {
-    URL.revokeObjectURL(objectUrl);
-  }
+function fileInfo(file: File) {
+  const name = file.name.toLowerCase();
+  if (file.type === "image/png" || name.endsWith(".png")) return { extension: "png", contentType: "image/png" };
+  if (file.type === "image/gif" || name.endsWith(".gif")) return { extension: "gif", contentType: "image/gif" };
+  if (file.type === "image/jpeg" || name.endsWith(".jpg") || name.endsWith(".jpeg")) return { extension: "jpg", contentType: "image/jpeg" };
+  return { extension: "webp", contentType: "image/webp" };
 }
 
 export default function StickerCreator() {
@@ -88,10 +74,9 @@ export default function StickerCreator() {
         window.location.href = "/auth";
         return;
       }
-      const prepared = await prepareSticker(file);
-      const ext = extension(prepared.contentType);
-      const path = auth.user.id + "/" + crypto.randomUUID() + "." + ext;
-      const { error: uploadError } = await supabase.storage.from("stickers").upload(path, prepared.blob, { contentType: prepared.contentType, upsert: false });
+      const info = fileInfo(file);
+      const path = auth.user.id + "/" + crypto.randomUUID() + "." + info.extension;
+      const { error: uploadError } = await supabase.storage.from("stickers").upload(path, file, { contentType: info.contentType, upsert: false });
       if (uploadError) throw uploadError;
       const { data: publicData } = supabase.storage.from("stickers").getPublicUrl(path);
       const { error: insertError } = await supabase.from("stickers").insert({
@@ -100,9 +85,9 @@ export default function StickerCreator() {
         category,
         tags: [category.toLowerCase()],
         image_url: publicData.publicUrl,
-        mime_type: prepared.contentType,
-        width: prepared.width,
-        height: prepared.height,
+        mime_type: info.contentType,
+        width: null,
+        height: null,
         status: "pending",
       });
       if (insertError) {
