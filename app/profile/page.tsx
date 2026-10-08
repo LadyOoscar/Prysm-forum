@@ -16,6 +16,11 @@ type Profile = {
   banner_url: string | null;
   identity: string | null;
   interests: string[];
+  age: number | null;
+  location: string | null;
+  orientation: string | null;
+  looking_for: string | null;
+  dating_enabled: boolean;
 };
 
 function normalizeUsername(value: string) {
@@ -50,7 +55,7 @@ export default function ProfilePage() {
 
       const { data, error } = await supabase
         .from("profiles")
-        .select("id,username,display_name,bio,avatar_url,banner_url,pronouns,identity,interests,reputation")
+        .select("id,username,display_name,bio,avatar_url,banner_url,pronouns,identity,interests,age,location,orientation,looking_for,dating_enabled,reputation")
         .eq("id", userId)
         .single();
 
@@ -126,6 +131,11 @@ export default function ProfilePage() {
         banner_url: profile.banner_url?.trim() || null,
         identity: profile.identity?.trim().slice(0, 80) || null,
         interests: [...new Set(profile.interests.map(item => item.trim()).filter(Boolean))].slice(0, 12),
+        age: profile.age,
+        location: profile.location?.trim().slice(0, 80) || null,
+        orientation: profile.orientation?.trim().slice(0, 80) || null,
+        looking_for: profile.looking_for?.trim().slice(0, 120) || null,
+        dating_enabled: profile.dating_enabled,
         updated_at: new Date().toISOString(),
       })
       .eq("id", profile.id)
@@ -188,6 +198,17 @@ export default function ProfilePage() {
               <input value={profile.interests.join(", ")} onChange={e => setProfile({...profile, interests: e.target.value.split(",").map(v => v.trim()).filter(Boolean).slice(0, 12)})} placeholder="jeux vidéo, fantasy, cuisine…" />
               <small className="fieldHint">Sépare les centres d'intérêt par des virgules, jusqu'à 12.</small>
             </label>
+            <div className="datingSettings">
+              <p className="eyebrow">RENCONTRES</p>
+              <label className="toggleLabel"><input type="checkbox" checked={profile.dating_enabled} onChange={e => setProfile({...profile, dating_enabled: e.target.checked})} /> Afficher mon profil dans Rencontres</label>
+              <div className="profileTwoCols">
+                <label>Âge<input type="number" min="18" max="120" value={profile.age ?? ""} onChange={e => setProfile({...profile, age: e.target.value ? Number(e.target.value) : null})} placeholder="18+" /></label>
+                <label>Région / ville<input value={profile.location ?? ""} onChange={e => setProfile({...profile, location: e.target.value})} maxLength={80} placeholder="ex. Paris, Bretagne…" /></label>
+              </div>
+              <label>Orientation<input value={profile.orientation ?? ""} onChange={e => setProfile({...profile, orientation: e.target.value})} maxLength={80} placeholder="ex. lesbienne, bi, pan…" /></label>
+              <label>Je recherche<input value={profile.looking_for ?? ""} onChange={e => setProfile({...profile, looking_for: e.target.value})} maxLength={120} placeholder="ex. amitié, relation, rencontres…" /></label>
+            </div>
+
             <label>Bio<textarea value={profile.bio} onChange={e => setProfile({...profile, bio: e.target.value})} maxLength={500} rows={5} placeholder="Quelques mots sur toi…" /></label>
             <label>URL d'avatar externe <input type="url" value={profile.avatar_url ?? ""} onChange={e => setProfile({...profile, avatar_url: e.target.value})} placeholder="https://…" /></label>
             <label>URL de bannière externe <input type="url" value={profile.banner_url ?? ""} onChange={e => setProfile({...profile, banner_url: e.target.value})} placeholder="https://…" /></label>
