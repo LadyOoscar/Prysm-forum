@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createSupabaseBrowser } from "../../lib/supabase-browser";
 import BadgeManager from "./badge-manager";
+import ModerationSanction from "../components/moderation-sanction";
 
 type Report = {
   id: string;
@@ -102,6 +103,7 @@ export default function ModerationPage() {
     {isAdmin && <div className="notice"><strong>ADMIN</strong> · Tu disposes des pouvoirs complets. <Link href="/admin">Gérer les rôles et les accès →</Link></div>}
     {error && <div className="notice error">{error}</div>}
     <BadgeManager />
+    <ModerationSanction />
     <section className="moderation-list">
       {reports.length === 0 ? <div className="empty"><div className="empty-symbol">✓</div><h2>Aucun signalement</h2><p>La file de modération est vide.</p></div> : reports.map((report) => {
         const topicId = report.forum_posts?.topic_id;
