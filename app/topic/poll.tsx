@@ -20,7 +20,7 @@ export default function Poll({ pollId }: Props) {
   async function load() {
     const { data: p } = await supabase.from("forum_polls").select("question,multiple_choice").eq("id",pollId).maybeSingle();
     const { data: o } = await supabase.from("forum_poll_options").select("id,label,position").eq("poll_id",pollId).order("position");
-    const { data: v } = await supabase.from("forum_poll_results").select("option_id,vote_count").eq("poll_id",pollId);
+    const { data: v } = await supabase.rpc("get_poll_results",{p_poll_id:pollId});
     if (p) { setQuestion(p.question); setMultiple(p.multiple_choice); }
     setOptions((o ?? []) as Option[]);
     const counts:Record<string,number> = {};
