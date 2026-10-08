@@ -101,7 +101,14 @@ export default function ModerationPage() {
     </header>
     <section className="page-head compact"><p className="eyebrow">Modération</p><h1>Centre de contrôle</h1><p className="lead">Examine les signalements, verrouille les sujets problématiques et garde une trace des décisions de modération.</p></section>
     {isAdmin && <div className="notice"><strong>ADMIN</strong> · Tu disposes des pouvoirs complets. <Link href="/admin">Gérer les rôles et les accès →</Link></div>}
+    {!isAdmin && <div className="notice"><strong>MODO</strong> · Tu peux agir sur les contenus, signalements et sanctions, mais pas modifier les rôles de l’équipe.</div>}
     {error && <div className="notice error">{error}</div>}
+    <section className="moderator-action-grid">
+      <div className="moderator-action-card"><span>🚨</span><strong>Signalements</strong><small>Examiner, résoudre ou rejeter les alertes.</small></div>
+      <div className="moderator-action-card"><span>🔒</span><strong>Sujets</strong><small>Verrouiller, déverrouiller ou épingler une discussion.</small></div>
+      <div className="moderator-action-card"><span>🗑️</span><strong>Contenus</strong><small>Supprimer un message ou une discussion problématique.</small></div>
+      <div className="moderator-action-card"><span>⏱️</span><strong>Sanctions</strong><small>Appliquer un bannissement temporaire ou permanent.</small></div>
+    </section>
     <BadgeManager />
     <ModerationSanction />
     <section className="moderation-list">
