@@ -50,10 +50,12 @@ export default function AuthPage() {
       <form onSubmit={submit}>
         {mode==="signup" && <label>Pseudo<input required minLength={2} maxLength={32} value={username} onChange={e=>setUsername(e.target.value)} /></label>}
         <label>E-mail<input required type="email" value={email} onChange={e=>setEmail(e.target.value)} /></label>
-        <label>Mot de passe<input required minLength={8} type="password" value={password} onChange={e=>setPassword(e.target.value)} /></label>
+        <label>Mot de passe<input required minLength={12} type="password" autoComplete={mode==="login"?"current-password":"new-password"} value={password} onChange={e=>setPassword(e.target.value)} /></label>
         <button className="button primary" disabled={loading}>{loading?"Patiente…":mode==="login"?"Se connecter":"Créer mon compte"}</button>
       </form>
       {message && <div className="notice">{message}</div>}
+      {mode==="signup" && <p className="notice">Mot de passe : 12 caractères minimum, avec une minuscule, une majuscule, un chiffre et un symbole.</p>}
+      {mode==="login" && <Link className="switch" href="/auth/reset">Mot de passe oublié ?</Link>}
       <button className="switch" onClick={()=>{setMode(mode==="login"?"signup":"login");setMessage("")}}>{mode==="login"?"Pas encore de compte ? Créer un compte":"Déjà un compte ? Se connecter"}</button>
     </section>
   </main>;
