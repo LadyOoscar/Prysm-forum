@@ -59,7 +59,10 @@ export default function StickerCreator() {
     setError("");
     setMessage("");
     if (!next) return;
-    if (!next.type.startsWith("image/") || !["image/png", "image/jpeg", "image/gif", "image/webp"].includes(next.type)) {
+    const lowerName = next.name.toLowerCase();
+    const allowedExtension = /\.(png|jpe?g|gif|webp)$/.test(lowerName);
+    const allowedMime = ["image/png", "image/jpeg", "image/gif", "image/webp"].includes(next.type);
+    if (!allowedExtension && !allowedMime) {
       setError("Format accepté : PNG, JPG, GIF ou WebP.");
       return;
     }
@@ -129,10 +132,10 @@ export default function StickerCreator() {
           <p className="sticker-help">PRYSM conserve ton image telle quelle. PNG, JPG, GIF et WebP sont acceptés jusqu’à 5 Mo.</p>
         </div>
         <form className="sticker-creator-form" onSubmit={submit}>
-          <div className="sticker-upload-zone" onClick={() => inputRef.current?.click()}>
+          <label className="sticker-upload-zone" htmlFor="sticker-file">
             {preview ? <img src={preview} alt="Aperçu du sticker" /> : <><strong>＋ Choisir une image</strong><small>PNG · JPG · GIF · WebP · 5 Mo max.</small></>}
-            <input ref={inputRef} type="file" accept="image/png,image/jpeg,image/gif,image/webp" onChange={chooseFile} />
-          </div>
+            <input id="sticker-file" ref={inputRef} type="file" accept=".png,.jpg,.jpeg,.gif,.webp,image/png,image/jpeg,image/gif,image/webp" onChange={chooseFile} />
+          </label>
           <div className="sticker-fields">
             <label>Nom<input value={name} onChange={e => setName(e.target.value)} maxLength={40} placeholder="Ex. Cherrie en panique" required /></label>
             <label>Catégorie<select value={category} onChange={e => setCategory(e.target.value)}><option>Général</option><option>Réactions</option><option>Humour</option><option>Amour</option><option>Animaux</option><option>Gaming</option><option>Communauté</option></select></label>
