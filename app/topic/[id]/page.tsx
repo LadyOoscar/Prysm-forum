@@ -65,6 +65,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
             );
           })}
         </section>
+        <ReplyBox topicId={topic.id} locked={topic.locked} />
       )}
     </main>
   );
