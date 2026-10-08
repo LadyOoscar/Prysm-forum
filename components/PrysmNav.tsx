@@ -3,13 +3,14 @@
 import Link from "next/link";
 import NotificationBell from "@/components/NotificationBell";
 
-type NavKey = "forum" | "search" | "messages" | "communities" | "pantheon";
+type NavKey = "forum" | "search" | "messages" | "communities" | "pantheon" | "dating";
 
 export default function PrysmNav({ active = "forum" }: { active?: NavKey }) {
   const items = [
     ["forum", "Forum", "/"],
     ["search", "Recherche", "/search"],
     ["messages", "Messages", "/messages"],
+    ["dating", "Rencontres", "/rencontres"],
     ["communities", "Communautés", "/communities"],
     ["pantheon", "Panthéon", "/pantheon"],
   ] as const;
@@ -31,7 +32,7 @@ export default function PrysmNav({ active = "forum" }: { active?: NavKey }) {
       <nav className="mobileNav" aria-label="Navigation mobile">
         {items.map(([key, label, href]) => (
           <Link key={key} className={active === key ? "active" : ""} href={href}>
-            <span className="mobileNavIcon">{key === "forum" ? "⌂" : key === "search" ? "⌕" : key === "messages" ? "✉" : key === "communities" ? "✦" : "☽"}</span>
+            <span className="mobileNavIcon">{key === "forum" ? "⌂" : key === "search" ? "⌕" : key === "messages" ? "✉" : key === "dating" ? "♥" : key === "communities" ? "✦" : "☽"}</span>
             <span>{label}</span>
           </Link>
         ))}
