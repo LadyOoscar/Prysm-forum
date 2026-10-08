@@ -14,7 +14,11 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
   const supabase = getSupabase();
   const { data: topic } = await supabase.from("forum_topics").select("id, title, locked, category_id, forum_categories:category_id(slug, name)").eq("id", id).maybeSingle();
   if (!topic) notFound();
-  const { data: posts, error } = await supabase.from("forum_posts").select("id, body, created_at, profiles:author_id(username, display_name, avatar_url, reputation)").eq("topic_id", id).order("created_at", { ascending: true });
+  const { data: posts, error } = await supabase.from("forum_posts").select("id, body, created_at, author_id, profiles:author_id(username, display_name, avatar_url, reputation)").eq("topic_id", id).order("created_at", { ascending: true });
+  const authorIds = [...new Set((posts ?? []).map((post:any) => post.author_id).filter(Boolean))];
+  const { data: badgeRows } = authorIds.length ? await supabase.from("profile_badges").select("profile_id, badge_id, badges:badge_id(name, icon, tone)").in("profile_id", authorIds) : { data: [] };
+  const badgesByProfile = new Map<string, any[]>();
+  for (const row of badgeRows ?? []) { const list = badgesByProfile.get(row.profile_id) ?? []; list.push(row.badges); badgesByProfile.set(row.profile_id, list); }
   const category = Array.isArray(topic.forum_categories) ? topic.forum_categories[0] : topic.forum_categories;
 
   return (
@@ -36,7 +40,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
                       <div className="avatar">{(profile?.display_name || profile?.username || "?").slice(0, 1).toUpperCase()}</div>
                       <strong>{profile?.display_name || profile?.username || "Membre"}</strong>
                     </Link>
-                    <Link className="member-handle" href={profileHref}>@{profile?.username || "membre"}</Link><span className="member-reputation"><strong>{profile?.reputation ?? 0}</strong> réputation · {getReputationTitle(profile?.reputation ?? 0)}</span>
+                    <Link className="member-handle" href={profileHref}>@{profile?.username || "membre"}</Link><span className="member-reputation"><strong>{profile?.reputation ?? 0}</strong> réputation · {getReputationTitle(profile?.reputation ?? 0)}</span><div className="member-badges">{(badgesByProfile.get(post.author_id) ?? []).map((badge:any)=><span className={badge?.tone === "negative" ? "profile-badge negative" : "profile-badge"} key={badge?.name}>{badge?.icon} {badge?.name}</span>)}</div>
                   </aside>
                   <div className="post-body">
                     <time>{new Date(post.created_at).toLocaleString("fr-FR")}</time>
