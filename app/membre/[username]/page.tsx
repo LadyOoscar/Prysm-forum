@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getSupabase } from "../../../lib/supabase";
 import BlockButton from "./block-button";
 import DatingFavorite from "../../components/dating-favorite";
-import CompatibilityScore from "../../../components/compatibility-score";
+import CompatibilityScore from "../../components/compatibility-score";
 import { getReputationTitle } from "../../../lib/reputation";
 
 export const revalidate = 30;
