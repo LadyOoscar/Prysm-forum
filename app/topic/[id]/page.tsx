@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getSupabase } from "../../../lib/supabase";
 import ReplyBox from "./reply-box";
 import Reactions from "./reactions";
+import ReportButton from "./report-button";
 
 export const revalidate = 10;
 
@@ -16,6 +17,6 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
   return <main className="shell">
     <header className="topbar"><Link className="brand" href="/">PRYSM</Link><nav><Link href="/">Accueil</Link><Link className="active" href="/forum">Forum</Link><Link href="/#rencontres">Rencontres</Link><Link href="/#messages">Messages</Link><Link href="/profil">Profil</Link></nav></header>
     <section className="page-head compact"><Link className="back" href={"/forum/"+(category?.slug || "")}>← {category?.name || "Section"}</Link><p className="eyebrow">Discussion</p><h1>{topic.title}</h1></section>
-    {error ? <div className="notice error">Impossible de charger cette discussion.</div> : <><section className="post-list">{(posts ?? []).map((post) => { const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles; return <article className="post" key={post.id}><aside className="post-author"><div className="avatar">{(profile?.display_name || profile?.username || "?").slice(0, 1).toUpperCase()}</div><strong>{profile?.display_name || profile?.username || "Membre"}</strong><span>@{profile?.username || "membre"}</span></aside><div className="post-body"><time>{new Date(post.created_at).toLocaleString("fr-FR")}</time><p>{post.body}</p><Reactions postId={post.id} /></div></article>; })}</section><ReplyBox topicId={topic.id} locked={topic.locked} /></>}
+    {error ? <div className="notice error">Impossible de charger cette discussion.</div> : <><section className="post-list">{(posts ?? []).map((post) => { const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles; return <article className="post" key={post.id}><aside className="post-author"><div className="avatar">{(profile?.display_name || profile?.username || "?").slice(0, 1).toUpperCase()}</div><strong>{profile?.display_name || profile?.username || "Membre"}</strong><span>@{profile?.username || "membre"}</span></aside><div className="post-body"><time>{new Date(post.created_at).toLocaleString("fr-FR")}</time><p>{post.body}</p><Reactions postId={post.id} /><ReportButton postId={post.id} /></div></article>; })}</section><ReplyBox topicId={topic.id} locked={topic.locked} /></>}
   </main>;
 }
