@@ -51,7 +51,7 @@ export default function ProfilePage() {
         return;
       }
 
-      setEmail(typeof claimsData.claims.email === "string" ? claimsData.claims.email : "");
+      setEmail(typeof claimsData?.claims?.email === "string" ? claimsData.claims.email : "");
 
       const { data, error } = await supabase
         .from("profiles")
