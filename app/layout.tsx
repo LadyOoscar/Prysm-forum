@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import ActivityPulse from "./components/activity-pulse";
 
 export const metadata: Metadata = {
   title: "PRYSM",
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="fr">
-      <body>{children}</body>
+      <body><ActivityPulse />{children}</body>
     </html>
   );
 }
