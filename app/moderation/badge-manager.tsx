@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createSupabaseBrowser } from "../lib/supabase-browser";
+import { createSupabaseBrowser } from "../../lib/supabase-browser";
 
 type Badge = { id: string; slug: string; name: string; description: string; icon: string; tone: string };
 type Award = { profile_id: string; badge_id: string; reason: string; awarded_at: string; badges: Badge | null };
