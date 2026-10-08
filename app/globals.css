@@ -234,3 +234,9 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 2px rgba(69,239,255,.1)
 /* PRYSM // MODERATION POWERS */
 .moderation-inline-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.moderation-inline-actions .button{min-height:34px}.button.danger{border-color:#6a3150;color:#ff9fbe}.button.danger:hover{border-color:#ff5b8d;background:#2a1020}.moderation-tool{margin:0 0 28px;padding:20px;border:1px solid #4b3f86;border-radius:4px;background:rgba(13,16,43,.82)}.moderation-tool .page-head{padding:0;margin:0 0 16px}.moderation-search{display:flex;gap:8px}.moderation-search input{flex:1;min-width:0;padding:10px 12px}.moderation-tool .moderation-list{margin-top:14px}.moderation-tool .moderation-card{margin-bottom:8px}
 @media(max-width:600px){.moderation-search{flex-direction:column}.moderation-search .button{width:100%}.moderation-inline-actions{display:grid;grid-template-columns:1fr}.moderation-inline-actions .button{width:100%}}
+
+
+/* PRYSM role colors */
+.role-name{font-weight:800}
+.role-admin{color:#ff9d2e!important;text-shadow:0 0 10px rgba(255,157,46,.22)}
+.role-moderator{color:#62d98b!important;text-shadow:0 0 10px rgba(98,217,139,.18)}
