@@ -18,6 +18,7 @@ export default function AdminPage() {
   const [members, setMembers] = useState<Member[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState("");
+  const [currentUserId, setCurrentUserId] = useState("");
 
   async function load() {
     const { data: { user } } = await supabase.auth.getUser();
@@ -124,10 +125,10 @@ export default function AdminPage() {
               <button
                 className={member.is_admin ? "button primary" : "button"}
                 type="button"
-                disabled={busy === member.id || member.is_admin}
-                onClick={() => void setRole(member, "is_admin", true)}
+                disabled={busy === member.id || member.id === currentUserId}
+                onClick={() => void setRole(member, "is_admin", !member.is_admin)}
               >
-                {member.is_admin ? "ADMIN" : "Promouvoir admin"}
+                {member.is_admin ? (member.id === currentUserId ? "ADMIN (toi)" : "Retirer admin") : "Promouvoir admin"}
               </button>
               <button
                 className={member.is_moderator ? "button primary" : "button"}
@@ -137,7 +138,7 @@ export default function AdminPage() {
               >
                 {member.is_moderator ? "MODÉRATEUR" : "Nommer modérateur"}
               </button>
-              {member.is_moderator && !member.is_admin && (
+              {member.is_moderator && !member.is_admin && member.id !== currentUserId && (
                 <button
                   className="button"
                   type="button"
@@ -148,6 +149,7 @@ export default function AdminPage() {
                 </button>
               )}
               {member.is_admin && <span className="status">POUVOIRS COMPLETS</span>}
+              {member.id === currentUserId && <span className="status">COMPTE PROTÉGÉ</span>}
             </div>
           </article>
         ))}
