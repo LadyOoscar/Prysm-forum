@@ -1,0 +1,10 @@
+"use client";
+import {useEffect,useRef,useState} from "react";
+import {createSupabaseBrowser} from "../../lib/supabase-browser";
+type Props={value:string;onChange:(value:string)=>void;placeholder?:string;maxLength?:number;required?:boolean};
+type User={username:string;display_name:string};
+export default function MentionInput({value,onChange,placeholder,maxLength=10000,required}:Props){const supabase=createSupabaseBrowser();const [users,setUsers]=useState<User[]>([]);const [open,setOpen]=useState(false);const [query,setQuery]=useState("");const ref=useRef<HTMLTextAreaElement>(null);
+useEffect(()=>{if(!open||!query){setUsers([]);return;}const t=setTimeout(async()=>{const {data}=await supabase.from("profiles").select("username,display_name").ilike("username",query+"%").order("username").limit(8);setUsers((data??[]) as User[])},120);return()=>clearTimeout(t)},[query,open]);
+function input(v:string){onChange(v);const el=ref.current;if(!el)return;const before=v.slice(0,el.selectionStart??v.length);const match=before.match(/(^|\s)@([a-zA-Z0-9_]{1,32})$/);if(match){setQuery(match[2]);setOpen(true)}else setOpen(false)}
+function choose(username:string){const el=ref.current;const pos=el?.selectionStart??value.length;const before=value.slice(0,pos);const replaced=before.replace(/(^|\s)@[a-zA-Z0-9_]{1,32}$/,(m,p)=>p+"@"+username+" ");onChange(replaced+value.slice(pos));setOpen(false);requestAnimationFrame(()=>{if(el){el.focus();const p=replaced.length;el.setSelectionRange(p,p)}})}
+return <div className="mention-wrap"><textarea ref={ref} required={required} maxLength={maxLength} value={value} placeholder={placeholder} onChange={e=>input(e.target.value)} onBlur={()=>setTimeout(()=>setOpen(false),120)}/>{open&&users.length>0&&<div className="mention-menu">{users.map(u=><button type="button" key={u.username} onMouseDown={e=>e.preventDefault()} onClick={()=>choose(u.username)}><strong>@{u.username}</strong><span>{u.display_name}</span></button>)}</div>}</div>}
