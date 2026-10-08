@@ -89,3 +89,78 @@ footer { padding: 35px 0 60px; color: #666d7e; font-size: .78rem; }
 .votes{display:flex;align-items:center;gap:7px;margin-top:20px;padding-top:14px;border-top:1px solid var(--line);width:max-content}.vote{width:32px;height:30px;border:1px solid var(--line);border-radius:8px;background:#0d0f16;color:var(--muted);cursor:pointer;font:inherit;display:grid;place-items:center;transition:border-color .15s,background .15s,color .15s}.vote:hover{border-color:#4b5265;color:var(--text)}.vote.selected.vote-up{border-color:#69d5a0;background:rgba(105,213,160,.12);color:#69d5a0}.vote.selected.vote-down{border-color:#e58b9a;background:rgba(229,139,154,.12);color:#e58b9a}.vote:disabled{cursor:wait;opacity:.7}.vote-score{min-width:42px;text-align:center;font-size:.85rem;font-weight:900}.vote-score.positive{color:#69d5a0}.vote-score.negative{color:#e58b9a}.votes small{color:var(--muted);font-size:.65rem;margin-left:2px}
 
 .hot-section{padding:20px 0 55px}.hot-intro{margin:-14px 0 20px;color:var(--muted);line-height:1.6;max-width:760px}.hot-list{display:grid;gap:10px}.hot-row{display:grid;grid-template-columns:54px 1fr auto;align-items:center;gap:16px;padding:18px 20px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(100deg,rgba(169,140,255,.08),rgba(17,19,27,.82));transition:border-color .15s,transform .15s}.hot-row:hover{border-color:#5b526f;transform:translateX(2px)}.hot-rank{font-size:1rem;font-weight:900;color:var(--accent)}.hot-main{min-width:0}.hot-main>span{color:var(--accent2);font-size:.66rem;text-transform:uppercase;letter-spacing:.1em}.hot-main h3{margin:5px 0 6px;font-size:1.05rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hot-main small{color:var(--muted);font-size:.7rem}.controversy-score{min-width:78px;text-align:right;font-size:1.15rem;color:#e58b9a}.controversy-score small{display:block;color:var(--muted);font-size:.58rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em}.forum-section{padding:20px 0 80px}.forum-section .forum-list{padding-bottom:0}.forum-section .section-heading{margin-bottom:24px}@media(max-width:650px){.hot-row{grid-template-columns:36px 1fr}.controversy-score{grid-column:2;text-align:left}.hot-main h3{white-space:normal}.hot-section .section-heading{align-items:flex-start;flex-direction:column}}
+
+
+/* PRYSM queer pop visual direction: saturated 2D comic energy, original and non-derivative */
+:root{
+  --bg:#fff4e7;--panel:#fffaf4;--panel2:#f7e5f4;--text:#24152d;--muted:#6f596f;--line:#2d1d35;
+  --accent:#f21b82;--accent2:#6b35ff;--cyan:#00cfe8;--yellow:#ffd43b;--mint:#70e1b4;--orange:#ff7043;
+}
+body{
+  background:
+    radial-gradient(circle at 8% 8%,rgba(242,27,130,.18) 0 7rem,transparent 7.1rem),
+    radial-gradient(circle at 92% 16%,rgba(0,207,232,.18) 0 8rem,transparent 8.1rem),
+    linear-gradient(135deg,#fff4e7 0%,#fff9f2 48%,#f6e9ff 100%);
+  color:var(--text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+body:before,body:after{content:"";position:fixed;z-index:-1;pointer-events:none;width:180px;height:180px;border:5px solid var(--line);opacity:.08;transform:rotate(18deg);border-radius:35%}
+body:before{top:12%;right:-60px;background:var(--yellow)}
+body:after{bottom:8%;left:-70px;background:var(--cyan)}
+.shell{width:min(1220px,calc(100% - 28px))}
+.topbar{min-height:78px;border-bottom:4px solid var(--line);position:relative}
+.brand{font-size:1.65rem;letter-spacing:.12em;color:var(--accent);text-shadow:3px 3px 0 var(--yellow);transform:rotate(-2deg)}
+nav{gap:5px;flex-wrap:wrap}
+nav a{color:var(--text);font-weight:800;padding:10px 13px;border:2px solid transparent;border-radius:12px}
+nav a:hover,nav a.active{background:var(--yellow);border-color:var(--line);box-shadow:3px 3px 0 var(--line);color:var(--text);transform:rotate(-1deg)}
+.eyebrow{color:var(--accent2);font-weight:950;letter-spacing:.1em}
+h1,h2,h3{font-weight:950}
+h1{letter-spacing:-.055em;text-shadow:4px 4px 0 rgba(255,212,59,.72)}
+h1 span{color:var(--accent)}
+.lead{color:var(--muted);font-weight:650}
+.button{border:3px solid var(--line);background:var(--panel);color:var(--text);border-radius:13px;font-weight:850;box-shadow:4px 4px 0 var(--line)}
+.button:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--line)}
+.button.primary{background:var(--accent);color:white;border-color:var(--line)}
+.page-head{padding:70px 0 38px}
+.page-head h1{font-size:clamp(3.5rem,8vw,6.8rem)}
+.section{padding:42px 0 78px}
+.section-heading{margin-bottom:22px}
+.status{border:3px solid var(--line);background:var(--yellow);color:var(--text);border-radius:9px;font-weight:950;box-shadow:3px 3px 0 var(--line);transform:rotate(2deg)}
+.forum-row,.topic-row,.search-result,.moderation-card,.profile-box,.reply-box,.auth-card,.card{
+  border:3px solid var(--line);background:var(--panel);border-radius:18px;box-shadow:5px 5px 0 var(--line)
+}
+.forum-row:hover,.topic-row:hover,.search-result:hover,.card:hover{border-color:var(--line);transform:translate(-3px,-3px);box-shadow:8px 8px 0 var(--accent)}
+.forum-row:nth-child(4n+1){background:#fff7a8}.forum-row:nth-child(4n+2){background:#ffd5ea}.forum-row:nth-child(4n+3){background:#c9f7f5}.forum-row:nth-child(4n+4){background:#dfd1ff}
+.forum-kicker,.card span,.hot-main>span{color:var(--accent2);font-weight:950}
+.arrow{color:var(--accent);font-weight:950;font-size:1.8rem}
+.topic-icon{background:var(--cyan);border:3px solid var(--line);color:var(--text);box-shadow:3px 3px 0 var(--line)}
+.post{border:3px solid var(--line);border-radius:18px;background:var(--panel);box-shadow:5px 5px 0 var(--line)}
+.post-author{background:#f7dff1;border-right:3px solid var(--line)}
+.avatar{border:3px solid var(--line);background:linear-gradient(135deg,var(--accent),var(--cyan));box-shadow:3px 3px 0 var(--line)}
+.reactions{border-top:3px dashed rgba(45,29,53,.25)}
+.reaction{border:2px solid var(--line);background:#fff;color:var(--text);font-weight:800;box-shadow:2px 2px 0 var(--line)}
+.reaction:hover{border-color:var(--line);background:var(--yellow);color:var(--text)}
+.reaction.selected{border-color:var(--line);background:var(--mint);color:var(--text);box-shadow:3px 3px 0 var(--line)}
+.hot-section{margin:12px 0 54px;padding:28px;background:#2d1d35;border:4px solid var(--line);border-radius:24px;box-shadow:8px 8px 0 var(--accent)}
+.hot-section .eyebrow{color:var(--yellow)}
+.hot-section h2{color:#fff;font-size:clamp(2.1rem,5vw,3.7rem)}
+.hot-intro{color:#f5dff0;max-width:760px;font-weight:650;line-height:1.55}
+.hot-list{display:grid;gap:11px;margin-top:22px}
+.hot-row{display:flex;align-items:center;gap:16px;padding:17px 18px;border:3px solid var(--line);border-radius:15px;background:#fff8ef;color:var(--text);box-shadow:4px 4px 0 var(--yellow);transition:.15s}
+.hot-row:hover{transform:translate(-3px,-3px);box-shadow:7px 7px 0 var(--cyan)}
+.hot-rank{font-size:1.25rem;font-weight:950;color:var(--accent)}
+.hot-main{min-width:0;flex:1}
+.hot-main h3{margin:5px 0 5px;font-size:1.08rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hot-main small{color:var(--muted)}
+.controversy-score{font-size:1.15rem;color:var(--accent2);white-space:nowrap}
+.controversy-score small{font-size:.62rem;color:var(--muted);font-weight:800}
+.notice.error{border:3px solid var(--line);background:#ffd5dc;color:#7e1730}
+input,textarea,select{border:2px solid var(--line)!important;background:#fffaf4!important;color:var(--text)!important}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)!important;box-shadow:3px 3px 0 var(--cyan);outline:none}
+.empty{border:3px dashed var(--line);background:rgba(255,250,244,.7)}
+@media(max-width:760px){
+  .shell{width:min(100% - 18px,1220px)}
+  .hot-section{padding:20px}
+  .hot-row{align-items:flex-start}
+  .controversy-score{display:none}
+}
