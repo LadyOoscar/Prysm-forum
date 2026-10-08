@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { createSupabaseBrowser } from "../../lib/supabase-browser";
 import BadgeManager from "./badge-manager";
 
@@ -23,6 +24,7 @@ export default function ModerationPage() {
   const supabase = createSupabaseBrowser();
   const [reports, setReports] = useState<Report[]>([]);
   const [allowed, setAllowed] = useState<boolean | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [lockedTopics, setLockedTopics] = useState<Record<string, boolean>>({});
@@ -30,9 +32,10 @@ export default function ModerationPage() {
   async function load() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setAllowed(false); return; }
-    const { data: profile } = await supabase.from("profiles").select("is_moderator").eq("id", user.id).maybeSingle();
+    const { data: profile } = await supabase.from("profiles").select("is_moderator, is_admin").eq("id", user.id).maybeSingle();
     if (!profile?.is_moderator) { setAllowed(false); return; }
     setAllowed(true);
+    setIsAdmin(Boolean(profile.is_admin));
 
     const { data, error } = await supabase.from("forum_reports")
       .select("id, post_id, reporter_id, reason, details, status, created_at, forum_posts:post_id(body, topic_id)")
@@ -85,7 +88,18 @@ export default function ModerationPage() {
   if (!allowed) return <main className="shell"><section className="page-head"><p className="eyebrow">Modération</p><h1>Accès refusé</h1><p className="lead">Cette section est réservée aux membres de l’équipe de modération.</p></section></main>;
 
   return <main className="shell">
+    <header className="topbar">
+      <Link className="brand" href="/">PRYSM</Link>
+      <nav>
+        <Link href="/">Accueil</Link>
+        <Link href="/forum">Forum</Link>
+        <Link className="active" href="/moderation">Modération</Link>
+        {isAdmin && <Link href="/admin">Administration</Link>}
+        <Link href="/profil">Profil</Link>
+      </nav>
+    </header>
     <section className="page-head compact"><p className="eyebrow">Modération</p><h1>Centre de contrôle</h1><p className="lead">Examine les signalements, verrouille les sujets problématiques et garde une trace des décisions de modération.</p></section>
+    {isAdmin && <div className="notice"><strong>ADMIN</strong> · Tu disposes des pouvoirs complets. <Link href="/admin">Gérer les rôles et les accès →</Link></div>}
     {error && <div className="notice error">{error}</div>}
     <BadgeManager />
     <section className="moderation-list">
