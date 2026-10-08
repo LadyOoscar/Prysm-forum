@@ -50,10 +50,21 @@ export default function Reactions({ postId }: { postId: string }) {
         setCounts((current) => ({ ...current, [reaction]: Math.max(0, (current[reaction] ?? 1) - 1) }));
       }
     } else {
+      const previous = mine[0];
+      if (previous) {
+        const { error: removeError } = await supabase.from("forum_reactions").delete().eq("post_id", postId).eq("user_id", userId);
+        if (removeError) {
+          setBusy(null);
+          return;
+        }
+        setCounts((current) => ({ ...current, [previous]: Math.max(0, (current[previous] ?? 1) - 1) }));
+      }
       const { error } = await supabase.from("forum_reactions").insert({ post_id: postId, user_id: userId, reaction });
       if (!error) {
-        setMine((current) => [...current, reaction]);
+        setMine([reaction]);
         setCounts((current) => ({ ...current, [reaction]: (current[reaction] ?? 0) + 1 }));
+      } else if (previous) {
+        setMine([]);
       }
     }
     setBusy(null);
