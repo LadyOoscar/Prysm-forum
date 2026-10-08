@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createSupabaseBrowser } from "../../lib/supabase-browser";
+import BadgeManager from "./badge-manager";
 
 type Report = {
   id: string;
@@ -86,6 +87,7 @@ export default function ModerationPage() {
   return <main className="shell">
     <section className="page-head compact"><p className="eyebrow">Modération</p><h1>Centre de contrôle</h1><p className="lead">Examine les signalements, verrouille les sujets problématiques et garde une trace des décisions de modération.</p></section>
     {error && <div className="notice error">{error}</div>}
+    <BadgeManager />
     <section className="moderation-list">
       {reports.length === 0 ? <div className="empty"><div className="empty-symbol">✓</div><h2>Aucun signalement</h2><p>La file de modération est vide.</p></div> : reports.map((report) => {
         const topicId = report.forum_posts?.topic_id;
