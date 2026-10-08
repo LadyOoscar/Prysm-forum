@@ -70,7 +70,7 @@ export default function Reactions({ postId }: { postId: string }) {
     setBusy(null);
   }
 
-  return <div className="reactions" aria-label="Réactions">{reactions.map((reaction) => {
+  return <div className="reactions" aria-label="Réactions"><small className="reaction-hint">Une réaction par message</small>{reactions.map((reaction) => {
     const selected = mine.includes(reaction.key);
     return <button className={selected ? "reaction selected" : "reaction"} key={reaction.key} type="button" onClick={() => toggle(reaction.key)} disabled={busy !== null} title={reaction.name} aria-pressed={selected}><span>{reaction.label}</span><strong>{counts[reaction.key] ?? 0}</strong></button>;
   })}</div>;
