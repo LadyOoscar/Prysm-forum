@@ -64,11 +64,9 @@ export default function ForumModerationActions({
           <button className="button" type="button" disabled={busy} onClick={() => void updateTopic("pinned", !pinned)}>
             {pinned ? "Désépingler" : "Épingler"}
           </button>
-          {role.admin && (
-            <button className="button danger" type="button" disabled={busy} onClick={() => void deleteTopic()}>
-              Supprimer le sujet
-            </button>
-          )}
+          <button className="button danger" type="button" disabled={busy} onClick={() => void deleteTopic()}>
+            Supprimer le sujet
+          </button>
         </>
       )}
       {postId && (
