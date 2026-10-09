@@ -9,7 +9,6 @@ export function VoiceAudioPlayer({ src, label = "Message vocal" }: { src: string
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
-  const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
   const frameRef = useRef<number | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [playing, setPlaying] = useState(false);
@@ -55,9 +54,7 @@ export function VoiceAudioPlayer({ src, label = "Message vocal" }: { src: string
         gradient.addColorStop(1, "#45efff");
         context.fillStyle = gradient;
         context.globalAlpha = 0.48 + energy * 0.52;
-        context.beginPath();
-        context.roundRect(x, y, barWidth, barHeight, Math.min(2, barWidth / 2));
-        context.fill();
+        context.fillRect(x, y, barWidth, barHeight);
       }
       context.globalAlpha = 1;
       if (!audioRef.current?.paused) frameRef.current = requestAnimationFrame(draw);
@@ -81,7 +78,6 @@ export function VoiceAudioPlayer({ src, label = "Message vocal" }: { src: string
         analyser.connect(audioContext.destination);
         audioContextRef.current = audioContext;
         analyserRef.current = analyser;
-        sourceRef.current = source;
       }
       if (audioContextRef.current.state === "suspended") await audioContextRef.current.resume();
       setFrequencyReady(true);
@@ -122,6 +118,7 @@ export function VoiceAudioPlayer({ src, label = "Message vocal" }: { src: string
       <audio
         ref={audioRef}
         src={src}
+        crossOrigin="anonymous"
         preload="metadata"
         onTimeUpdate={(event) => setCurrent(event.currentTarget.currentTime)}
         onLoadedMetadata={(event) => {
