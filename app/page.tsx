@@ -9,6 +9,7 @@ const sections = [
   { title: "Culture & passions", text: "Jeux, musique, lecture, cinéma et tout ce qui mérite une discussion.", href: "/forum/culture" },
   { title: "Entraide & quotidien", text: "Questions, conseils et coups de main entre membres.", href: "/forum/entraide" },
   { title: "Rencontres", text: "Faire connaissance sans transformer PRYSM en catalogue de profils.", href: "/rencontres" },
+  { title: "PRYSM Orbite", text: "Découvrir les membres autour de toi dans un système d’orbites animé.", href: "/orbite" },
 ];
 
 export default function HomePage() {
@@ -35,6 +36,7 @@ export default function HomePage() {
         <Link className="active" href="/">Accueil</Link>
         <Link href="/forum">Forum</Link>
         <Link href="/rencontres">Rencontres</Link>
+        <Link href="/orbite">Orbite</Link>
         <Link href="/messages">Messages</Link>
         <Link href="/profil">Profil</Link>
         {canModerate && <Link href="/moderation" aria-label="Espace Modo/Admin">Modo/Admin</Link>}
