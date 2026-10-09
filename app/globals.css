@@ -1763,3 +1763,30 @@ footer:before {
 @media(prefers-reduced-motion:reduce){
   .federation-broadcast__ticker-text{animation:none!important}
 }
+
+
+/* PRYSM AUDIO CONTROL // compact radio console */
+.prysm-sound-control{position:fixed;z-index:10020;right:14px;bottom:14px;display:flex;align-items:flex-end;flex-direction:column;gap:9px;font-family:Rajdhani,ui-sans-serif,sans-serif}
+.prysm-sound-launcher{display:flex;align-items:center;gap:8px;min-height:37px;padding:8px 11px;border:1px solid #718a91a8;border-radius:7px;background:linear-gradient(180deg,#1c2930f5,#0b1219f7);color:#b8cbd0;box-shadow:0 5px 20px #0007,inset 0 1px #ffffff12;font-size:11px;font-weight:800;letter-spacing:.12em;cursor:pointer}
+.prysm-sound-launcher>span:first-child{font-size:17px;line-height:1;color:#a3b7bd}
+.prysm-sound-launcher.is-on{border-color:#659b91;color:#d0e8df;box-shadow:0 0 12px #659b9122,0 5px 20px #0007}
+.prysm-sound-launcher.is-on>span:first-child{color:#9fd5c5}
+.prysm-sound-panel{width:min(290px,calc(100vw - 28px));padding:15px;border:1px solid #587a7e;border-radius:9px;background:linear-gradient(160deg,#202b33f7,#0b1118fc 75%);color:#d7e2e5;box-shadow:0 12px 36px #000a,inset 0 1px #ffffff13}
+.prysm-sound-panel__heading{display:flex;justify-content:space-between;gap:8px;padding-bottom:11px;margin-bottom:12px;border-bottom:1px solid #ffffff18;font-size:12px;font-weight:900;letter-spacing:.13em}
+.prysm-sound-panel__heading span{color:#829da4;font-size:9px;letter-spacing:.08em}
+.prysm-sound-toggle{display:flex;align-items:center;gap:10px;font-size:13px;cursor:pointer}
+.prysm-sound-toggle input{position:absolute;width:1px;height:1px;opacity:0}
+.prysm-sound-switch{position:relative;width:31px;height:17px;border:1px solid #52656b;border-radius:99px;background:#101820;transition:background .15s}
+.prysm-sound-switch:after{content:"";position:absolute;left:2px;top:2px;width:11px;height:11px;border-radius:50%;background:#7b8d91;transition:transform .15s,background .15s}
+.prysm-sound-toggle input:checked+.prysm-sound-switch{background:#315d56;border-color:#7cb4a6}
+.prysm-sound-toggle input:checked+.prysm-sound-switch:after{transform:translateX(14px);background:#d3f6e8}
+.prysm-sound-toggle input:focus-visible+.prysm-sound-switch{outline:2px solid #a6d9cc;outline-offset:3px}
+.prysm-sound-volume{display:block;margin-top:17px}
+.prysm-sound-volume>span{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.12em;color:#a9bec2}
+.prysm-sound-volume b{color:#d7e2e5}
+.prysm-sound-volume input{display:block;width:100%;margin:10px 0 4px;accent-color:#8ebcaf;cursor:pointer}
+.prysm-sound-test{width:100%;margin-top:12px;padding:8px;border:1px solid #527b75;border-radius:5px;background:#19332f;color:#d5eee7;font-size:11px;font-weight:800;letter-spacing:.08em;cursor:pointer}
+.prysm-sound-test:disabled{opacity:.4;cursor:not-allowed}
+.prysm-sound-panel p{margin:10px 0 0;color:#85979d;font-size:10px;line-height:1.45}
+@media(max-width:600px){.prysm-sound-control{right:9px;bottom:9px}.prysm-sound-launcher{min-height:34px;padding:7px 9px}.prysm-sound-panel{width:min(280px,calc(100vw - 18px))}}
+@media(prefers-reduced-motion:reduce){.prysm-sound-switch,.prysm-sound-switch:after{transition:none}}
