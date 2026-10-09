@@ -96,13 +96,14 @@ export default function SoundControl() {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       const filter = ctx.createBiquadFilter();
-      osc.type = "triangle";
+      osc.type = "sine";
       osc.frequency.value = notes[step % notes.length];
       filter.type = "lowpass";
       filter.frequency.value = 420;
       gain.gain.setValueAtTime(0.0001, t);
       gain.gain.linearRampToValueAtTime(0.035, t + 1.8);
-      gain.gain.setValueAtTime(0.035, t + 1.8);\n      gain.gain.setTargetAtTime(0.0001, t + 1.8, 3.2);
+      gain.gain.setValueAtTime(0.035, t + 1.8);
+      gain.gain.setTargetAtTime(0.0001, t + 1.8, 3.2);
       osc.connect(filter); filter.connect(gain); gain.connect(master);
       osc.start(t); osc.stop(t + 15);
       osc.onended = () => { try { osc.disconnect(); filter.disconnect(); gain.disconnect(); } catch {} };
@@ -188,8 +189,26 @@ export default function SoundControl() {
         noise(0, 0.34, 0.2, 160, 3400); tone(310, 0, 0.32, "sawtooth", 0.13, -22); tone(317, 0.025, 0.3, "square", 0.09, 19); tone(94, 0.08, 0.35, "triangle", 0.16); tone(740, 0.17, 0.12, "square", 0.07); break;
       case "arcade":
         tone(420, 0, 0.06, "square", 0.09); tone(620, 0.055, 0.07, "square", 0.1); tone(940, 0.12, 0.11, "triangle", 0.12); tone(1280, 0.19, 0.13, "square", 0.08); break;
+      case "panel":
+        tone(880, 0, 0.045, "sine", 0.06); tone(1240, 0.055, 0.07, "sine", 0.045); break;
+      case "door":
+        noise(0, 1.7, 0.055, 90, 650);
+        tone(72, 0.08, 2.5, "sawtooth", 0.075);
+        tone(58, 1.35, 1.8, "sine", 0.11);
+        tone(180, 2.15, 0.75, "triangle", 0.045);
+        break;
+      case "impact":
+        noise(0, 2.8, 0.07, 35, 260);
+        tone(48, 0, 2.4, "sine", 0.14);
+        tone(71, 0.07, 1.9, "triangle", 0.07, -9);
+        tone(120, 0.3, 1.4, "sine", 0.025);
+        break;
       case "ambient":
-        tone(68, 0, 1.8, "sine", 0.18); tone(102, 0.05, 1.45, "triangle", 0.1, -7); tone(205, 0.24, 0.8, "sine", 0.05); noise(0.15, 1.3, 0.045, 140, 620); break;
+        tone(41, 0, 9.5, "sine", 0.11);
+        tone(61.7, 0.25, 8.8, "triangle", 0.045, -5);
+        tone(82.4, 0.8, 7.5, "sine", 0.025);
+        noise(0.3, 5.8, 0.012, 80, 360);
+        break;
     }
     window.setTimeout(() => { try { master.disconnect(); } catch {} }, kind === "ambient" ? 11000 : kind === "door" || kind === "impact" ? 5200 : 900);
   }, [getAudio]);
@@ -242,10 +261,11 @@ export default function SoundControl() {
     const timer = window.setInterval(() => {
       if (document.visibilityState === "visible") {
         const roll = Math.random();
-        if (roll < 0.45) play("static");
-        else if (roll < 0.7) play("military");
-        else if (roll < 0.88) play("crt");
-        else play("arcade");
+        if (roll < 0.28) play("panel");
+        else if (roll < 0.55) play("door");
+        else if (roll < 0.78) play("impact");
+        else if (roll < 0.9) play("military");
+        else play("static");
       }
     }, 21000 + Math.floor(Math.random() * 17000));
     return () => window.clearInterval(timer);
