@@ -12,7 +12,8 @@ export default function SoundControl() {
   const audioRef = useRef<AudioContext | null>(null);
   const enabledRef = useRef(false);
   const volumeRef = useRef(28);
-  const ambientRef = useRef<{ master: GainNode; nodes: AudioNode[]; timer: number | null } | null>(null);
+  const ambientRef = useRef<HTMLAudioElement | null>(null);
+  const uiSoundRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     try {
@@ -40,83 +41,34 @@ export default function SoundControl() {
     const track = ambientRef.current;
     if (!track) return;
     ambientRef.current = null;
-    if (track.timer !== null) window.clearInterval(track.timer);
-    const now = track.master.context.currentTime;
-    try {
-      track.master.gain.cancelScheduledValues(now);
-      track.master.gain.setTargetAtTime(0.0001, now, 0.12);
-      window.setTimeout(() => {
-        track.nodes.forEach((node) => { try { if (node instanceof OscillatorNode) node.stop(); } catch {} try { node.disconnect(); } catch {} });
-        try { track.master.disconnect(); } catch {}
-      }, 650);
-    } catch {}
+    track.pause();
+    track.currentTime = 0;
   }, []);
 
   const startAmbient = useCallback(() => {
     if (!enabledRef.current || ambientRef.current) return;
-    const ctx = getAudio();
-    if (!ctx) return;
-    void ctx.resume();
-    const now = ctx.currentTime;
-    const master = ctx.createGain();
-    master.gain.setValueAtTime(0.0001, now);
-    master.gain.linearRampToValueAtTime(Math.max(0.0001, volumeRef.current / 100 * 0.008), now + 2.8);
-    master.connect(ctx.destination);
-    const nodes: AudioNode[] = [];
-    const drone = (frequency: number, type: OscillatorType, level: number, detune = 0) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      const filter = ctx.createBiquadFilter();
-      osc.type = type;
-      osc.frequency.value = frequency;
-      osc.detune.value = detune;
-      filter.type = "lowpass";
-      filter.frequency.value = 1500;
-      gain.gain.value = level;
-      osc.connect(filter); filter.connect(gain); gain.connect(master);
-      osc.start(now);
-      nodes.push(osc, filter, gain);
-    };
-    drone(41.2, "sine", 0.17);
-    drone(61.74, "triangle", 0.025, -4);
-    drone(82.41, "sawtooth", 0.002, 5);
-    drone(123.47, "sine", 0.004);
-    const lfo = ctx.createOscillator();
-    const lfoGain = ctx.createGain();
-    lfo.type = "sine"; lfo.frequency.value = 0.035; lfoGain.gain.value = 0.001;
-    lfo.connect(lfoGain); lfoGain.connect(master.gain); lfo.start(now);
-    nodes.push(lfo, lfoGain);
-
-    // A single soft arcade note appears occasionally, leaving long stretches of calm ambience.
-    const notes = [73.42, 82.41, 98, 110, 98, 82.41, 87.31, 73.42];
-    let step = 0;
-    const playStep = () => {
-      if (!enabledRef.current || !ambientRef.current) return;
-      const t = ctx.currentTime;
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      const filter = ctx.createBiquadFilter();
-      osc.type = "sine";
-      osc.frequency.value = notes[step % notes.length];
-      filter.type = "lowpass";
-      filter.frequency.value = 420;
-      gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.linearRampToValueAtTime(0.035, t + 1.8);
-      gain.gain.setValueAtTime(0.035, t + 1.8);
-      gain.gain.setTargetAtTime(0.0001, t + 1.8, 3.2);
-      osc.connect(filter); filter.connect(gain); gain.connect(master);
-      osc.start(t); osc.stop(t + 15);
-      osc.onended = () => { try { osc.disconnect(); filter.disconnect(); gain.disconnect(); } catch {} };
-      step = (step + 1) % notes.length;
-    };
-    const track = { master, nodes, timer: null as number | null };
+    const track = new Audio("https://opengameart.org/sites/default/files/sector_0.mp3");
+    track.loop = true;
+    track.preload = "auto";
+    track.volume = Math.max(0, Math.min(1, volumeRef.current / 100 * 0.18));
     ambientRef.current = track;
-    playStep();
-    track.timer = window.setInterval(playStep, 18000);
-  }, [getAudio, stopAmbient]);
+    void track.play().catch(() => {
+      if (ambientRef.current === track) ambientRef.current = null;
+    });
+  }, [stopAmbient]);
 
   const play = useCallback((kind: SoundKind) => {
     if (!enabledRef.current || volumeRef.current <= 0) return;
+    if (kind === "click" || kind === "panel") {
+      if (!uiSoundRef.current) {
+        uiSoundRef.current = new Audio("https://opengameart.org/sites/default/files/hover_0.mp3");
+        uiSoundRef.current.preload = "auto";
+      }
+      const sound = uiSoundRef.current.cloneNode(true) as HTMLAudioElement;
+      sound.volume = Math.max(0, Math.min(1, volumeRef.current / 100 * (kind === "panel" ? 0.22 : 0.14)));
+      void sound.play().catch(() => {});
+      return;
+    }
     const ctx = getAudio();
     if (!ctx) return;
     const now = ctx.currentTime;
@@ -229,6 +181,7 @@ export default function SoundControl() {
   const changeVolume = (value: number) => {
     setVolume(value);
     volumeRef.current = value;
+    if (ambientRef.current) ambientRef.current.volume = Math.max(0, Math.min(1, value / 100 * 0.18));
     try { window.localStorage.setItem("prysm-sound-volume", String(value)); } catch {}
   };
 
@@ -288,7 +241,7 @@ export default function SoundControl() {
             <input aria-label="Volume des effets sonores" type="range" min="0" max="100" step="1" value={volume} onChange={(e) => changeVolume(Number(e.target.value))} />
           </label>
           <button className="prysm-sound-test" type="button" disabled={!enabled} onClick={() => play(TEST_SOUNDS[Math.floor(Math.random() * TEST_SOUNDS.length)])}>▶ Tester un son aléatoire</button>
-          <p>AMBIANCE : nappes graves prolongées, bips de console occasionnels, sas pressurisé et impacts sourds lointains. Sons synthétiques, volume réglable, désactivés par défaut.</p>
+          <p>AMBIANCE : bande-son sombre en boucle, bips de console, sas pressurisés et impacts sourds lointains. Sons désactivés par défaut. La bande-son et les effets sont réglables.</p>
         </div>
       )}
       <button className={`prysm-sound-launcher${enabled ? " is-on" : ""}`} type="button" aria-expanded={panelOpen} aria-label="Ouvrir les réglages sonores" onClick={() => setPanelOpen((open) => !open)}>
