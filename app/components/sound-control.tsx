@@ -105,7 +105,7 @@ export default function SoundControl() {
       gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.39);
       osc.connect(filter); filter.connect(gain); gain.connect(master);
       osc.start(t); osc.stop(t + 0.42);
-      nodes.push(osc, filter, gain);
+      osc.onended = () => { try { osc.disconnect(); filter.disconnect(); gain.disconnect(); } catch {} };
       step = (step + 1) % notes.length;
     };
     const track = { master, nodes, timer: null as number | null };
