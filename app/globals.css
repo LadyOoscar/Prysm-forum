@@ -305,3 +305,7 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 2px rgba(69,239,255,.1)
 .sticker-status.approved{color:var(--lime)}.sticker-status.rejected{color:var(--danger)}
 @media(max-width:800px){.sticker-creator-card{grid-template-columns:1fr}.sticker-mine-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:520px){.sticker-fields{grid-template-columns:1fr}.sticker-mine-grid{grid-template-columns:repeat(2,1fr)}}
+
+
+/* PRYSM // sticker tag search */
+.sticker-search{display:block;width:100%;padding:9px 10px;margin:0 0 10px;font-size:.78rem}.sticker-tags-field{grid-column:1/-1;display:grid;gap:7px;color:#969ec0;font-size:.78rem;font-weight:600}.sticker-tags-field input{width:100%;padding:11px 12px}.sticker-tags-field small{color:#737c9e;font-weight:400;font-size:.68rem}
