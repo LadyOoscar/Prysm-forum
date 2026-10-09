@@ -55,7 +55,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
                     <Votes postId={post.id} />
                     <Reactions postId={post.id} />
                     <ReportButton postId={post.id} />
-                    {!topic.locked && <QuoteReplyButton body={post.body} author={profile?.display_name || profile?.username || "Membre"} />
+                    {!topic.locked && <QuoteReplyButton body={post.body} author={profile?.display_name || profile?.username || "Membre"} />}
                     <ForumModerationActions postId={post.id} />
                   </div>
                 </article>
