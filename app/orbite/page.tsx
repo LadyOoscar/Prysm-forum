@@ -101,13 +101,13 @@ export default function OrbitePage() {
         } else if (err.code === err.POSITION_UNAVAILABLE) {
           setMessage("Le téléphone n’arrive pas à déterminer ta position. Active la localisation Android, puis réessaie près d’une fenêtre ou en extérieur.");
         } else if (err.code === err.TIMEOUT) {
-          setMessage("La recherche de position a expiré. Active la localisation Android et réessaie.");
+          setMessage("Android n’a pas fourni de position après 60 secondes. Vérifie Paramètres → Localisation → Services de localisation → Précision de la localisation Google, active la recherche Wi‑Fi et Bluetooth si proposées, puis réessaie dehors avec une vue dégagée du ciel.");
         } else {
           setMessage(`Géolocalisation indisponible : ${err.message || "erreur inconnue"}`);
         }
         setBusy(false);
       },
-      { enableHighAccuracy: false, timeout: 20000, maximumAge: 300000 }
+      { enableHighAccuracy: true, timeout: 60000, maximumAge: 60000 }
     );
   }
 
