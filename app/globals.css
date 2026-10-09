@@ -313,3 +313,5 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 2px rgba(69,239,255,.1)
 
 /* PRYSM // sticker tag search */
 .sticker-search{display:block;width:100%;padding:9px 10px;margin:0 0 10px;font-size:.78rem}.sticker-search-empty{grid-column:1/-1;color:var(--muted);font-size:.75rem;padding:8px}.sticker-tags-field{grid-column:1/-1;display:grid;gap:7px;color:#969ec0;font-size:.78rem;font-weight:600}.sticker-tags-field input{width:100%;padding:11px 12px}.sticker-tags-field small{color:#737c9e;font-weight:400;font-size:.68rem}
+
+.sticker-community{margin-top:42px;padding-bottom:10px}.sticker-community-count{color:var(--cyan);font-size:.72rem}.sticker-gallery-search{max-width:520px;margin:0 0 16px}.sticker-tag-list{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}.sticker-tag-list span{padding:2px 5px;border:1px solid #303660;border-radius:3px;color:#9da6d2;font-size:.6rem}
