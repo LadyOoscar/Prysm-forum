@@ -27,6 +27,7 @@ export default function StickerCreator() {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("Général");
   const [tagsText, setTagsText] = useState("");
+  const [tagsText, setTagsText] = useState("");
   const [mine, setMine] = useState<Sticker[]>([]);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -82,6 +83,7 @@ export default function StickerCreator() {
       const { error: uploadError } = await supabase.storage.from("stickers").upload(path, file, { contentType: info.contentType, upsert: false });
       if (uploadError) throw new Error("Upload Storage : " + uploadError.message);
       const stickerStatus = "approved";
+      const tags = [...new Set([category.toLocaleLowerCase(), ...tagsText.split(",").map(tag => tag.trim().toLocaleLowerCase().replace(/^#/, "")).filter(Boolean)])].slice(0, 10);
       const tags = [...new Set([category.toLocaleLowerCase(), ...tagsText.split(",").map(tag => tag.trim().toLocaleLowerCase().replace(/^#/, "")).filter(Boolean)])].slice(0, 10);
 
       const { data: publicData } = supabase.storage.from("stickers").getPublicUrl(path);
