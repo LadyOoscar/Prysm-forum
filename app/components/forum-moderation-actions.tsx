@@ -18,17 +18,20 @@ export default function ForumModerationActions({
   const [role, setRole] = useState<{ moderator: boolean; admin: boolean } | null>(null);
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState("");
+  const [roleError, setRoleError] = useState("");
 
   useEffect(() => {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      const { data } = await supabase.from("profiles").select("is_moderator,is_admin").eq("id", user.id).maybeSingle();
+      const { data, error } = await supabase.from("profiles").select("is_moderator,is_admin").eq("id", user.id).maybeSingle();
+      if (error) { setRoleError(`Impossible de vérifier les droits de modération : ${error.message}`); return; }
       if (data) setRole({ moderator: Boolean(data.is_moderator), admin: Boolean(data.is_admin) });
     }
     void load();
   }, []);
 
+  if (roleError) return <p className="notice error" role="alert">{roleError}</p>;
   if (!role || (!role.moderator && !role.admin)) return null;
 
   async function updateTopic(field: "locked" | "pinned", value: boolean) {
@@ -42,12 +45,12 @@ export default function ForumModerationActions({
   }
 
   async function deletePost() {
-    if (!postId || !window.confirm("Supprimer définitivement ce message ?")) return;
+    if (!postId || !window.confirm("Supprimer définitivement ce message ? Seuls les modos et admins peuvent effectuer cette action.")) return;
     setBusy(true);
     setActionError("");
     const { data, error } = await supabase.from("forum_posts").delete().eq("id", postId).select("id");
     if (error) setActionError(`Suppression impossible : ${error.message}`);
-    else if (!data?.length) setActionError("Aucun message supprimé. Vérifie tes droits de modération puis réessaie.");
+    else if (!data?.length) setActionError("Aucun message supprimé. Vérifie que ton compte est bien modo ou admin, puis réessaie.");
     else window.location.reload();
     setBusy(false);
   }
