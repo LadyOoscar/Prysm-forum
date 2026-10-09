@@ -102,7 +102,8 @@ export default function Stories() {
       ctx.fillStyle = gradient; ctx.fillRect(0, 0, 1080, 1920);
       ctx.strokeStyle = "#ffffff28"; ctx.lineWidth = 2; ctx.strokeRect(42, 42, 996, 1836);
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      // Text, stickers and music are rendered as editable overlays in the story viewer.\n      const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, "image/png", .95));
+      // Text, stickers and music are rendered as editable overlays in the story viewer.
+      const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, "image/png", .95));
       if (!blob) { setNotice("Impossible de générer l’image de la story."); setUploading(false); return; }
       fileToUpload = new File([blob], "prysm-story.png", { type: "image/png" });
     }
