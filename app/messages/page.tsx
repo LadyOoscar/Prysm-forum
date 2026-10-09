@@ -55,6 +55,8 @@ export default function MessagesPage() {
 
   useEffect(() => {
     void loadConversations();
+    const target = new URLSearchParams(window.location.search).get("to");
+    if (target) setUsername(target);
   }, []);
 
   async function startConversation(event: FormEvent) {
