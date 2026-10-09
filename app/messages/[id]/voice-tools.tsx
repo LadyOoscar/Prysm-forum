@@ -112,7 +112,12 @@ export function VoiceAudioPlayer({ src, label = "Message vocal", durationMs: dec
     }
   }, []);
 
-  useEffect(() => {\n    if (declaredDurationMs && declaredDurationMs > 0) setDuration(declaredDurationMs / 1000);\n  }, [declaredDurationMs]);\n\n  function readDuration(audio: HTMLAudioElement) {\n    if (declaredDurationMs && declaredDurationMs > 0) return;
+  useEffect(() => {
+    if (declaredDurationMs && declaredDurationMs > 0) setDuration(declaredDurationMs / 1000);
+  }, [declaredDurationMs]);
+
+  function readDuration(audio: HTMLAudioElement) {
+    if (declaredDurationMs && declaredDurationMs > 0) return;
     // Some WebM/Opus files recorded with MediaRecorder report Infinity or a
     // partial duration until the browser probes the end of the media.
     const seekableEnd = audio.seekable.length
@@ -124,11 +129,12 @@ export function VoiceAudioPlayer({ src, label = "Message vocal", durationMs: dec
     if (Number.isFinite(candidate) && candidate > 0) setDuration(candidate);
   }
 
-  function recoverWebmDuration(audio: HTMLAudioElement) {\n    if (declaredDurationMs && declaredDurationMs > 0) { setDuration(declaredDurationMs / 1000); return; }
+  function recoverWebmDuration(audio: HTMLAudioElement) {
+    if (declaredDurationMs && declaredDurationMs > 0) { setDuration(declaredDurationMs / 1000); return; }
     const knownDuration = Number.isFinite(audio.duration) && audio.duration > 0
       ? audio.duration
       : 0;
-    const isWebm = src.startsWith("blob:") || /\\.webm(?:$|[?#])/i.test(src);
+    const isWebm = src.startsWith("blob:") || /\.webm(?:$|[?#])/i.test(src);
 
     // WebM recordings from MediaRecorder can expose a finite but truncated
     // duration, so don't trust metadata alone. Probe the media end for WebM.
@@ -281,7 +287,8 @@ export function VoiceRecorder({
   const timeoutRef = useRef<number | null>(null);
   const intervalRef = useRef<number | null>(null);
   const previewUrlRef = useRef("");
-  const recordingStartedAtRef = useRef(0);\n  const recordingDurationMsRef = useRef(0);
+  const recordingStartedAtRef = useRef(0);
+  const recordingDurationMsRef = useRef(0);
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [preview, setPreview] = useState("");
