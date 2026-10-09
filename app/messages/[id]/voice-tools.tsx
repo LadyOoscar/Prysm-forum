@@ -124,33 +124,58 @@ export function VoiceAudioPlayer({ src, label = "Message vocal" }: { src: string
   }
 
   function recoverWebmDuration(audio: HTMLAudioElement) {
-    if (Number.isFinite(audio.duration) && audio.duration > 0) {
-      readDuration(audio);
+    const knownDuration = Number.isFinite(audio.duration) && audio.duration > 0
+      ? audio.duration
+      : 0;
+    const isWebm = src.startsWith("blob:") || /\\.webm(?:$|[?#])/i.test(src);
+
+    // WebM recordings from MediaRecorder can expose a finite but truncated
+    // duration, so don't trust metadata alone. Probe the media end for WebM.
+    if (!isWebm) {
+      if (knownDuration > 0) setDuration(knownDuration);
       return;
     }
 
-    // Seeking far forward makes browsers scan WebM metadata and discover the
-    // real end time. Restore the playhead after the duration becomes available.
     const restoreTime = audio.currentTime;
+    let completed = false;
     const finishProbe = () => {
-      if (!Number.isFinite(audio.duration) || audio.duration <= 0) return;
-      setDuration(audio.duration);
+      const discovered = Number.isFinite(audio.duration) && audio.duration > 0
+        ? audio.duration
+        : (audio.seekable.length ? audio.seekable.end(audio.seekable.length - 1) : 0);
+      if (!Number.isFinite(discovered) || discovered <= 0) return;
+      completed = true;
+      setDuration(discovered);
       audio.removeEventListener("timeupdate", finishProbe);
       audio.removeEventListener("durationchange", finishProbe);
+      audio.removeEventListener("seeked", finishProbe);
       try {
-        audio.currentTime = restoreTime;
+        if (Math.abs(audio.currentTime - restoreTime) > 0.05) audio.currentTime = restoreTime;
       } catch {
-        // The media may not support seeking; playback remains available.
+        // Seeking may be unsupported; keep playback available.
       }
     };
+
     audio.addEventListener("timeupdate", finishProbe);
     audio.addEventListener("durationchange", finishProbe);
+    audio.addEventListener("seeked", finishProbe);
     try {
+      // A far-forward seek forces browsers to inspect the end of WebM media.
       audio.currentTime = 1e101;
     } catch {
       audio.removeEventListener("timeupdate", finishProbe);
       audio.removeEventListener("durationchange", finishProbe);
+      audio.removeEventListener("seeked", finishProbe);
+      if (knownDuration > 0) setDuration(knownDuration);
     }
+
+    // If the browser cannot probe the file, preserve the metadata duration.
+    window.setTimeout(() => {
+      if (completed) return;
+      audio.removeEventListener("timeupdate", finishProbe);
+      audio.removeEventListener("durationchange", finishProbe);
+      audio.removeEventListener("seeked", finishProbe);
+      if (knownDuration > 0) setDuration(knownDuration);
+    }, 1800);
   }
 
   const progress = duration > 0 ? Math.min(100, Math.max(0, (current / duration) * 100)) : 0;
