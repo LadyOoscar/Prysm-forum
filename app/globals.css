@@ -773,3 +773,36 @@ footer:before {
   }
   .site-topbar nav a { flex: 0 0 auto; }
 }
+
+
+/* PRYSM // occasional foreground comet */
+.site-nav-wrap:after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 190px;
+  height: 2px;
+  z-index: 1001;
+  pointer-events: none;
+  opacity: 0;
+  border-radius: 50%;
+  background: linear-gradient(90deg, transparent 0%, rgba(69,239,255,.12) 45%, #c8fbff 86%, #fff 100%);
+  box-shadow: 0 0 9px rgba(69,239,255,.85), 0 0 22px rgba(139,98,255,.5);
+  transform: translate3d(-30vw,-20vh,0) rotate(28deg);
+  transform-origin: center;
+  animation: prysm-comet-crossing 32s linear infinite;
+}
+@keyframes prysm-comet-crossing {
+  0%, 3% { opacity: 0; transform: translate3d(-30vw,-20vh,0) rotate(28deg); }
+  4% { opacity: .92; }
+  5% { opacity: 1; transform: translate3d(-10vw,-8vh,0) rotate(28deg); }
+  14% { opacity: 0; transform: translate3d(125vw,100vh,0) rotate(28deg); }
+  100% { opacity: 0; transform: translate3d(125vw,100vh,0) rotate(28deg); }
+}
+@media(max-width:760px) {
+  .site-nav-wrap:after { width: 135px; animation-duration: 38s; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .site-nav-wrap:after { display: none !important; animation: none !important; }
+}
