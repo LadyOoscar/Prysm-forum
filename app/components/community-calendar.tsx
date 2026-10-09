@@ -14,7 +14,8 @@ type CommunityEvent = {
   capacity: number | null;
   status: "scheduled" | "cancelled";
 };
-type Participant = { event_id: string; user_id: string };\ntype EventCount = { event_id: string; participant_count: number };
+type Participant = { event_id: string; user_id: string };
+type EventCount = { event_id: string; participant_count: number };
 
 const monthNames = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
 const weekdays = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
@@ -29,7 +30,8 @@ function formatDate(value: string) {
 export default function CommunityCalendar() {
   const supabase = useMemo(() => createSupabaseBrowser(), []);
   const [events, setEvents] = useState<CommunityEvent[]>([]);
-  const [participants, setParticipants] = useState<Participant[]>([]);\n  const [eventCounts, setEventCounts] = useState<EventCount[]>([]);
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [eventCounts, setEventCounts] = useState<EventCount[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
@@ -46,16 +48,18 @@ export default function CommunityCalendar() {
 
   const loadEvents = useCallback(async () => {
     setLoading(true);
-    const [{ data: authData }, { data: eventRows, error: eventError }, { data: participantRows }] = await Promise.all([
+    const [{ data: authData }, { data: eventRows, error: eventError }, { data: participantRows }, { data: countRows }] = await Promise.all([
       supabase.auth.getUser(),
       supabase.from("community_events").select("id,creator_id,title,description,starts_at,event_type,location_label,capacity,status").eq("status", "scheduled").gte("starts_at", new Date().toISOString()).order("starts_at", { ascending: true }).limit(100),
       supabase.from("community_event_participants").select("event_id,user_id"),
+      supabase.from("community_event_counts").select("event_id,participant_count"),
     ]);
     setUserId(authData.user?.id ?? null);
     if (eventError) setError("Le calendrier est momentanément indisponible.");
     else setError("");
     setEvents((eventRows ?? []) as CommunityEvent[]);
     setParticipants((participantRows ?? []) as Participant[]);
+    setEventCounts((countRows ?? []) as EventCount[]);
     setLoading(false);
   }, [supabase]);
 
