@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowser } from "../../lib/supabase-browser";
 
 type Story = {
@@ -20,7 +20,7 @@ type StoryGroup = { userId: string; name: string; avatar: string | null; stories
 const MAX_SIZE = 10 * 1024 * 1024;
 
 export default function Stories() {
-  const supabase = createSupabaseBrowser();
+  const supabase = useMemo(() => createSupabaseBrowser(), []);
   const [groups, setGroups] = useState<StoryGroup[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const [caption, setCaption] = useState("");
