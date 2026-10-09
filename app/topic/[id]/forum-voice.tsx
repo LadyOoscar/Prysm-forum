@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createSupabaseBrowser } from "../../../lib/supabase-browser";
 import { VoiceAudioPlayer, VoiceMessage } from "../../messages/[id]/voice-tools";
+import { fixWebmDuration } from "../../../lib/fix-webm-duration";
 
 export function ForumVoice({ path }: { path: string }) {
   return <VoiceMessage path={path} />;
@@ -18,6 +19,7 @@ export default function ForumVoiceRecorder({ topicId, parentPostId, disabled, on
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const recordingStartedAtRef = useRef(0);
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [blob, setBlob] = useState<Blob | null>(null);
@@ -55,14 +57,17 @@ export default function ForumVoiceRecorder({ topicId, parentPostId, disabled, on
       const recorder = type ? new MediaRecorder(stream, { mimeType: type }) : new MediaRecorder(stream);
       recorderRef.current = recorder;
       recorder.ondataavailable = e => { if (e.data.size) chunksRef.current.push(e.data); };
-      recorder.onstop = () => {
+      recorder.onstop = async () => {
         stopStream();
         setRecording(false);
-        const audio = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
-        if (!audio.size) { setError("Le vocal est vide. Réessaie."); return; }
+        const rawAudio = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
+        if (!rawAudio.size) { setError("Le vocal est vide. Réessaie."); return; }
+        const actualDurationMs = Math.max(0, performance.now() - recordingStartedAtRef.current);
+        const audio = await fixWebmDuration(rawAudio, actualDurationMs);
         setBlob(audio);
         setPreview(URL.createObjectURL(audio));
       };
+      recordingStartedAtRef.current = performance.now();
       recorder.start(250);
       setRecording(true);
       setSeconds(0);
