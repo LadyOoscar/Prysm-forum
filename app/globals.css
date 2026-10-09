@@ -1679,3 +1679,63 @@ footer:before {
 @media(prefers-reduced-motion:reduce){
   .federation-broadcast--secret{animation:none}
 }
+
+
+/* FEDERATION TV // compact lower-third, subdued phosphor palette */
+.federation-broadcast{
+  top:auto!important;bottom:14px;left:clamp(8px,2vw,24px);right:clamp(8px,2vw,24px);
+  width:auto;border:1px solid color-mix(in srgb,var(--broadcast-edge,#a8b7c8) 42%,#101722);
+  border-radius:7px;overflow:hidden;
+  background:linear-gradient(180deg,#202631f5 0%,#111720f7 52%,#0b111af8 100%)!important;
+  box-shadow:0 5px 24px #0008,0 0 10px color-mix(in srgb,var(--broadcast-a,#8094aa) 16%,transparent),inset 0 1px 0 #ffffff14!important;
+}
+.federation-broadcast__topline,.federation-broadcast__footer{
+  min-height:18px;padding:3px clamp(8px,1.5vw,18px);gap:8px;
+  background:#080d16a8!important;border-color:#ffffff15;
+  letter-spacing:.1em;
+}
+.federation-broadcast__seal{
+  padding:2px 6px;background:#ffffff0a!important;border-color:color-mix(in srgb,var(--broadcast-edge,#a8b7c8) 42%,transparent)!important;
+  box-shadow:none!important;color:var(--broadcast-edge,#c8d1df)!important;
+}
+.federation-broadcast__label{color:#d6dce6!important;text-shadow:none!important}
+.federation-broadcast__live{color:#aeb8c8!important}
+.federation-broadcast__live i{width:5px;height:5px;background:var(--broadcast-edge,#b6c1d2)!important;box-shadow:0 0 5px color-mix(in srgb,var(--broadcast-edge,#b6c1d2) 50%,transparent)!important}
+.federation-broadcast__ticker{height:clamp(34px,5vw,52px);padding:0 12px}
+.federation-broadcast__ticker-text{
+  color:#e0e5ed!important;font-size:clamp(17px,2.5vw,27px)!important;
+  letter-spacing:.045em;text-shadow:0 0 5px color-mix(in srgb,var(--broadcast-edge,#b6c1d2) 24%,transparent)!important;
+  -webkit-text-stroke:0!important;
+}
+.federation-broadcast__footer{color:#aeb8c8!important}
+.federation-broadcast__footer-right b{color:var(--broadcast-edge,#b6c1d2)!important;text-shadow:none!important}
+.federation-broadcast--presidence{--broadcast-a:#a66b76;--broadcast-b:#38252e;--broadcast-edge:#d2a0a8}
+.federation-broadcast--news{--broadcast-a:#658e9d;--broadcast-b:#263943;--broadcast-edge:#a8c8d0}
+.federation-broadcast--military{--broadcast-a:#a77769;--broadcast-b:#3d2926;--broadcast-edge:#d1b0a0}
+.federation-broadcast--classified{--broadcast-a:#777f91;--broadcast-b:#292f3d;--broadcast-edge:#bdc4d0}
+.federation-broadcast--field{--broadcast-a:#9d8961;--broadcast-b:#393324;--broadcast-edge:#d0c09a}
+.federation-broadcast--science{--broadcast-a:#82976b;--broadcast-b:#303a2b;--broadcast-edge:#bdcca9}
+.federation-broadcast--bureaucracy{--broadcast-a:#8a7da8;--broadcast-b:#332d42;--broadcast-edge:#c0b4d8}
+.federation-broadcast--entertainment{--broadcast-a:#a17b98;--broadcast-b:#3c2c3a;--broadcast-edge:#d2b1ca}
+.federation-broadcast--medical{--broadcast-a:#6e9b91;--broadcast-b:#263a37;--broadcast-edge:#b2d1c8}
+.federation-broadcast--philosophy{--broadcast-a:#8b8d9f;--broadcast-b:#30313c;--broadcast-edge:#c5c7d3}
+.federation-broadcast--weather{--broadcast-a:#718ba9;--broadcast-b:#293647;--broadcast-edge:#b4c8e0}
+.federation-broadcast--influencer{--broadcast-a:#a58198;--broadcast-b:#3c2c39;--broadcast-edge:#d5b5c9}
+.federation-broadcast--technician{--broadcast-a:#527d78;--broadcast-b:#111e20;--broadcast-edge:#8cc6bd;filter:none}
+.federation-broadcast[class*="federation-broadcast--"]{
+  background:linear-gradient(180deg,#242a35f5 0%,#151b25f7 55%,#0d131cf8 100%)!important;
+  border-color:color-mix(in srgb,var(--broadcast-edge,#a8b7c8) 35%,#101722)!important;
+  box-shadow:0 5px 24px #0008,0 0 10px color-mix(in srgb,var(--broadcast-a,#8094aa) 16%,transparent),inset 0 1px 0 #ffffff14!important;
+}
+.federation-broadcast--secret .federation-broadcast__ticker-text{color:#c6e4df!important;text-shadow:0 0 7px #8cc6bd45!important}
+@media(max-width:600px){
+  .federation-broadcast{bottom:10px;left:7px;right:7px;border-radius:6px}
+  .federation-broadcast__topline,.federation-broadcast__footer{padding:3px 7px;gap:5px;letter-spacing:.04em}
+  .federation-broadcast__label{font-size:8px}
+  .federation-broadcast__live{font-size:6px;letter-spacing:0}
+  .federation-broadcast__ticker{height:38px;padding:0 8px}
+  .federation-broadcast__ticker-text{font-size:clamp(16px,4.6vw,22px)!important;animation-duration:19s,2.8s}
+}
+@media(prefers-reduced-motion:reduce){
+  .federation-broadcast{top:auto!important;bottom:10px}
+}
