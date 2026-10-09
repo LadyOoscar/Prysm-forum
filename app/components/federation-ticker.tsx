@@ -45,6 +45,18 @@ export default function FederationTicker() {
   const broadcastCount = useRef(0);
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSecretAt = useRef(0);
+  const previousMessage = useRef<number | null>(null);
+
+  useEffect(() => {
+    const previous = previousMessage.current;
+    if (messageIndex !== null && previous === null) {
+      const secret = Boolean(TRANSMISSIONS[messageIndex]?.secret);
+      window.dispatchEvent(new CustomEvent("prysm:sound", { detail: { kind: secret ? "secret" : "broadcast" } }));
+    } else if (messageIndex === null && previous !== null) {
+      window.dispatchEvent(new CustomEvent("prysm:sound", { detail: { kind: TRANSMISSIONS[previous]?.secret ? "cut" : "cut" } }));
+    }
+    previousMessage.current = messageIndex;
+  }, [messageIndex]);
 
   useEffect(() => {
     let cancelled = false;
