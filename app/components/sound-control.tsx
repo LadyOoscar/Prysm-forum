@@ -119,8 +119,6 @@ export default function SoundControl() {
     };
 
     switch (kind) {
-      case "click":
-        tone(1250, 0, 0.035, "square", 0.07); tone(720, 0.018, 0.045, "sine", 0.09); break;
       case "confirm":
         tone(660, 0, 0.09, "sine", 0.15); tone(990, 0.075, 0.14, "sine", 0.13); break;
       case "error":
@@ -141,8 +139,6 @@ export default function SoundControl() {
         noise(0, 0.34, 0.2, 160, 3400); tone(310, 0, 0.32, "sawtooth", 0.13, -22); tone(317, 0.025, 0.3, "square", 0.09, 19); tone(94, 0.08, 0.35, "triangle", 0.16); tone(740, 0.17, 0.12, "square", 0.07); break;
       case "arcade":
         tone(420, 0, 0.06, "square", 0.09); tone(620, 0.055, 0.07, "square", 0.1); tone(940, 0.12, 0.11, "triangle", 0.12); tone(1280, 0.19, 0.13, "square", 0.08); break;
-      case "panel":
-        tone(880, 0, 0.045, "sine", 0.06); tone(1240, 0.055, 0.07, "sine", 0.045); break;
       case "door":
         noise(0, 1.7, 0.055, 90, 650);
         tone(72, 0.08, 2.5, "sawtooth", 0.075);
