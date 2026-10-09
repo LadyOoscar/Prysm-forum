@@ -1211,3 +1211,85 @@ footer:before {
 .prysm-video-overlay__footer span:last-child{color:var(--cyan)}
 @keyframes prysm-on-air{0%,100%{opacity:1}50%{opacity:.45}}
 @media(max-width:600px){.prysm-video-overlay{padding:7px}.prysm-video-overlay__header{gap:6px}.prysm-video-overlay__station{font-size:.62rem;letter-spacing:.07em}.prysm-video-overlay__live{font-size:.52rem;padding:4px 5px}.prysm-video-overlay__bug{top:7px;left:7px;font-size:.55rem;padding:4px 5px}.prysm-video-overlay__signal{top:7px;right:7px;font-size:.43rem}.prysm-video-overlay__lower-third{gap:7px;padding:8px}.prysm-video-overlay__lower-mark{width:25px;height:25px}.prysm-video-overlay__lower-third strong{font-size:.62rem}.prysm-video-overlay__lower-third small{font-size:.48rem}.prysm-video-overlay__tag{font-size:.48rem;padding:3px 4px}.prysm-video-overlay__footer{font-size:.46rem;letter-spacing:.07em}}
+
+
+/* RETRO-FUTURE CRT television casing for PRYSM TV */
+.prysm-video-overlay{
+  padding:17px 17px 13px;
+  border:2px solid #596a9d;
+  border-radius:22px 22px 17px 17px;
+  background:
+    linear-gradient(135deg,rgba(255,255,255,.12),transparent 13% 84%,rgba(69,239,255,.12)),
+    linear-gradient(155deg,#30375c 0%,#151a38 17%,#090c20 62%,#242044 100%);
+  box-shadow:
+    0 0 0 2px #070817,
+    0 0 0 4px rgba(139,98,255,.5),
+    0 12px 30px #0009,
+    inset 2px 2px 0 #ffffff25,
+    inset -3px -4px 0 #0008,
+    0 0 25px #45efff14;
+}
+.prysm-video-overlay:before{
+  inset:6px;
+  border:1px solid #a9c4ff24;
+  border-radius:15px 15px 11px 11px;
+  clip-path:none;
+  box-shadow:inset 0 1px 0 #ffffff0b;
+}
+.prysm-video-overlay:after{
+  content:"";
+  position:absolute;left:24px;right:24px;top:5px;height:2px;
+  border-radius:99px;
+  background:linear-gradient(90deg,transparent,var(--cyan) 22%,var(--violet) 52%,var(--pink) 78%,transparent);
+  opacity:.85;box-shadow:0 0 9px #45efff55;
+  pointer-events:none;
+}
+.prysm-video-overlay__header{padding:0 7px 12px;min-height:37px}
+.prysm-video-overlay__screen{
+  border:5px solid #080b1b;
+  border-radius:15px 15px 10px 10px;
+  outline:1px solid #6676a5;
+  outline-offset:1px;
+  box-shadow:inset 0 0 0 1px #ffffff20,0 0 0 4px #242b4d,0 0 0 5px #080a19,0 0 0 6px #8b62ff75,0 0 25px #45efff1c;
+}
+.prysm-video-overlay__screen:before{
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  border-radius:9px 9px 5px 5px;
+  box-shadow:inset 0 0 22px #0008,inset 0 0 0 1px #ffffff13;
+}
+.prysm-video-overlay__screen:after{
+  border-radius:9px 9px 5px 5px;
+  background:linear-gradient(180deg,#03040c4d,transparent 20%,transparent 78%,#03040c38),repeating-linear-gradient(0deg,#ffffff00 0,#ffffff00 2px,#cbd6ff0b 3px,#ffffff00 4px);
+  opacity:.2;
+}
+.prysm-video-overlay__lower-third{
+  margin:14px 4px 0;
+  border-radius:3px;
+  background:linear-gradient(100deg,#24284d,#121630 72%,#101326);
+  box-shadow:inset 0 1px #ffffff13,0 2px 0 #050714;
+}
+.prysm-video-overlay__footer{
+  padding:12px 7px 0;
+  border-top:1px solid #aab9ef16;
+  margin-top:10px;
+}
+/* Tiny speaker grille and status lights in the TV's lower bezel */
+.prysm-video-overlay__footer span:first-child:before{
+  content:"";display:inline-block;vertical-align:middle;width:30px;height:9px;margin-right:9px;
+  background:repeating-linear-gradient(90deg,#65729a 0 2px,transparent 2px 4px);
+  opacity:.65;
+}
+.prysm-video-overlay__footer span:last-child:after{
+  content:"";display:inline-block;vertical-align:middle;width:6px;height:6px;margin-left:8px;border-radius:50%;
+  background:var(--cyan);box-shadow:0 0 7px var(--cyan);
+}
+@media(max-width:600px){
+  .prysm-video-overlay{padding:12px 10px 10px;border-radius:17px 17px 13px 13px}
+  .prysm-video-overlay:before{inset:4px;border-radius:11px}
+  .prysm-video-overlay:after{left:18px;right:18px}
+  .prysm-video-overlay__header{padding:0 5px 10px;min-height:32px}
+  .prysm-video-overlay__screen{border-width:3px;border-radius:10px 10px 7px 7px}
+  .prysm-video-overlay__lower-third{margin:11px 2px 0}
+  .prysm-video-overlay__footer{padding:9px 4px 0;margin-top:8px}
+  .prysm-video-overlay__footer span:first-child:before{width:19px;margin-right:5px}
+}
