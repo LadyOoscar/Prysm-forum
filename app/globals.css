@@ -1739,3 +1739,27 @@ footer:before {
 @media(prefers-reduced-motion:reduce){
   .federation-broadcast{top:auto!important;bottom:10px}
 }
+
+
+/* FEDERATION TV // slightly richer phosphor, two slower ticker passes */
+.federation-broadcast{
+  animation:federation-broadcast-enter .72s cubic-bezier(.16,1.25,.3,1) both,federation-broadcast-exit .65s ease-in 49.85s forwards;
+  box-shadow:0 5px 24px #0008,0 0 14px color-mix(in srgb,var(--broadcast-a,#8094aa) 24%,transparent),inset 0 1px 0 #ffffff18!important;
+}
+.federation-broadcast[class*="federation-broadcast--"]{
+  border-color:color-mix(in srgb,var(--broadcast-edge,#a8b7c8) 48%,#101722)!important;
+  box-shadow:0 5px 24px #0008,0 0 14px color-mix(in srgb,var(--broadcast-a,#8094aa) 24%,transparent),inset 0 1px 0 #ffffff18!important;
+}
+.federation-broadcast__ticker-text{
+  animation:federation-marquee 24s linear 2 forwards,federation-hologram 2.8s steps(1,end) infinite!important;
+  text-shadow:0 0 7px color-mix(in srgb,var(--broadcast-edge,#b6c1d2) 38%,transparent)!important;
+}
+.federation-broadcast--secret{
+  animation:federation-broadcast-enter .72s cubic-bezier(.16,1.25,.3,1) both,federation-broadcast-exit .65s ease-in 49.85s forwards,federation-intercept-flicker .19s steps(2,end) 1.1s 5;
+}
+@media(max-width:600px){
+  .federation-broadcast__ticker-text{animation-duration:22s,2.8s!important;animation-iteration-count:2,infinite!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .federation-broadcast__ticker-text{animation:none!important}
+}
