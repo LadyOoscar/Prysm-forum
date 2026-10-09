@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createSupabaseBrowser } from "../../../lib/supabase-browser";
+import { fixWebmDuration } from "../../../lib/fix-webm-duration";
 
 type Message = { id: string; body: string; sender_id: string; created_at: string };
 
@@ -280,6 +281,7 @@ export function VoiceRecorder({
   const timeoutRef = useRef<number | null>(null);
   const intervalRef = useRef<number | null>(null);
   const previewUrlRef = useRef("");
+  const recordingStartedAtRef = useRef(0);
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [preview, setPreview] = useState("");
@@ -329,21 +331,24 @@ export function VoiceRecorder({
       recorder.ondataavailable = (event) => {
         if (event.data.size > 0) chunksRef.current.push(event.data);
       };
-      recorder.onstop = () => {
+      recorder.onstop = async () => {
         clearTimers();
         stopTracks();
         setRecording(false);
-        const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
-        if (!blob.size) {
+        const rawBlob = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
+        if (!rawBlob.size) {
           onError("L’enregistrement est vide. Réessaie.");
           return;
         }
+        const actualDurationMs = Math.max(0, performance.now() - recordingStartedAtRef.current);
+        const blob = await fixWebmDuration(rawBlob, actualDurationMs);
         if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
         const url = URL.createObjectURL(blob);
         previewUrlRef.current = url;
         setPreview(url);
         setAudioBlob(blob);
       };
+      recordingStartedAtRef.current = performance.now();
       recorder.start(250);
       setRecording(true);
       setSeconds(0);
