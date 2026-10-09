@@ -6,7 +6,7 @@ import { fixWebmDuration } from "../../../lib/fix-webm-duration";
 
 type Message = { id: string; body: string; sender_id: string; created_at: string };
 
-export function VoiceAudioPlayer({ src, label = "Message vocal" }: { src: string; label?: string }) {
+export function VoiceAudioPlayer({ src, label = "Message vocal", durationMs: declaredDurationMs }: { src: string; label?: string; durationMs?: number }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -14,7 +14,7 @@ export function VoiceAudioPlayer({ src, label = "Message vocal" }: { src: string
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [current, setCurrent] = useState(0);
-  const [duration, setDuration] = useState(0);
+  const [duration, setDuration] = useState(declaredDurationMs && declaredDurationMs > 0 ? declaredDurationMs / 1000 : 0);
   const [frequencyReady, setFrequencyReady] = useState(false);
 
   function formatTime(value: number) {
@@ -112,7 +112,7 @@ export function VoiceAudioPlayer({ src, label = "Message vocal" }: { src: string
     }
   }, []);
 
-  function readDuration(audio: HTMLAudioElement) {
+  useEffect(() => {\n    if (declaredDurationMs && declaredDurationMs > 0) setDuration(declaredDurationMs / 1000);\n  }, [declaredDurationMs]);\n\n  function readDuration(audio: HTMLAudioElement) {\n    if (declaredDurationMs && declaredDurationMs > 0) return;
     // Some WebM/Opus files recorded with MediaRecorder report Infinity or a
     // partial duration until the browser probes the end of the media.
     const seekableEnd = audio.seekable.length
@@ -124,7 +124,7 @@ export function VoiceAudioPlayer({ src, label = "Message vocal" }: { src: string
     if (Number.isFinite(candidate) && candidate > 0) setDuration(candidate);
   }
 
-  function recoverWebmDuration(audio: HTMLAudioElement) {
+  function recoverWebmDuration(audio: HTMLAudioElement) {\n    if (declaredDurationMs && declaredDurationMs > 0) { setDuration(declaredDurationMs / 1000); return; }
     const knownDuration = Number.isFinite(audio.duration) && audio.duration > 0
       ? audio.duration
       : 0;
@@ -240,7 +240,7 @@ export function VoiceAudioPlayer({ src, label = "Message vocal" }: { src: string
   );
 }
 
-export function VoiceMessage({ path }: { path: string }) {
+export function VoiceMessage({ path, durationMs }: { path: string; durationMs?: number }) {
   const supabase = createSupabaseBrowser();
   const [url, setUrl] = useState("");
   const [failed, setFailed] = useState(false);
@@ -258,7 +258,7 @@ export function VoiceMessage({ path }: { path: string }) {
 
   if (failed) return <span className="field-hint">Vocal indisponible.</span>;
   if (!url) return <span className="field-hint">Chargement du vocal…</span>;
-  return <VoiceAudioPlayer src={url} />;
+  return <VoiceAudioPlayer src={url} durationMs={durationMs} />;
 }
 
 export function VoiceRecorder({
@@ -281,7 +281,7 @@ export function VoiceRecorder({
   const timeoutRef = useRef<number | null>(null);
   const intervalRef = useRef<number | null>(null);
   const previewUrlRef = useRef("");
-  const recordingStartedAtRef = useRef(0);
+  const recordingStartedAtRef = useRef(0);\n  const recordingDurationMsRef = useRef(0);
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [preview, setPreview] = useState("");
@@ -405,7 +405,7 @@ export function VoiceRecorder({
         </>
       ) : preview ? (
         <>
-          <VoiceAudioPlayer src={preview} label="Écouter le vocal avant envoi" />
+          <VoiceAudioPlayer src={preview} durationMs={recordingDurationMsRef.current} label="Écouter le vocal avant envoi" />
           <button className="button primary" type="button" onClick={() => void sendVoice()} disabled={disabled || sending}>{sending ? "Envoi…" : "Envoyer le vocal"}</button>
           <button className="button" type="button" onClick={discardPreview} disabled={sending}>Annuler</button>
         </>
