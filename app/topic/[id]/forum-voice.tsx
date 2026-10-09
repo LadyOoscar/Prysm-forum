@@ -5,8 +5,8 @@ import { createSupabaseBrowser } from "../../../lib/supabase-browser";
 import { VoiceAudioPlayer, VoiceMessage } from "../../messages/[id]/voice-tools";
 import { fixWebmDuration } from "../../../lib/fix-webm-duration";
 
-export function ForumVoice({ path }: { path: string }) {
-  return <VoiceMessage path={path} />;
+export function ForumVoice({ path, durationMs }: { path: string; durationMs?: number }) {
+  return <VoiceMessage path={path} durationMs={durationMs} />;
 }
 
 export default function ForumVoiceRecorder({ topicId, parentPostId, disabled, onSent }: {
@@ -20,6 +20,7 @@ export default function ForumVoiceRecorder({ topicId, parentPostId, disabled, on
   const streamRef = useRef<MediaStream | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const recordingStartedAtRef = useRef(0);
+  const recordingDurationMsRef = useRef(0);
   const [recording, setRecording] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [blob, setBlob] = useState<Blob | null>(null);
@@ -63,6 +64,7 @@ export default function ForumVoiceRecorder({ topicId, parentPostId, disabled, on
         const rawAudio = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
         if (!rawAudio.size) { setError("Le vocal est vide. Réessaie."); return; }
         const actualDurationMs = Math.max(0, performance.now() - recordingStartedAtRef.current);
+        recordingDurationMsRef.current = actualDurationMs;
         const audio = await fixWebmDuration(rawAudio, actualDurationMs);
         setBlob(audio);
         setPreview(URL.createObjectURL(audio));
@@ -103,7 +105,7 @@ export default function ForumVoiceRecorder({ topicId, parentPostId, disabled, on
     const { error: insertError } = await supabase.from("forum_posts").insert({
       topic_id: topicId,
       author_id: user.id,
-      body: "voice:" + path,
+      body: "voice:" + path + "|durationMs=" + Math.round(recordingDurationMsRef.current),
       parent_post_id: parentPostId ?? null,
     });
     if (insertError) {
@@ -122,7 +124,7 @@ export default function ForumVoiceRecorder({ topicId, parentPostId, disabled, on
       <span className="field-hint" aria-live="polite">● Enregistrement {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")} / 1:30</span>
       <button type="button" className="button" onClick={() => recorderRef.current?.state !== "inactive" && recorderRef.current?.stop()}>Arrêter</button>
     </> : preview ? <>
-      <VoiceAudioPlayer src={preview} label="Écouter le vocal avant publication" />
+      <VoiceAudioPlayer src={preview} durationMs={recordingDurationMsRef.current} label="Écouter le vocal avant publication" />
       <button type="button" className="button primary" disabled={busy || disabled} onClick={() => void send()}>{busy ? "Envoi…" : "Publier le vocal"}</button>
       <button type="button" className="button" disabled={busy} onClick={clearPreview}>Annuler</button>
     </> : <button type="button" className="button" disabled={disabled} onClick={() => void start()}>🎙️ Enregistrer un vocal</button>}
