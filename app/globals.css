@@ -1400,3 +1400,77 @@ footer:before {
 .story-custom-background span{flex:1;font-size:.68rem;color:#d6dcf8}
 .story-custom-background button{border:1px solid #ff62c477;border-radius:4px;padding:6px 8px;color:#ff91d9;background:transparent;font-size:.65rem;cursor:pointer}
 @media(max-width:560px){.story-style-toggles{grid-template-columns:1fr}.story-custom-background{flex-wrap:wrap}.story-custom-background span{min-width:120px}}
+
+
+/* PRYSM TV: analog signal comes alive */
+.prysm-video-overlay{
+  transform-origin:center;
+  animation:prysm-tv-pulse 4.8s ease-in-out infinite,prysm-tv-twitch 7.3s steps(1,end) infinite;
+  will-change:transform,filter,box-shadow;
+}
+.prysm-video-overlay__screen{
+  isolation:isolate;
+  animation:prysm-screen-glow 3.2s ease-in-out infinite;
+}
+.prysm-video-overlay__screen:before{
+  content:"";position:absolute;inset:-35% 0 auto;height:24%;z-index:4;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(69,239,255,.025) 25%,rgba(69,239,255,.19) 50%,rgba(255,79,195,.08) 65%,transparent);
+  mix-blend-mode:screen;animation:prysm-tv-sweep 5.8s linear infinite;
+}
+.prysm-video-overlay__screen:after{
+  animation:prysm-static-flicker 2.7s steps(1,end) infinite;
+}
+.prysm-video-overlay__header .prysm-video-overlay__mark{animation:prysm-mark-flicker 5s steps(1,end) infinite}
+.prysm-video-overlay__live{animation:prysm-live-surge 2.2s ease-in-out infinite}
+.prysm-video-overlay__lower-third{animation:prysm-lower-glow 4s ease-in-out infinite}
+.prysm-video-overlay__signal span{animation:prysm-signal-blink 1.4s steps(2,end) infinite}
+@keyframes prysm-tv-pulse{
+  0%,100%{box-shadow:0 0 0 2px #070817,0 0 0 3px rgba(139,98,255,.55),0 10px 28px #0008,inset 0 0 22px #45efff0a;filter:brightness(1)}
+  50%{box-shadow:0 0 0 2px #070817,0 0 0 3px rgba(139,98,255,.8),0 0 9px #45efff55,0 0 31px #45efff21,0 10px 28px #0008,inset 0 0 28px #45efff14;filter:brightness(1.035)}
+}
+@keyframes prysm-tv-twitch{
+  0%,9%,9.5%,44%,44.4%,100%{transform:translate(0,0) skewX(0)}
+  9.2%{transform:translate(.7px,-.5px) skewX(.12deg)}
+  44.2%{transform:translate(-.6px,.4px) skewX(-.1deg)}
+}
+@keyframes prysm-screen-glow{
+  0%,100%{filter:brightness(1) saturate(1)}
+  48%{filter:brightness(1.025) saturate(1.06)}
+  49%{filter:brightness(.97) saturate(1.12)}
+  50%{filter:brightness(1.04) saturate(1.04)}
+}
+@keyframes prysm-tv-sweep{
+  0%{transform:translateY(-30%);opacity:0}
+  8%{opacity:.8}
+  70%{opacity:.45}
+  100%{transform:translateY(570%);opacity:0}
+}
+@keyframes prysm-static-flicker{
+  0%,93%,95%,98%,100%{opacity:.12}
+  94%{opacity:.3}
+  96%{opacity:.2}
+  97%{opacity:.38}
+}
+@keyframes prysm-mark-flicker{
+  0%,67%,69%,100%{opacity:1}
+  68%{opacity:.45}
+}
+@keyframes prysm-live-surge{
+  0%,100%{box-shadow:0 0 0 #ff547f00}
+  50%{box-shadow:0 0 13px #ff547f2b}
+}
+@keyframes prysm-lower-glow{
+  0%,100%{filter:brightness(1)}
+  50%{filter:brightness(1.12)}
+}
+@keyframes prysm-signal-blink{
+  0%,100%{opacity:1}
+  50%{opacity:.38}
+}
+@media(prefers-reduced-motion:reduce){
+  .prysm-video-overlay,.prysm-video-overlay__screen,.prysm-video-overlay__screen:before,
+  .prysm-video-overlay__screen:after,.prysm-video-overlay__header .prysm-video-overlay__mark,
+  .prysm-video-overlay__live,.prysm-video-overlay__lower-third,.prysm-video-overlay__signal span{
+    animation:none!important;will-change:auto;
+  }
+}
