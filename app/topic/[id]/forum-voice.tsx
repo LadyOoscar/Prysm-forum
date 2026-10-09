@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createSupabaseBrowser } from "../../../lib/supabase-browser";
-import { VoiceMessage } from "../../messages/[id]/voice-tools";
+import { VoiceAudioPlayer, VoiceMessage } from "../../messages/[id]/voice-tools";
 
 export function ForumVoice({ path }: { path: string }) {
   return <VoiceMessage path={path} />;
@@ -117,7 +117,7 @@ export default function ForumVoiceRecorder({ topicId, parentPostId, disabled, on
       <span className="field-hint" aria-live="polite">● Enregistrement {Math.floor(seconds / 60)}:{String(seconds % 60).padStart(2, "0")} / 1:30</span>
       <button type="button" className="button" onClick={() => recorderRef.current?.state !== "inactive" && recorderRef.current?.stop()}>Arrêter</button>
     </> : preview ? <>
-      <audio controls src={preview} aria-label="Écouter le vocal avant envoi" style={{ width: "min(100%, 280px)" }} />
+      <VoiceAudioPlayer src={preview} label="Écouter le vocal avant publication" />
       <button type="button" className="button primary" disabled={busy || disabled} onClick={() => void send()}>{busy ? "Envoi…" : "Publier le vocal"}</button>
       <button type="button" className="button" disabled={busy} onClick={clearPreview}>Annuler</button>
     </> : <button type="button" className="button" disabled={disabled} onClick={() => void start()}>🎙️ Enregistrer un vocal</button>}
