@@ -31,7 +31,7 @@ function ForumPostCard({ post, childrenByParent, postsById, badgesByProfile, top
   const parent = post.parent_post_id ? postsById.get(post.parent_post_id) : null;
   const parentProfile = parent ? (Array.isArray(parent.profiles) ? parent.profiles[0] : parent.profiles) : null;
   const rawBody = typeof post.body === "string" ? post.body : "";
-  const legacyQuoteMatch = rawBody.match(/^(?:(?:> ?.*)(?:\\n|$))+\\s*\\n?/);
+  const legacyQuoteMatch = rawBody.match(/^(?:(?:> ?.*)(?:\n|$))+\s*\n?/);
   const legacyQuote = legacyQuoteMatch?.[0]?.trim();
   const visibleBody = legacyQuote ? rawBody.slice(legacyQuoteMatch[0].length).trim() : rawBody;
   return (
@@ -49,7 +49,7 @@ function ForumPostCard({ post, childrenByParent, postsById, badgesByProfile, top
         <div className="post-body">
           <time>{new Date(post.created_at).toLocaleString("fr-FR")}</time>
           {parent && <aside className="post-quoted-context"><span className="post-quoted-label">↪ En réponse à {parentProfile?.display_name || parentProfile?.username || "un membre"}</span><p>{typeof parent.body === "string" && parent.body.startsWith("voice:") ? "Message vocal" : (parent.body || "").slice(0, 220) + ((parent.body || "").length > 220 ? "…" : "")}</p></aside>}
-          {legacyQuote && <aside className="post-quoted-context legacy-quote"><span className="post-quoted-label">Citation</span><p>{legacyQuote.split("\\n").map((line: string) => line.replace(/^> ?/, "")).join("\\n")}</p></aside>}
+          {legacyQuote && <aside className="post-quoted-context legacy-quote"><span className="post-quoted-label">Citation</span><p>{legacyQuote.split("\n").map((line: string) => line.replace(/^> ?/, "")).join("\n")}</p></aside>}
           {typeof post.body === "string" && post.body.startsWith("voice:") ? <ForumVoice path={post.body.slice(6)} /> : visibleBody ? <p><StickerText text={visibleBody} /></p> : null}
           <Votes postId={post.id} />
           <Reactions postId={post.id} />
