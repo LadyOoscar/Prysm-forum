@@ -562,3 +562,68 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 2px rgba(69,239,255,.1)
   .dating-card,.cards .card,.forum-row,.topic-row,.profile-box,.post,.conversation-row,.notification-row,.search-result{opacity:1;translate:none;scale:1}
   .dating-card,.dating-avatar,.dating-actions .button,.dating-card .interest-tag,.orbit-person-face{transition:none!important}
 }
+
+
+/* PRYSM // HOMEPAGE MOTION: every section joins the show */
+@keyframes home-copy-rise{from{opacity:0;translate:0 20px}to{opacity:1;translate:0 0}}
+@keyframes home-title-glow{0%,100%{text-shadow:0 0 0 rgba(69,239,255,0)}50%{text-shadow:0 0 24px rgba(139,98,255,.17)}}
+@keyframes home-card-sheen{0%,68%,100%{background-position:-180% 0}35%{background-position:180% 0}}
+@keyframes home-calendar-glow{0%,100%{box-shadow:0 0 0 rgba(139,98,255,0)}50%{box-shadow:0 0 28px rgba(139,98,255,.09)}}
+@keyframes home-section-line{from{transform:scaleX(0);transform-origin:left}to{transform:scaleX(1);transform-origin:left}}
+@keyframes home-dot-float{0%,100%{translate:0 0}50%{translate:0 -5px}}
+
+.hero>div{animation:home-copy-rise .8s cubic-bezier(.2,.7,.2,1) both}
+.hero h1{animation:home-title-glow 8s ease-in-out 1s infinite}
+.hero .lead{animation:home-copy-rise .8s .12s cubic-bezier(.2,.7,.2,1) both}
+.hero .actions{animation:home-copy-rise .8s .22s cubic-bezier(.2,.7,.2,1) both}
+.home-orbit{animation:home-copy-rise .95s .14s cubic-bezier(.2,.7,.2,1) both}
+.section-heading{position:relative}
+.section-heading:after{
+  content:"";position:absolute;left:0;right:0;bottom:-11px;height:1px;
+  background:linear-gradient(90deg,var(--cyan),rgba(139,98,255,.45),transparent 85%);
+  transform-origin:left;animation:home-section-line 1s .35s both;
+}
+.section-heading .status{animation:prysm-button-breathe 5s ease-in-out infinite}
+.cards .card{position:relative;overflow:hidden}
+.cards .card:before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background:linear-gradient(110deg,transparent 20%,rgba(255,255,255,.065) 48%,transparent 70%);
+  background-size:220% 100%;background-position:-180% 0;
+  animation:home-card-sheen 9s ease-in-out infinite;
+}
+.cards .card:nth-child(2):before{animation-delay:1.2s}
+.cards .card:nth-child(3):before{animation-delay:2.4s}
+.cards .card h3{transition:color .25s ease,text-shadow .25s ease}
+.cards .card:hover h3,.cards .card:focus-visible h3{color:#fff;text-shadow:0 0 16px rgba(69,239,255,.24)}
+.cards .card>strong{display:inline-block;transition:transform .25s ease,color .25s ease}
+.cards .card:hover>strong,.cards .card:focus-visible>strong{transform:translateX(5px)}
+.community-calendar{animation:home-copy-rise .8s .12s cubic-bezier(.2,.7,.2,1) both}
+.calendar-heading{position:relative}
+.calendar-heading h2{animation:home-title-glow 9s ease-in-out 1.5s infinite}
+.calendar-month,.calendar-events{transition:border-color .3s ease,box-shadow .3s ease,transform .3s ease;animation:home-calendar-glow 10s ease-in-out infinite}
+.calendar-events{animation-delay:1.2s}
+.calendar-month:hover,.calendar-events:hover{border-color:rgba(139,98,255,.55);box-shadow:0 0 25px rgba(139,98,255,.09)}
+.calendar-day.has-events i{animation:home-dot-float 3s ease-in-out infinite}
+.calendar-event{transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease}
+.calendar-event:hover{transform:translateX(3px);border-color:rgba(69,239,255,.55);box-shadow:0 0 18px rgba(69,239,255,.07)}
+.calendar-event .event-type-mark{transition:transform .25s ease,box-shadow .25s ease}
+.calendar-event:hover .event-type-mark{transform:rotate(-5deg) scale(1.06);box-shadow:0 0 15px rgba(69,239,255,.12)}
+footer{position:relative}
+footer:before{content:"";display:block;width:100%;height:1px;margin:0 0 22px;background:linear-gradient(90deg,transparent,rgba(69,239,255,.45),rgba(255,79,195,.28),transparent)}
+@media(max-width:760px){
+  .hero>div,.hero .lead,.hero .actions,.home-orbit,.community-calendar{animation-duration:.55s}
+  .hero h1,.calendar-heading h2{animation:none}
+  .cards .card:before{animation-duration:12s;opacity:.65}
+  .calendar-month,.calendar-events{animation:none}
+  .calendar-event:hover{transform:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .hero>div,.hero h1,.hero .lead,.hero .actions,.home-orbit,.section-heading:after,
+  .section-heading .status,.cards .card:before,.cards .card h3,.cards .card>strong,
+  .community-calendar,.calendar-heading h2,.calendar-month,.calendar-events,
+  .calendar-day.has-events i,.calendar-event,.calendar-event .event-type-mark{
+    animation:none!important;transition:none!important;
+  }
+  .hero>div,.hero .lead,.hero .actions,.home-orbit,.community-calendar{opacity:1;translate:none}
+  .calendar-event:hover,.calendar-event:hover .event-type-mark{transform:none}
+}
