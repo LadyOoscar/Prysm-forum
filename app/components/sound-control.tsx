@@ -60,7 +60,7 @@ export default function SoundControl() {
     const now = ctx.currentTime;
     const master = ctx.createGain();
     master.gain.setValueAtTime(0.0001, now);
-    master.gain.linearRampToValueAtTime(Math.max(0.0001, volumeRef.current / 100 * 0.045), now + 2.8);
+    master.gain.linearRampToValueAtTime(Math.max(0.0001, volumeRef.current / 100 * 0.012), now + 2.8);
     master.connect(ctx.destination);
     const nodes: AudioNode[] = [];
     const drone = (frequency: number, type: OscillatorType, level: number, detune = 0) => {
@@ -77,17 +77,17 @@ export default function SoundControl() {
       osc.start(now);
       nodes.push(osc, filter, gain);
     };
-    drone(55, "sine", 0.28);
-    drone(82.41, "triangle", 0.12, -4);
-    drone(110, "sawtooth", 0.025, 5);
-    drone(164.81, "sine", 0.035);
+    drone(55, "sine", 0.13);
+    drone(82.41, "triangle", 0.035, -4);
+    drone(110, "sawtooth", 0.004, 5);
+    drone(164.81, "sine", 0.008);
     const lfo = ctx.createOscillator();
     const lfoGain = ctx.createGain();
-    lfo.type = "sine"; lfo.frequency.value = 0.075; lfoGain.gain.value = 0.012;
+    lfo.type = "sine"; lfo.frequency.value = 0.075; lfoGain.gain.value = 0.002;
     lfo.connect(lfoGain); lfoGain.connect(master.gain); lfo.start(now);
     nodes.push(lfo, lfoGain);
 
-    // Eight-step synth motif loops every four seconds over the continuous drones.
+    // A single soft arcade note appears occasionally, leaving long stretches of calm ambience.
     const notes = [329.63, 392, 493.88, 587.33, 493.88, 392, 440, 329.63];
     let step = 0;
     const playStep = () => {
@@ -101,17 +101,17 @@ export default function SoundControl() {
       filter.type = "lowpass";
       filter.frequency.value = 1250;
       gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.linearRampToValueAtTime(0.075, t + 0.035);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.39);
+      gain.gain.linearRampToValueAtTime(0.018, t + 0.06);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.65);
       osc.connect(filter); filter.connect(gain); gain.connect(master);
-      osc.start(t); osc.stop(t + 0.42);
+      osc.start(t); osc.stop(t + 0.68);
       osc.onended = () => { try { osc.disconnect(); filter.disconnect(); gain.disconnect(); } catch {} };
       step = (step + 1) % notes.length;
     };
     const track = { master, nodes, timer: null as number | null };
     ambientRef.current = track;
     playStep();
-    track.timer = window.setInterval(playStep, 500);
+    track.timer = window.setInterval(playStep, 6200);
   }, [getAudio, stopAmbient]);
 
   const play = useCallback((kind: SoundKind) => {
@@ -120,7 +120,7 @@ export default function SoundControl() {
     if (!ctx) return;
     const now = ctx.currentTime;
     const master = ctx.createGain();
-    const baseVolume = kind === "ambient" ? 0.035 : kind === "secret" || kind === "static" ? 0.09 : 0.12;
+    const baseVolume = kind === "ambient" ? 0.012 : kind === "secret" || kind === "static" ? 0.045 : 0.065;
     master.gain.setValueAtTime(Math.max(0.0001, volumeRef.current / 100 * baseVolume), now);
     master.connect(ctx.destination);
 
@@ -269,7 +269,7 @@ export default function SoundControl() {
             <input aria-label="Volume des effets sonores" type="range" min="0" max="100" step="1" value={volume} onChange={(e) => changeVolume(Number(e.target.value))} />
           </label>
           <button className="prysm-sound-test" type="button" disabled={!enabled} onClick={() => play(TEST_SOUNDS[Math.floor(Math.random() * TEST_SOUNDS.length)])}>▶ Tester un son aléatoire</button>
-          <p>BOUCLE SYNTHÉTIQUE CONTINUE : drones graves, motif arcade à huit notes et modulation lente. Les effets CRT, radio, parasites et signal secret se superposent aux événements. Volume indépendant, sans fichier audio externe.</p>
+          <p>Ambiance discrète : nappe très douce, une note synthétique espacée et effets rares. Volume réglable, sons désactivés par défaut, sans fichier audio externe.</p>
         </div>
       )}
       <button className={`prysm-sound-launcher${enabled ? " is-on" : ""}`} type="button" aria-expanded={panelOpen} aria-label="Ouvrir les réglages sonores" onClick={() => setPanelOpen((open) => !open)}>
