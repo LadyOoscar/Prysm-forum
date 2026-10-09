@@ -453,3 +453,40 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 2px rgba(69,239,255,.1)
   .cards .card:hover,.cards .card:focus-visible{transform:none}
   .section:before,.community-calendar:before{animation:none!important;opacity:.25}
 }
+
+
+/* PRYSM // final polish: restrained arcade feedback without changing layout */
+.hero{position:relative;isolation:isolate}
+.hero:before{
+  content:"";position:absolute;inset:8% -2% 5%;z-index:-1;pointer-events:none;
+  background:radial-gradient(ellipse at 78% 46%,rgba(139,98,255,.075),transparent 48%),
+    radial-gradient(ellipse at 18% 22%,rgba(69,239,255,.045),transparent 42%);
+  opacity:.8;animation:home-hero-breathe 11s ease-in-out infinite alternate;
+}
+.hero .eyebrow:before{
+  content:"";display:inline-block;width:6px;height:6px;margin:0 9px 1px 0;
+  border-radius:50%;background:var(--cyan);box-shadow:0 0 10px rgba(69,239,255,.8);
+  animation:home-status-pulse 3.2s ease-in-out infinite;
+}
+.home-orbit{transition:transform .4s cubic-bezier(.2,.7,.2,1),border-color .35s ease,box-shadow .35s ease}
+.home-orbit:hover,.home-orbit:focus-visible{transform:scale(1.018);outline:none}
+.hero .actions .button{position:relative;overflow:hidden}
+.hero .actions .button:after{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:0;
+  background:linear-gradient(110deg,transparent 20%,rgba(255,255,255,.14) 48%,transparent 72%);
+  transform:translateX(-120%);transition:transform .55s ease,opacity .2s ease;
+}
+.hero .actions .button:hover:after,.hero .actions .button:focus-visible:after{opacity:1;transform:translateX(120%)}
+.topbar nav a{transition:color .2s ease,border-color .2s ease,background .2s ease,box-shadow .2s ease}
+.topbar nav a:hover,.topbar nav a:focus-visible{box-shadow:0 0 15px rgba(69,239,255,.08);outline-color:var(--cyan)}
+@keyframes home-hero-breathe{from{opacity:.48}to{opacity:1}}
+@media(max-width:700px){
+  .hero:before{inset:2% 0 0;opacity:.6}
+  .home-orbit:hover,.home-orbit:focus-visible{transform:none}
+  .hero .actions .button:after{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .hero:before,.hero .eyebrow:before{animation:none!important}
+  .home-orbit,.topbar nav a,.hero .actions .button:after{transition:none!important}
+  .home-orbit:hover,.home-orbit:focus-visible{transform:none}
+}
