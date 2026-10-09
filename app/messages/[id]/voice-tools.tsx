@@ -111,6 +111,48 @@ export function VoiceAudioPlayer({ src, label = "Message vocal" }: { src: string
     }
   }, []);
 
+  function readDuration(audio: HTMLAudioElement) {
+    // Some WebM/Opus files recorded with MediaRecorder report Infinity or a
+    // partial duration until the browser probes the end of the media.
+    const seekableEnd = audio.seekable.length
+      ? audio.seekable.end(audio.seekable.length - 1)
+      : 0;
+    const candidate = Number.isFinite(audio.duration) && audio.duration > 0
+      ? audio.duration
+      : seekableEnd;
+    if (Number.isFinite(candidate) && candidate > 0) setDuration(candidate);
+  }
+
+  function recoverWebmDuration(audio: HTMLAudioElement) {
+    if (Number.isFinite(audio.duration) && audio.duration > 0) {
+      readDuration(audio);
+      return;
+    }
+
+    // Seeking far forward makes browsers scan WebM metadata and discover the
+    // real end time. Restore the playhead after the duration becomes available.
+    const restoreTime = audio.currentTime;
+    const finishProbe = () => {
+      if (!Number.isFinite(audio.duration) || audio.duration <= 0) return;
+      setDuration(audio.duration);
+      audio.removeEventListener("timeupdate", finishProbe);
+      audio.removeEventListener("durationchange", finishProbe);
+      try {
+        audio.currentTime = restoreTime;
+      } catch {
+        // The media may not support seeking; playback remains available.
+      }
+    };
+    audio.addEventListener("timeupdate", finishProbe);
+    audio.addEventListener("durationchange", finishProbe);
+    try {
+      audio.currentTime = 1e101;
+    } catch {
+      audio.removeEventListener("timeupdate", finishProbe);
+      audio.removeEventListener("durationchange", finishProbe);
+    }
+  }
+
   const progress = duration > 0 ? Math.min(100, Math.max(0, (current / duration) * 100)) : 0;
 
   return (
@@ -120,15 +162,13 @@ export function VoiceAudioPlayer({ src, label = "Message vocal" }: { src: string
         src={src}
         crossOrigin="anonymous"
         preload="metadata"
-        onTimeUpdate={(event) => setCurrent(event.currentTarget.currentTime)}
-        onLoadedMetadata={(event) => {
-          const value = event.currentTarget.duration;
-          setDuration(Number.isFinite(value) && value > 0 ? value : 0);
+        onTimeUpdate={(event) => {
+          const audio = event.currentTarget;
+          setCurrent(audio.currentTime);
+          readDuration(audio);
         }}
-        onDurationChange={(event) => {
-          const value = event.currentTarget.duration;
-          if (Number.isFinite(value) && value > 0) setDuration(value);
-        }}
+        onLoadedMetadata={(event) => recoverWebmDuration(event.currentTarget)}
+        onDurationChange={(event) => readDuration(event.currentTarget)}
         onPlay={() => setPlaying(true)}
         onPause={() => { setPlaying(false); stopVisualizer(); }}
         onEnded={() => {
