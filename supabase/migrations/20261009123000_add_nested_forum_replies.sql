@@ -33,3 +33,5 @@ CREATE TRIGGER forum_posts_validate_parent
 BEFORE INSERT OR UPDATE OF parent_post_id, topic_id
 ON public.forum_posts
 FOR EACH ROW EXECUTE FUNCTION public.validate_forum_post_parent();
+
+-- Nested replies are constrained to their original topic by the trigger above.
