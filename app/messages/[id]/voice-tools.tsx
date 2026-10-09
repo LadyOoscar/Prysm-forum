@@ -7,24 +7,115 @@ type Message = { id: string; body: string; sender_id: string; created_at: string
 
 export function VoiceAudioPlayer({ src, label = "Message vocal" }: { src: string; label?: string }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const sourceRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const frameRef = useRef<number | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [current, setCurrent] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [frequencyReady, setFrequencyReady] = useState(false);
 
   function formatTime(value: number) {
     if (!Number.isFinite(value)) return "0:00";
     return Math.floor(value / 60) + ":" + String(Math.floor(value % 60)).padStart(2, "0");
   }
 
+  function stopVisualizer() {
+    if (frameRef.current !== null) cancelAnimationFrame(frameRef.current);
+    frameRef.current = null;
+  }
+
+  function drawVisualizer() {
+    const canvas = canvasRef.current;
+    const analyser = analyserRef.current;
+    if (!canvas || !analyser) return;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+    const bins = new Uint8Array(analyser.frequencyBinCount);
+    const width = canvas.width;
+    const height = canvas.height;
+    const bars = 40;
+    const gap = 3;
+    const barWidth = (width - gap * (bars - 1)) / bars;
+
+    const draw = () => {
+      analyser.getByteFrequencyData(bins);
+      context.clearRect(0, 0, width, height);
+      for (let i = 0; i < bars; i++) {
+        const binIndex = Math.floor(Math.pow(i / bars, 1.65) * bins.length * 0.72);
+        const energy = bins[binIndex] / 255;
+        const barHeight = Math.max(3, energy * (height - 2));
+        const x = i * (barWidth + gap);
+        const y = (height - barHeight) / 2;
+        const gradient = context.createLinearGradient(0, y, 0, y + barHeight);
+        gradient.addColorStop(0, "#ff4fc3");
+        gradient.addColorStop(0.52, "#8b62ff");
+        gradient.addColorStop(1, "#45efff");
+        context.fillStyle = gradient;
+        context.globalAlpha = 0.48 + energy * 0.52;
+        context.beginPath();
+        context.roundRect(x, y, barWidth, barHeight, Math.min(2, barWidth / 2));
+        context.fill();
+      }
+      context.globalAlpha = 1;
+      if (!audioRef.current?.paused) frameRef.current = requestAnimationFrame(draw);
+      else frameRef.current = null;
+    };
+    stopVisualizer();
+    frameRef.current = requestAnimationFrame(draw);
+  }
+
+  async function setupVisualizer(audio: HTMLAudioElement) {
+    if (typeof window === "undefined" || !("AudioContext" in window)) return;
+    try {
+      if (!audioContextRef.current) {
+        const AudioContextConstructor = window.AudioContext;
+        const audioContext = new AudioContextConstructor();
+        const analyser = audioContext.createAnalyser();
+        analyser.fftSize = 128;
+        analyser.smoothingTimeConstant = 0.78;
+        const source = audioContext.createMediaElementSource(audio);
+        source.connect(analyser);
+        analyser.connect(audioContext.destination);
+        audioContextRef.current = audioContext;
+        analyserRef.current = analyser;
+        sourceRef.current = source;
+      }
+      if (audioContextRef.current.state === "suspended") await audioContextRef.current.resume();
+      setFrequencyReady(true);
+      drawVisualizer();
+    } catch {
+      // Playback still works if the browser blocks Web Audio analysis.
+      setFrequencyReady(false);
+    }
+  }
+
   async function togglePlayback() {
     const audio = audioRef.current;
     if (!audio) return;
     if (audio.paused) {
-      try { await audio.play(); } catch { setPlaying(false); }
+      try {
+        await audio.play();
+        await setupVisualizer(audio);
+      } catch {
+        setPlaying(false);
+      }
     } else {
       audio.pause();
+      stopVisualizer();
     }
   }
+
+  useEffect(() => () => {
+    stopVisualizer();
+    if (audioContextRef.current && audioContextRef.current.state !== "closed") {
+      void audioContextRef.current.close();
+    }
+  }, []);
+
+  const progress = duration > 0 ? Math.min(100, Math.max(0, (current / duration) * 100)) : 0;
 
   return (
     <div className="prysm-audio-player" aria-label={label}>
@@ -33,10 +124,22 @@ export function VoiceAudioPlayer({ src, label = "Message vocal" }: { src: string
         src={src}
         preload="metadata"
         onTimeUpdate={(event) => setCurrent(event.currentTarget.currentTime)}
-        onLoadedMetadata={(event) => setDuration(Number.isFinite(event.currentTarget.duration) ? event.currentTarget.duration : 0)}
+        onLoadedMetadata={(event) => {
+          const value = event.currentTarget.duration;
+          setDuration(Number.isFinite(value) && value > 0 ? value : 0);
+        }}
+        onDurationChange={(event) => {
+          const value = event.currentTarget.duration;
+          if (Number.isFinite(value) && value > 0) setDuration(value);
+        }}
         onPlay={() => setPlaying(true)}
-        onPause={() => setPlaying(false)}
-        onEnded={() => { setPlaying(false); setCurrent(0); if (audioRef.current) audioRef.current.currentTime = 0; }}
+        onPause={() => { setPlaying(false); stopVisualizer(); }}
+        onEnded={() => {
+          setPlaying(false);
+          setCurrent(0);
+          stopVisualizer();
+          if (audioRef.current) audioRef.current.currentTime = 0;
+        }}
       />
       <button className="audio-play-button" type="button" onClick={() => void togglePlayback()} aria-label={playing ? "Mettre en pause" : "Lire le vocal"}>
         {playing ? "Ⅱ" : "▶"}
@@ -51,8 +154,9 @@ export function VoiceAudioPlayer({ src, label = "Message vocal" }: { src: string
           type="range"
           min={0}
           max={duration || 1}
-          step={0.1}
+          step={0.01}
           value={Math.min(current, duration || 1)}
+          style={{ background: `linear-gradient(90deg, #45efff 0%, #8b62ff ${progress}%, rgba(69,239,255,.16) ${progress}%, rgba(69,239,255,.16) 100%)` }}
           aria-label="Position dans le vocal"
           onChange={(event) => {
             const next = Number(event.currentTarget.value);
@@ -60,9 +164,14 @@ export function VoiceAudioPlayer({ src, label = "Message vocal" }: { src: string
             setCurrent(next);
           }}
         />
-        <div className="audio-waveform" aria-hidden="true">
-          {Array.from({ length: 32 }, (_, index) => <i key={index} style={{ height: `${[5,9,13,7,17,11,21,8,14,24,12,18,7,15,22,10,17,6,12,20,9,15,24,8,17,11,19,7,13,21,9,15][index]}px` }} />)}
-        </div>
+        <canvas
+          ref={canvasRef}
+          className={frequencyReady && playing ? "audio-waveform is-active" : "audio-waveform"}
+          width={360}
+          height={34}
+          aria-label="Visualisation des fréquences audio"
+          role="img"
+        />
       </div>
     </div>
   );
