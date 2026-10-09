@@ -1,23 +1,54 @@
-/* The eclipse dims the entire viewport while it crosses the sky. */
-.cosmic-eclipse-dim {
-  position: absolute !important;
-  inset: 0 !important;
-  z-index: 0 !important;
-  width: 100%;
-  height: 100%;
-  background: #000;
+/* PRYSM cosmic event scheduler: only the currently selected event may animate. */
+.cosmic-overlay span {
+  animation: none !important;
   opacity: 0;
-  animation: cosmic-eclipse-dim 37s 15s ease-in-out infinite;
 }
-.cosmic-overlay span:not(.cosmic-eclipse-dim) {
-  z-index: 1;
+
+/* Common events */
+.cosmic-overlay .cosmic-dust.is-active {
+  animation: cosmic-drift 8s ease-in-out 0s 1 both !important;
 }
+.cosmic-overlay .cosmic-shooting-one.is-active {
+  animation: cosmic-shoot 17s linear 0s 1 both !important;
+}
+.cosmic-overlay .cosmic-shooting-two.is-active {
+  animation: cosmic-shoot 23s linear 0s 1 both !important;
+}
+.cosmic-overlay .cosmic-ripple.is-active {
+  animation: cosmic-ripple 25s ease-out 0s 1 both !important;
+}
+
+/* Uncommon events */
+.cosmic-overlay .cosmic-comet.is-active {
+  animation: cosmic-comet 29s linear 0s 1 both !important;
+}
+.cosmic-overlay .cosmic-constellation.is-active {
+  animation: cosmic-constellation 31s ease-in-out 0s 1 both !important;
+}
+
+/* Rare events */
+.cosmic-overlay .cosmic-birth.is-active {
+  animation: cosmic-birth 21s ease-out 0s 1 both !important;
+}
+.cosmic-overlay .cosmic-pulse.is-active {
+  animation: cosmic-pulse 33s ease-in-out 0s 1 both !important;
+}
+
+/* Legendary event: eclipse and viewport dimming form one event. */
+.cosmic-overlay .cosmic-eclipse.is-active {
+  animation: cosmic-eclipse 37s ease-in-out 0s 1 both !important;
+}
+.cosmic-overlay .cosmic-eclipse-dim.is-active {
+  animation: cosmic-eclipse-dim 37s ease-in-out 0s 1 both !important;
+}
+
 @keyframes cosmic-eclipse-dim {
   0%, 100% { opacity: 0; }
   4% { opacity: .72; }
   75% { opacity: .72; }
   88% { opacity: 0; }
 }
+
 @media(prefers-reduced-motion: reduce) {
-  .cosmic-eclipse-dim { animation: none; opacity: 0; }
+  .cosmic-overlay { display: none !important; }
 }
