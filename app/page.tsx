@@ -9,8 +9,6 @@ const sections = [
   { title: "Discussions générales", text: "Parler, débattre, partager et faire vivre la communauté.", href: "/forum/general" },
   { title: "Culture & passions", text: "Jeux, musique, lecture, cinéma et tout ce qui mérite une discussion.", href: "/forum/culture" },
   { title: "Entraide & quotidien", text: "Questions, conseils et coups de main entre membres.", href: "/forum/entraide" },
-  { title: "Rencontres", text: "Faire connaissance sans transformer PRYSM en catalogue de profils.", href: "/rencontres" },
-  { title: "PRYSM Orbite", text: "Découvrir les membres autour de toi dans un système d’orbites animé.", href: "/orbite" },
 ];
 
 export default function HomePage() {
