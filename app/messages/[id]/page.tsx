@@ -136,7 +136,7 @@ export default function ConversationPage({ params }: { params: Promise<{ id: str
           <div className="private-message-list">
             {messages.map((message) => (
               <article className={"private-message " + (message.sender_id === userId ? "mine" : "")} key={message.id}>
-                {message.body.startsWith("voice:") ? <VoiceMessage path={message.body.slice(6)} /> : <p><StickerText text={message.body} /></p>}
+                {message.body.startsWith("voice:") ? <VoiceMessage path={message.body.slice(6).split("|durationMs=")[0]} durationMs={Number(message.body.split("|durationMs=")[1]) || undefined} /> : <p><StickerText text={message.body} /></p>}
                 <time>{new Date(message.created_at).toLocaleString("fr-FR")}</time>
               </article>
             ))}
