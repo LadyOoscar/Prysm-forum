@@ -89,7 +89,7 @@ export default function FederationTicker() {
           if (cancelled) return;
           setMessageIndex(null);
           schedule(35000 + Math.random() * 10000);
-        }, 12000);
+        }, 50000);
       }, delay);
     };
 
