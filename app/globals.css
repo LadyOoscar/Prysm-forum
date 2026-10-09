@@ -1137,9 +1137,9 @@ footer:before {
 .stories-rail{display:flex;gap:16px;overflow-x:auto;padding:4px 2px 12px;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
 .story-bubble{border:0;background:transparent;color:var(--muted);font:600 .72rem "DM Sans",sans-serif;display:flex;flex-direction:column;align-items:center;gap:7px;min-width:70px;max-width:84px;cursor:pointer;padding:0}
 .story-bubble>span:last-child{max-width:84px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.story-avatar{width:64px;height:64px;display:grid;place-items:center;border-radius:50%;padding:3px;border:2px solid transparent;background:linear-gradient(var(--bg),var(--bg)) padding-box,linear-gradient(135deg,var(--pink),var(--violet),var(--cyan)) border-box;box-shadow:0 0 15px #8b62ff25}
-.story-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;border:2px solid var(--bg)}
-.story-avatar b{width:100%;height:100%;display:grid;place-items:center;border-radius:50%;background:linear-gradient(145deg,#27235d,#10152e);color:var(--cyan);font:700 1.35rem Rajdhani,sans-serif}
+.story-avatar{position:relative;isolation:isolate;flex:0 0 64px;width:64px;height:64px;display:grid;place-items:center;border-radius:50%;padding:3px;border:0;box-sizing:border-box;background:linear-gradient(135deg,var(--pink),var(--violet) 48%,var(--cyan));box-shadow:0 0 15px #8b62ff25;overflow:hidden}
+.story-avatar img{display:block;width:100%;height:100%;min-width:0;min-height:0;object-fit:cover;object-position:center;border-radius:50%;border:2px solid var(--bg);box-sizing:border-box}
+.story-avatar b{width:100%;height:100%;display:grid;place-items:center;border-radius:50%;box-sizing:border-box;background:linear-gradient(145deg,#27235d,#10152e);color:var(--cyan);font:700 1.35rem Rajdhani,sans-serif}
 .story-add-avatar{border:1px dashed var(--cyan);background:linear-gradient(145deg,#152548,#14102c)}
 .story-add-avatar b{font-size:1.8rem;background:transparent;color:var(--cyan)}
 .story-add input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
