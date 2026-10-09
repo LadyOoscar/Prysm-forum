@@ -26,6 +26,7 @@ export default function StickerCreator() {
   const [preview, setPreview] = useState("");
   const [name, setName] = useState("");
   const [category, setCategory] = useState("Général");
+  const [tagsText, setTagsText] = useState("");
   const [mine, setMine] = useState<Sticker[]>([]);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -81,13 +82,14 @@ export default function StickerCreator() {
       const { error: uploadError } = await supabase.storage.from("stickers").upload(path, file, { contentType: info.contentType, upsert: false });
       if (uploadError) throw new Error("Upload Storage : " + uploadError.message);
       const stickerStatus = "approved";
+      const tags = [...new Set([category.toLocaleLowerCase(), ...tagsText.split(",").map(tag => tag.trim().toLocaleLowerCase().replace(/^#/, "")).filter(Boolean)])].slice(0, 10);
 
       const { data: publicData } = supabase.storage.from("stickers").getPublicUrl(path);
       const { error: insertError } = await supabase.from("stickers").insert({
         creator_id: auth.user.id,
         name: cleanName,
         category,
-        tags: [category.toLowerCase()],
+        tags,
         image_url: publicData.publicUrl,
         mime_type: info.contentType,
         width: null,
@@ -101,6 +103,7 @@ export default function StickerCreator() {
       }
       setMessage("Sticker créé et approuvé automatiquement. Il est disponible dans la galerie !");
       setName("");
+      setTagsText("");
       setFile(null);
       setPreview("");
       if (inputRef.current) inputRef.current.value = "";
@@ -134,6 +137,7 @@ export default function StickerCreator() {
           <div className="sticker-fields">
             <label>Nom<input value={name} onChange={e => setName(e.target.value)} maxLength={40} placeholder="Ex. Cherrie en panique" required /></label>
             <label>Catégorie<select value={category} onChange={e => setCategory(e.target.value)}><option>Général</option><option>Réactions</option><option>Humour</option><option>Amour</option><option>Animaux</option><option>Gaming</option><option>Communauté</option></select></label>
+            <label className="sticker-tags-field">Tags (séparés par des virgules)<input value={tagsText} onChange={e => setTagsText(e.target.value)} maxLength={180} placeholder="#chat, drôle, réaction" /><small>Ajoute des mots-clés pour que tout le monde retrouve ton sticker.</small></label>
           </div>
           {error && <div className="notice error">{error}</div>}
           {message && <div className="notice">{message}</div>}
@@ -141,7 +145,7 @@ export default function StickerCreator() {
         </form>
       </div>
       <div className="sticker-mine">
-        <div className="section-heading"><div><p className="eyebrow">Mes créations</p><h2>En attente de validation</h2></div></div>
+        <div className="section-heading"><div><p className="eyebrow">Mes créations</p><h2>Mes créations</h2></div></div>
         {mine.length === 0 ? <div className="empty"><p>Tu n'as encore créé aucun sticker.</p></div> : <div className="sticker-mine-grid">{mine.map(sticker => <article className="sticker-mine-card" key={sticker.id}><img src={sticker.image_url} alt="" /><div><strong>{sticker.name}</strong><span className={"sticker-status " + sticker.status}>{sticker.status === "pending" ? "En attente" : sticker.status === "approved" ? "Approuvé" : "Refusé"}</span></div></article>)}</div>}
       </div>
     </section>
