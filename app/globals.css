@@ -1790,3 +1790,16 @@ footer:before {
 .prysm-sound-panel p{margin:10px 0 0;color:#85979d;font-size:10px;line-height:1.45}
 @media(max-width:600px){.prysm-sound-control{right:9px;bottom:9px}.prysm-sound-launcher{min-height:34px;padding:7px 9px}.prysm-sound-panel{width:min(280px,calc(100vw - 18px))}}
 @media(prefers-reduced-motion:reduce){.prysm-sound-switch,.prysm-sound-switch:after{transition:none}}
+
+
+/* Fédération TV : une seule traversée, puis extinction rapide de la bannière. */
+.federation-broadcast[class*="federation-broadcast--"] .federation-broadcast__ticker-text{
+  animation:federation-marquee 14s linear 1 forwards,federation-hologram 2.8s steps(1,end) 5!important;
+  animation-iteration-count:1,5!important;
+}
+@media(max-width:640px){
+  .federation-broadcast[class*="federation-broadcast--"] .federation-broadcast__ticker-text{
+    animation-duration:14s,2.8s!important;
+    animation-iteration-count:1,5!important;
+  }
+}
