@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-type SoundKind = "click" | "confirm" | "error" | "broadcast" | "cut" | "secret" | "notification" | "crt" | "military" | "static" | "arcade" | "ambient";
-const TEST_SOUNDS: SoundKind[] = ["crt", "military", "static", "secret", "ambient", "arcade", "broadcast", "notification"];
+type SoundKind = "click" | "confirm" | "error" | "broadcast" | "cut" | "secret" | "notification" | "crt" | "military" | "static" | "arcade" | "ambient" | "door" | "impact" | "panel";
+const TEST_SOUNDS: SoundKind[] = ["ambient", "door", "impact", "panel", "crt", "military", "static", "secret"];
 
 export default function SoundControl() {
   const [enabled, setEnabled] = useState(false);
@@ -60,7 +60,7 @@ export default function SoundControl() {
     const now = ctx.currentTime;
     const master = ctx.createGain();
     master.gain.setValueAtTime(0.0001, now);
-    master.gain.linearRampToValueAtTime(Math.max(0.0001, volumeRef.current / 100 * 0.012), now + 2.8);
+    master.gain.linearRampToValueAtTime(Math.max(0.0001, volumeRef.current / 100 * 0.008), now + 2.8);
     master.connect(ctx.destination);
     const nodes: AudioNode[] = [];
     const drone = (frequency: number, type: OscillatorType, level: number, detune = 0) => {
@@ -77,18 +77,18 @@ export default function SoundControl() {
       osc.start(now);
       nodes.push(osc, filter, gain);
     };
-    drone(55, "sine", 0.13);
-    drone(82.41, "triangle", 0.035, -4);
-    drone(110, "sawtooth", 0.004, 5);
-    drone(164.81, "sine", 0.008);
+    drone(41.2, "sine", 0.17);
+    drone(61.74, "triangle", 0.025, -4);
+    drone(82.41, "sawtooth", 0.002, 5);
+    drone(123.47, "sine", 0.004);
     const lfo = ctx.createOscillator();
     const lfoGain = ctx.createGain();
-    lfo.type = "sine"; lfo.frequency.value = 0.075; lfoGain.gain.value = 0.002;
+    lfo.type = "sine"; lfo.frequency.value = 0.035; lfoGain.gain.value = 0.001;
     lfo.connect(lfoGain); lfoGain.connect(master.gain); lfo.start(now);
     nodes.push(lfo, lfoGain);
 
     // A single soft arcade note appears occasionally, leaving long stretches of calm ambience.
-    const notes = [329.63, 392, 493.88, 587.33, 493.88, 392, 440, 329.63];
+    const notes = [73.42, 82.41, 98, 110, 98, 82.41, 87.31, 73.42];
     let step = 0;
     const playStep = () => {
       if (!enabledRef.current || !ambientRef.current) return;
@@ -99,19 +99,19 @@ export default function SoundControl() {
       osc.type = "triangle";
       osc.frequency.value = notes[step % notes.length];
       filter.type = "lowpass";
-      filter.frequency.value = 1250;
+      filter.frequency.value = 420;
       gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.linearRampToValueAtTime(0.018, t + 0.06);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.65);
+      gain.gain.linearRampToValueAtTime(0.035, t + 1.8);
+      gain.gain.setValueAtTime(0.035, t + 1.8);\n      gain.gain.setTargetAtTime(0.0001, t + 1.8, 3.2);
       osc.connect(filter); filter.connect(gain); gain.connect(master);
-      osc.start(t); osc.stop(t + 0.68);
+      osc.start(t); osc.stop(t + 15);
       osc.onended = () => { try { osc.disconnect(); filter.disconnect(); gain.disconnect(); } catch {} };
       step = (step + 1) % notes.length;
     };
     const track = { master, nodes, timer: null as number | null };
     ambientRef.current = track;
     playStep();
-    track.timer = window.setInterval(playStep, 6200);
+    track.timer = window.setInterval(playStep, 18000);
   }, [getAudio, stopAmbient]);
 
   const play = useCallback((kind: SoundKind) => {
@@ -120,7 +120,7 @@ export default function SoundControl() {
     if (!ctx) return;
     const now = ctx.currentTime;
     const master = ctx.createGain();
-    const baseVolume = kind === "ambient" ? 0.012 : kind === "secret" || kind === "static" ? 0.045 : 0.065;
+    const baseVolume = kind === "ambient" ? 0.009 : kind === "impact" || kind === "door" ? 0.035 : kind === "secret" || kind === "static" ? 0.028 : 0.04;
     master.gain.setValueAtTime(Math.max(0.0001, volumeRef.current / 100 * baseVolume), now);
     master.connect(ctx.destination);
 
@@ -191,7 +191,7 @@ export default function SoundControl() {
       case "ambient":
         tone(68, 0, 1.8, "sine", 0.18); tone(102, 0.05, 1.45, "triangle", 0.1, -7); tone(205, 0.24, 0.8, "sine", 0.05); noise(0.15, 1.3, 0.045, 140, 620); break;
     }
-    window.setTimeout(() => { try { master.disconnect(); } catch {} }, kind === "ambient" ? 2400 : 900);
+    window.setTimeout(() => { try { master.disconnect(); } catch {} }, kind === "ambient" ? 11000 : kind === "door" || kind === "impact" ? 5200 : 900);
   }, [getAudio]);
 
   const toggle = () => {
@@ -247,7 +247,7 @@ export default function SoundControl() {
         else if (roll < 0.88) play("crt");
         else play("arcade");
       }
-    }, 26000);
+    }, 21000 + Math.floor(Math.random() * 17000));
     return () => window.clearInterval(timer);
   }, [enabled, play]);
 
@@ -268,7 +268,7 @@ export default function SoundControl() {
             <input aria-label="Volume des effets sonores" type="range" min="0" max="100" step="1" value={volume} onChange={(e) => changeVolume(Number(e.target.value))} />
           </label>
           <button className="prysm-sound-test" type="button" disabled={!enabled} onClick={() => play(TEST_SOUNDS[Math.floor(Math.random() * TEST_SOUNDS.length)])}>▶ Tester un son aléatoire</button>
-          <p>Ambiance discrète : nappe très douce, une note synthétique espacée et effets rares. Volume réglable, sons désactivés par défaut, sans fichier audio externe.</p>
+          <p>AMBIANCE : nappes graves prolongées, bips de console occasionnels, sas pressurisé et impacts sourds lointains. Sons synthétiques, volume réglable, désactivés par défaut.</p>
         </div>
       )}
       <button className={`prysm-sound-launcher${enabled ? " is-on" : ""}`} type="button" aria-expanded={panelOpen} aria-label="Ouvrir les réglages sonores" onClick={() => setPanelOpen((open) => !open)}>
