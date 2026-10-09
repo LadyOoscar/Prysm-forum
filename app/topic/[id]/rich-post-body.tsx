@@ -17,7 +17,7 @@ export default function RichPostBody({ text }: { text: string }) {
     <div className="rich-post-body">
       <p><StickerText text={text} /></p>
       {videoIds.map((id) => (
-        <div className="youtube-embed" key={id}>
+        <div className="youtube-embed" key={id} style={{ width: "100%", maxWidth: "800px", aspectRatio: "16 / 9", marginTop: "12px" }}>
           <iframe
             src={`https://www.youtube-nocookie.com/embed/${id}`}
             title="Vidéo YouTube intégrée"
@@ -25,6 +25,7 @@ export default function RichPostBody({ text }: { text: string }) {
             referrerPolicy="strict-origin-when-cross-origin"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
+            style={{ width: "100%", height: "100%", border: 0, borderRadius: "12px" }}
           />
         </div>
       ))}
