@@ -3,30 +3,46 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowser } from "../../lib/supabase-browser";
 
+type StoryDesign = { v: 1; caption: string; text: string; textColor: string; font: string; position: string; background: string; filter: string; stickers: string[]; musicTitle: string; musicArtist: string; musicUrl: string; };
 type Story = {
-  id: string;
-  user_id: string;
-  media_path: string;
-  media_type: "image" | "video";
-  caption: string;
-  created_at: string;
-  expires_at: string;
+  id: string; user_id: string; media_path: string; media_type: "image" | "video"; caption: string;
+  created_at: string; expires_at: string;
   profiles: { username: string | null; display_name: string | null; avatar_url: string | null } | null;
-  mediaUrl: string;
+  mediaUrl: string; design: StoryDesign | null;
 };
-
 type StoryGroup = { userId: string; name: string; avatar: string | null; stories: Story[] };
 
 const MAX_SIZE = 10 * 1024 * 1024;
+const backgrounds = [
+  { name: "Prisme", value: "linear-gradient(145deg,#151338,#5b1e71 48%,#092f48)" },
+  { name: "Cyber", value: "linear-gradient(135deg,#020617,#082f49 48%,#701a75)" },
+  { name: "Crépuscule", value: "linear-gradient(145deg,#4c1d95,#be185d 52%,#fb923c)" },
+  { name: "Forêt", value: "linear-gradient(145deg,#052e2b,#14532d 55%,#172554)" },
+  { name: "Cosmos", value: "radial-gradient(circle at 50% 25%,#4c1d95,#111827 55%,#020617)" },
+  { name: "Rose", value: "linear-gradient(145deg,#831843,#be185d 55%,#312e81)" },
+  { name: "Nuit", value: "linear-gradient(145deg,#020617,#111827)" },
+  { name: "Clair", value: "linear-gradient(145deg,#fce7f3,#ddd6fe 55%,#bae6fd)" }
+];
+const stickerChoices = ["✨","🌙","⭐","🦋","🌸","💜","🔥","🌿","🔮","🪐","🦊","🐈","🎵","💫","🖤","☀️"];
+const emptyDesign = (): StoryDesign => ({ v: 1, caption: "", text: "", textColor: "#ffffff", font: "Space Grotesk", position: "center", background: backgrounds[0].value, filter: "none", stickers: [], musicTitle: "", musicArtist: "", musicUrl: "" });
+function decodeCaption(value: string): { caption: string; design: StoryDesign | null } {
+  if (value.startsWith("__PRYSM_STORY_V1__")) {
+    try { const parsed = JSON.parse(value.slice("__PRYSM_STORY_V1__".length)); return { caption: parsed.caption || "", design: parsed.design || null }; } catch {}
+  }
+  return { caption: value || "", design: null };
+}
+function designCaption(design: StoryDesign) { return "__PRYSM_STORY_V1__" + JSON.stringify({ caption: design.caption, design }); }
 
 export default function Stories() {
   const supabase = useMemo(() => createSupabaseBrowser(), []);
   const [groups, setGroups] = useState<StoryGroup[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
-  const [caption, setCaption] = useState("");
+  const [design, setDesign] = useState<StoryDesign>(emptyDesign);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [notice, setNotice] = useState("");
   const [viewer, setViewer] = useState<{ group: number; item: number } | null>(null);
+  const [editorOpen, setEditorOpen] = useState(false);
 
   const loadStories = useCallback(async () => {
     const { data: auth } = await supabase.auth.getUser();
@@ -38,7 +54,8 @@ export default function Stories() {
     if (error || !data) { setNotice(error ? "Les stories sont momentanément indisponibles." : ""); return; }
     const withUrls = await Promise.all(data.map(async (row: any) => {
       const { data: signed } = await supabase.storage.from("prysm-stories").createSignedUrl(row.media_path, 3600);
-      return { ...row, profiles: Array.isArray(row.profiles) ? row.profiles[0] : row.profiles, mediaUrl: signed?.signedUrl ?? "" } as Story;
+      const decoded = decodeCaption(row.caption);
+      return { ...row, caption: decoded.caption, design: decoded.design, profiles: Array.isArray(row.profiles) ? row.profiles[0] : row.profiles, mediaUrl: signed?.signedUrl ?? "" } as Story;
     }));
     const grouped = new Map<string, StoryGroup>();
     for (const story of withUrls.filter((s: Story) => s.mediaUrl)) {
@@ -47,42 +64,73 @@ export default function Stories() {
       if (!grouped.has(story.user_id)) grouped.set(story.user_id, { userId: story.user_id, name, avatar: profile?.avatar_url ?? null, stories: [] });
       grouped.get(story.user_id)!.stories.push(story);
     }
-    setGroups(Array.from(grouped.values()).sort((a, b) => {
-      const aDate = a.stories[a.stories.length - 1]?.created_at ?? "";
-      const bDate = b.stories[b.stories.length - 1]?.created_at ?? "";
-      return bDate.localeCompare(aDate);
-    }));
+    setGroups(Array.from(grouped.values()).sort((a, b) => (b.stories[b.stories.length - 1]?.created_at ?? "").localeCompare(a.stories[a.stories.length - 1]?.created_at ?? "")));
   }, [supabase]);
 
   useEffect(() => { void loadStories(); }, [loadStories]);
 
-  async function addStory(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (!file) return;
+  function updateDesign<K extends keyof StoryDesign>(key: K, value: StoryDesign[K]) {
+    setDesign(previous => ({ ...previous, [key]: value }));
+  }
+
+  async function addStory() {
     setNotice("");
-    if (!["image/jpeg", "image/png", "image/webp", "video/mp4", "video/webm"].includes(file.type)) {
+    if (!selectedFile && !design.text.trim() && !design.stickers.length && !design.musicTitle.trim()) {
+      setNotice("Ajoute une photo, une vidéo ou du texte pour créer ta story."); return;
+    }
+    if (selectedFile && !["image/jpeg", "image/png", "image/webp", "video/mp4", "video/webm"].includes(selectedFile.type)) {
       setNotice("Format accepté : JPG, PNG, WebP, MP4 ou WebM."); return;
     }
-    if (file.size > MAX_SIZE) { setNotice("Le fichier ne doit pas dépasser 10 Mo."); return; }
+    if (selectedFile && selectedFile.size > MAX_SIZE) { setNotice("Le fichier ne doit pas dépasser 10 Mo."); return; }
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) { window.location.href = "/auth"; return; }
     setUploading(true);
-    const ext = file.name.split(".").pop()?.toLowerCase() || (file.type.startsWith("video/") ? "mp4" : "jpg");
-    const path = auth.user.id + "/" + Date.now() + "." + ext;
-    const { error: uploadError } = await supabase.storage.from("prysm-stories").upload(path, file, { contentType: file.type, upsert: false });
-    if (uploadError) {
-      setNotice("Envoi impossible. Réessaie avec une image ou une vidéo plus légère."); setUploading(false); return;
+    let fileToUpload: File;
+    let mediaType: "image" | "video" = selectedFile?.type.startsWith("video/") ? "video" : "image";
+    if (selectedFile) {
+      fileToUpload = selectedFile;
+    } else {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1080; canvas.height = 1920;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { setNotice("Impossible de créer cette story sur cet appareil."); setUploading(false); return; }
+      const gradient = ctx.createLinearGradient(0, 0, 1080, 1920);
+      if (design.background.includes("linear-gradient")) {
+        const colors = design.background.match(/#[0-9a-fA-F]{3,8}/g) || ["#151338", "#5b1e71", "#092f48"];
+        gradient.addColorStop(0, colors[0]); gradient.addColorStop(.52, colors[1] || colors[0]); gradient.addColorStop(1, colors[2] || colors[1] || colors[0]);
+      } else { gradient.addColorStop(0, "#4c1d95"); gradient.addColorStop(.5, "#111827"); gradient.addColorStop(1, "#020617"); }
+      ctx.fillStyle = gradient; ctx.fillRect(0, 0, 1080, 1920);
+      ctx.strokeStyle = "#ffffff28"; ctx.lineWidth = 2; ctx.strokeRect(42, 42, 996, 1836);
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      if (design.stickers.length) { ctx.font = "100px sans-serif"; ctx.fillText(design.stickers.join(" "), 540, 720, 950); }
+      if (design.text.trim()) {
+        ctx.fillStyle = design.textColor; ctx.font = "bold 74px " + JSON.stringify(design.font);
+        const words = design.text.split(/\s+/); const lines: string[] = []; let line = "";
+        for (const word of words) { const test = line ? line + " " + word : word; if (ctx.measureText(test).width > 900 && line) { lines.push(line); line = word; } else line = test; }
+        if (line) lines.push(line);
+        const y = design.position === "top" ? 320 : design.position === "bottom" ? 1450 : 960;
+        lines.slice(0, 8).forEach((l, i) => { ctx.shadowColor = design.textColor; ctx.shadowBlur = 22; ctx.fillText(l, 540, y + (i - (Math.min(lines.length, 8) - 1) / 2) * 92, 930); });
+        ctx.shadowBlur = 0;
+      }
+      if (design.musicTitle.trim()) { ctx.fillStyle = "#08091acc"; ctx.fillRect(75, 1650, 930, 150); ctx.fillStyle = "#45efff"; ctx.font = "bold 25px sans-serif"; ctx.textAlign = "left"; ctx.fillText("♫  EN ÉCOUTE", 110, 1690); ctx.fillStyle = "#fff"; ctx.font = "bold 38px sans-serif"; ctx.fillText(design.musicTitle.slice(0, 38), 110, 1740); ctx.fillStyle = "#c4b5fd"; ctx.font = "28px sans-serif"; ctx.fillText(design.musicArtist.slice(0, 48), 110, 1790); }
+      const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, "image/png", .95));
+      if (!blob) { setNotice("Impossible de générer l’image de la story."); setUploading(false); return; }
+      fileToUpload = new File([blob], "prysm-story.png", { type: "image/png" });
     }
+    const ext = fileToUpload.name.split(".").pop()?.toLowerCase() || (mediaType === "video" ? "mp4" : "png");
+    const path = auth.user.id + "/" + Date.now() + "." + ext;
+    const { error: uploadError } = await supabase.storage.from("prysm-stories").upload(path, fileToUpload, { contentType: fileToUpload.type, upsert: false });
+    if (uploadError) { setNotice("Envoi impossible. Réessaie avec un média plus léger."); setUploading(false); return; }
     const { error: insertError } = await supabase.from("stories").insert({
-      user_id: auth.user.id, media_path: path, media_type: file.type.startsWith("video/") ? "video" : "image",
-      caption: caption.trim(), expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      user_id: auth.user.id, media_path: path, media_type: mediaType,
+      caption: designCaption(design), expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
     });
     if (insertError) {
       await supabase.storage.from("prysm-stories").remove([path]);
       setNotice("Le média a été envoyé, mais la story n’a pas pu être publiée.");
     } else {
-      setCaption(""); setNotice("Story publiée ! Elle disparaîtra dans 24 heures."); await loadStories();
+      setDesign(emptyDesign()); setSelectedFile(null); setEditorOpen(false);
+      setNotice("Story publiée ! Elle disparaîtra dans 24 heures."); await loadStories();
     }
     setUploading(false);
   }
@@ -109,10 +157,9 @@ export default function Stories() {
     <section className="stories-section shell" aria-label="Stories PRYSM">
       <div className="stories-heading"><div><p className="eyebrow">En ce moment</p><h2>Les stories</h2></div><span>24 H · ÉPHÉMÈRES</span></div>
       <div className="stories-rail">
-        <label className="story-bubble story-add">
-          <span className="story-avatar story-add-avatar"><b>{uploading ? "…" : "+"}</b></span><span>{uploading ? "Envoi…" : "Ma story"}</span>
-          <input type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" onChange={addStory} disabled={uploading} />
-        </label>
+        <button type="button" className="story-bubble story-add" onClick={() => setEditorOpen(v => !v)}>
+          <span className="story-avatar story-add-avatar"><b>{editorOpen ? "×" : "+"}</b></span><span>Créer</span>
+        </button>
         {groups.map((group, index) => <button className="story-bubble" key={group.userId} onClick={() => setViewer({ group: index, item: 0 })}>
           <span className={"story-avatar" + (group.stories.every(s => s.user_id === userId) ? " own-story" : "")}>
             {group.avatar ? <img src={group.avatar} alt="" /> : <b>{group.name.slice(0, 1).toUpperCase()}</b>}
@@ -120,8 +167,38 @@ export default function Stories() {
         </button>)}
       </div>
       {notice && <p className="stories-notice" role="status">{notice}</p>}
-      <div className="story-caption-row"><input value={caption} onChange={e => setCaption(e.target.value.slice(0, 300))} placeholder="Une petite légende pour ta prochaine story…" maxLength={300} aria-label="Légende de la prochaine story" /><span>{caption.length}/300</span></div>
-      <p className="stories-hint">Choisis une image ou une vidéo pour publier. Les stories sont visibles par les membres connectés et expirent automatiquement après 24 h.</p>
+      {editorOpen && <div className="story-editor">
+        <div className="story-editor-title"><div><span className="eyebrow">STORY STUDIO / 01</span><h3>Compose ta story</h3></div><span className="story-editor-live">APERÇU EN DIRECT</span></div>
+        <div className="story-editor-layout">
+          <div className="story-editor-preview" style={{ background: selectedFile && selectedFile.type.startsWith("image/") ? "linear-gradient(#0002,#0004)" : design.background }}>
+            {selectedFile && selectedFile.type.startsWith("image/") && <img className={"story-preview-photo filter-" + design.filter.replace(/[^a-z0-9-]/g, "")} src={URL.createObjectURL(selectedFile)} alt="Aperçu" />}
+            {selectedFile && selectedFile.type.startsWith("video/") && <div className="story-preview-video">▶ Vidéo sélectionnée</div>}
+            <div className={"story-preview-content pos-" + design.position}>
+              {design.stickers.length > 0 && <div className="story-preview-stickers">{design.stickers.join(" ")}</div>}
+              {design.text && <div className="story-preview-text" style={{ color: design.textColor, fontFamily: design.font }}>{design.text}</div>}
+            </div>
+            {design.musicTitle && <div className="story-preview-music"><span>♫ EN ÉCOUTE</span><strong>{design.musicTitle}</strong><small>{design.musicArtist || "Artiste"}</small></div>}
+            <span className="story-preview-brand">◆ PRYSM / STORY</span>
+          </div>
+          <div className="story-editor-controls">
+            <label className="story-upload-control">＋ {selectedFile ? selectedFile.name : "Ajouter une photo ou vidéo"}<input type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" onChange={e => setSelectedFile(e.target.files?.[0] || null)} /></label>
+            {selectedFile && <button type="button" className="story-clear-media" onClick={() => setSelectedFile(null)}>Retirer le média</button>}
+            <label>Ton texte<textarea value={design.text} onChange={e => updateDesign("text", e.target.value.slice(0, 180))} placeholder="Écris quelque chose…" rows={3} maxLength={180} /></label>
+            <div className="story-control-grid">
+              <label>Police<select value={design.font} onChange={e => updateDesign("font", e.target.value)}><option value="Space Grotesk">Space Grotesk</option><option value="DM Sans">DM Sans</option><option value="Rajdhani">Rajdhani</option><option value="serif">Sérif</option><option value="monospace">Pixel / monospace</option></select></label>
+              <label>Position<select value={design.position} onChange={e => updateDesign("position", e.target.value)}><option value="top">En haut</option><option value="center">Au centre</option><option value="bottom">En bas</option></select></label>
+            </div>
+            <label>Couleur du texte <div className="story-color-row">{["#ffffff","#45efff","#ff4fc3","#ffd45a","#c9ff58","#111827"].map(c => <button type="button" key={c} aria-label={"Couleur "+c} className={"story-color-swatch" + (design.textColor === c ? " active" : "")} style={{ background: c }} onClick={() => updateDesign("textColor", c)} />)}</div></label>
+            <label>Ambiance du fond <div className="story-background-grid">{backgrounds.map(bg => <button type="button" key={bg.name} className={"story-background-swatch" + (design.background === bg.value ? " active" : "")} style={{ background: bg.value }} onClick={() => updateDesign("background", bg.value)}>{bg.name}</button>)}</div></label>
+            <label>Filtre photo <select value={design.filter} onChange={e => updateDesign("filter", e.target.value)}><option value="none">Naturel</option><option value="vivid">Vibrant</option><option value="mono">Noir et blanc</option><option value="warm">Chaud</option><option value="dream">Rêve violet</option></select></label>
+            <label>Stickers <div className="story-sticker-grid">{stickerChoices.map(sticker => <button type="button" key={sticker} className={design.stickers.includes(sticker) ? "active" : ""} onClick={() => updateDesign("stickers", design.stickers.includes(sticker) ? design.stickers.filter(s => s !== sticker) : [...design.stickers, sticker].slice(0, 8))}>{sticker}</button>)}</div></label>
+            <div className="story-music-fields"><span className="story-field-title">♫ Carte musicale (facultatif)</span><label>Titre<input value={design.musicTitle} onChange={e => updateDesign("musicTitle", e.target.value.slice(0, 80))} placeholder="Titre du morceau" /></label><label>Artiste<input value={design.musicArtist} onChange={e => updateDesign("musicArtist", e.target.value.slice(0, 80))} placeholder="Nom de l’artiste" /></label><label>Lien d’écoute<input type="url" value={design.musicUrl} onChange={e => updateDesign("musicUrl", e.target.value.slice(0, 300))} placeholder="https://…" /></label></div>
+            <label>Légende <input value={design.caption} onChange={e => updateDesign("caption", e.target.value.slice(0, 300))} maxLength={300} placeholder="Une légende pour ta story…" /></label>
+            <div className="story-editor-actions"><button type="button" className="story-reset" onClick={() => { setDesign(emptyDesign()); setSelectedFile(null); }}>Réinitialiser</button><button type="button" className="button primary" onClick={() => void addStory()} disabled={uploading}>{uploading ? "Publication…" : "Publier la story ↗"}</button></div>
+            <p className="stories-hint">Photos et vidéos jusqu’à 10 Mo. Les stories disparaissent après 24 h.</p>
+          </div>
+        </div>
+      </div>}
     </section>
     {currentStory && currentGroup && <div className="story-viewer-backdrop" role="dialog" aria-modal="true" aria-label={"Story de " + currentGroup.name} onClick={() => setViewer(null)}>
       <div className="story-viewer" onClick={e => e.stopPropagation()}>
@@ -131,11 +208,24 @@ export default function Stories() {
           {currentStory.user_id === userId && <button onClick={() => void deleteStory(currentStory)}>Supprimer</button>}
           <button aria-label="Fermer la story" onClick={() => setViewer(null)}>✕</button>
         </div>
-        {currentStory.media_type === "video" ? <video className="story-media" src={currentStory.mediaUrl} controls autoPlay playsInline /> : <img className="story-media" src={currentStory.mediaUrl} alt={currentStory.caption || "Story"} />}
+        {currentStory.media_type === "video" ? <video className="story-media" style={{ filter: filterValue(currentStory.design?.filter) }} src={currentStory.mediaUrl} controls autoPlay playsInline /> : <img className="story-media" style={{ filter: filterValue(currentStory.design?.filter) }} src={currentStory.mediaUrl} alt={currentStory.caption || "Story"} />}
+        {currentStory.design && <div className={"story-design-overlay pos-" + currentStory.design.position}>
+          {currentStory.design.stickers.length > 0 && <div className="story-design-stickers">{currentStory.design.stickers.join(" ")}</div>}
+          {currentStory.design.text && <div className="story-design-text" style={{ color: currentStory.design.textColor, fontFamily: currentStory.design.font }}>{currentStory.design.text}</div>}
+        </div>}
+        {currentStory.design?.musicTitle && <div className="story-viewer-music"><span>♫ EN ÉCOUTE</span><strong>{currentStory.design.musicTitle}</strong><small>{currentStory.design.musicArtist}</small>{currentStory.design.musicUrl && <a href={currentStory.design.musicUrl} target="_blank" rel="noreferrer">Écouter ↗</a>}</div>}
         {currentStory.caption && <p className="story-viewer-caption">{currentStory.caption}</p>}
         <button className="story-nav story-prev" onClick={() => moveStory(-1)} aria-label="Story précédente">‹</button>
         <button className="story-nav story-next" onClick={() => moveStory(1)} aria-label="Story suivante">›</button>
       </div>
     </div>}
   </>;
+}
+
+function filterValue(filter?: string) {
+  if (filter === "vivid") return "saturate(1.65) contrast(1.08)";
+  if (filter === "mono") return "grayscale(1)";
+  if (filter === "warm") return "sepia(.3) saturate(1.25)";
+  if (filter === "dream") return "hue-rotate(18deg) saturate(1.4) brightness(1.08)";
+  return "none";
 }
