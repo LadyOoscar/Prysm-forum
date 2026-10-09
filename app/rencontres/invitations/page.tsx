@@ -118,7 +118,7 @@ export default function InvitationsPage() {
               <button className="button" disabled={!!busyId} onClick={() => void respond(invitation, "declined")}>Refuser</button>
             </div>
           )}
-          {invitation.status === "accepted" && <Link className="button" href="/rencontres/matchs">Voir mes matchs</Link>}
+          {invitation.status === "accepted" && <><Link className="button" href="/rencontres/matchs">Voir mes matchs</Link>{person?.username && <Link className="button" href={"/messages?to="+encodeURIComponent(person.username)}>Contacter</Link>}</>}
           {person?.username && <Link className="profile-link" href={"/membre/" + person.username}>Voir le profil</Link>}
         </div>
       </article>
