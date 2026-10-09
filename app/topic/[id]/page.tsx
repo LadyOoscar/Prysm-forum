@@ -43,7 +43,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
                 <article className="post" key={post.id}>
                   <aside className="post-author">
                     <Link href={profileHref}>
-                      <div className="avatar">{(profile?.display_name || profile?.username || "?").slice(0, 1).toUpperCase()}</div>
+                      <div className="avatar">{profile?.avatar_url ? <img src={profile.avatar_url} alt={"Avatar de " + (profile.display_name || profile.username || "membre")} /> : (profile?.display_name || profile?.username || "?").slice(0, 1).toUpperCase()}</div>
                       <span className={profile?.is_admin ? "role-name role-admin" : profile?.is_moderator ? "role-name role-moderator" : "role-name"}>{profile?.display_name || profile?.username || "Membre"}</span>
                     </Link>
                     <Link className="member-handle" href={profileHref}>@{profile?.username || "membre"}</Link><span className="member-reputation"><strong>{profile?.reputation ?? 0}</strong> réputation · {getReputationTitle(profile?.reputation ?? 0)}</span><div className="member-badges">{(badgesByProfile.get(post.author_id) ?? []).map((badge:any)=><span className={badge?.tone === "negative" ? "profile-badge negative" : "profile-badge"} key={badge?.name}>{badge?.icon} {badge?.name}</span>)}</div>
