@@ -1474,3 +1474,95 @@ footer:before {
     animation:none!important;will-change:auto;
   }
 }
+
+
+/* PRYSM TV TURBO MODE: loud analog interference, hard pulses and signal kicks */
+.prysm-video-overlay{
+  animation:prysm-tv-pulse 2.15s ease-in-out infinite,prysm-tv-twitch 3.9s steps(1,end) infinite,prysm-tv-thump 6.4s steps(1,end) infinite;
+}
+.prysm-video-overlay:after{
+  content:"";position:absolute;left:0;right:0;top:0;height:4px;z-index:6;pointer-events:none;
+  background:linear-gradient(90deg,transparent 0%,#45efff 12%,#fff 25%,#ff4fc3 44%,#8b62ff 66%,transparent 92%);
+  opacity:0;filter:blur(.5px);box-shadow:0 0 16px #45efff,0 0 30px #ff4fc3;
+  animation:prysm-horizontal-glitch 5.2s steps(1,end) infinite;
+}
+.prysm-video-overlay__screen{
+  animation:prysm-screen-glow 2.4s ease-in-out infinite,prysm-screen-rattle 8.1s steps(1,end) infinite;
+}
+.prysm-video-overlay__screen:before{
+  height:34%;
+  background:linear-gradient(180deg,transparent,rgba(69,239,255,.04) 20%,rgba(69,239,255,.42) 47%,rgba(255,255,255,.2) 51%,rgba(255,79,195,.35) 59%,transparent);
+  filter:blur(.35px);
+  animation:prysm-tv-sweep 3.6s linear infinite;
+}
+.prysm-video-overlay__screen:after{
+  background:
+    linear-gradient(90deg,transparent 0%,#45efff14 28%,#ff4fc320 49%,transparent 70%),
+    repeating-linear-gradient(0deg,#fff0 0,#fff0 2px,#dffcff28 3px,#fff0 5px),
+    repeating-linear-gradient(90deg,transparent 0,transparent 17px,#ff4fc30c 18px,transparent 21px);
+  animation:prysm-static-flicker 1.8s steps(1,end) infinite;
+}
+.prysm-video-overlay__header .prysm-video-overlay__mark{animation:prysm-mark-flicker 2.8s steps(1,end) infinite}
+.prysm-video-overlay__live{animation:prysm-live-surge 1.1s ease-in-out infinite}
+.prysm-video-overlay__lower-third{animation:prysm-lower-glow 2.1s ease-in-out infinite}
+.prysm-video-overlay__signal span{animation:prysm-signal-blink .72s steps(2,end) infinite}
+@keyframes prysm-tv-pulse{
+  0%,100%{box-shadow:0 0 0 2px #070817,0 0 0 3px #8b62ff99,0 10px 28px #0009,inset 0 0 24px #45efff12;filter:brightness(1) saturate(1)}
+  35%{box-shadow:0 0 0 2px #070817,0 0 0 4px #45efff,0 0 15px #45efffbb,0 0 38px #8b62ff99,0 0 58px #ff4fc33d,0 10px 28px #0009,inset 0 0 34px #45efff30;filter:brightness(1.13) saturate(1.2)}
+  38%{box-shadow:0 0 0 2px #070817,0 0 0 2px #ff4fc3,0 0 7px #ff4fc399,0 10px 28px #0009;filter:brightness(.94) saturate(1.4)}
+  42%{box-shadow:0 0 0 2px #070817,0 0 0 4px #45efff,0 0 27px #45efff99,0 0 48px #ff4fc344,0 10px 28px #0009;filter:brightness(1.09) saturate(1.25)}
+}
+@keyframes prysm-tv-twitch{
+  0%,17%,17.5%,38%,38.3%,69%,69.4%,100%{transform:translate(0,0) skewX(0)}
+  17.1%{transform:translate(1.5px,-1px) skewX(.25deg)}
+  17.3%{transform:translate(-1px,.5px) skewX(-.18deg)}
+  38.1%{transform:translate(-1.7px,.8px) skewX(.22deg)}
+  69.2%{transform:translate(1px,1px) skewX(-.2deg)}
+}
+@keyframes prysm-tv-thump{
+  0%,28%,28.7%,73%,73.5%,100%{translate:0 0}
+  28.2%{translate:0 -2px}
+  28.4%{translate:0 1px}
+  73.2%{translate:0 -1.5px}
+}
+@keyframes prysm-screen-rattle{
+  0%,54%,54.5%,55%,100%{transform:translate(0,0)}
+  54.1%{transform:translate(1px,0)}
+  54.3%{transform:translate(-1px,.5px)}
+  54.7%{transform:translate(.5px,-.5px)}
+}
+@keyframes prysm-horizontal-glitch{
+  0%,21%,21.5%,22%,48%,48.4%,100%{opacity:0;transform:translateY(0)}
+  21.1%{opacity:1;transform:translateY(45px)}
+  21.3%{opacity:.9;transform:translateY(170px)}
+  21.7%{opacity:0;transform:translateY(90px)}
+  48.1%{opacity:1;transform:translateY(260px)}
+  48.2%{opacity:.7;transform:translateY(210px)}
+  48.3%{opacity:0;transform:translateY(300px)}
+}
+@keyframes prysm-screen-glow{
+  0%,100%{filter:brightness(1) saturate(1)}
+  34%{filter:brightness(1.12) saturate(1.25)}
+  36%{filter:brightness(.86) saturate(1.5)}
+  38%{filter:brightness(1.18) saturate(1.3)}
+  70%{filter:brightness(1.04) saturate(1.1)}
+}
+@keyframes prysm-tv-sweep{
+  0%{transform:translateY(-40%);opacity:0}
+  5%{opacity:1}
+  48%{opacity:.9}
+  100%{transform:translateY(390%);opacity:0}
+}
+@keyframes prysm-static-flicker{
+  0%,71%,74%,100%{opacity:.19}
+  71.2%{opacity:.62}
+  71.5%{opacity:.12}
+  72%{opacity:.48}
+  72.4%{opacity:.24}
+  73%{opacity:.78}
+  73.2%{opacity:.18}
+  74.2%{opacity:.55}
+}
+@media(prefers-reduced-motion:reduce){
+  .prysm-video-overlay:after{display:none}
+}
