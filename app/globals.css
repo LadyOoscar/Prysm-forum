@@ -1165,3 +1165,20 @@ footer:before {
 .story-nav{position:absolute;top:50%;transform:translateY(-50%);border:1px solid #ffffff50;background:#05050c70;color:white;width:36px;height:48px;font-size:2rem;line-height:1;cursor:pointer;border-radius:5px}
 .story-prev{left:8px}.story-next{right:8px}
 @media(max-width:650px){.stories-section{padding-top:18px}.story-viewer{height:90dvh;border-radius:8px}.story-avatar{flex-basis:59px;width:59px;height:59px;min-width:59px;min-height:59px}.stories-heading h2{font-size:1.3rem}}
+
+
+/* PRYSM video overlay embedded directly in topic messages */
+.prysm-video-overlay{
+  position:relative;width:min(100%,800px);margin:22px 0 8px;padding:10px;
+  overflow:hidden;border:1px solid rgba(69,239,255,.62);border-radius:5px;
+  background:radial-gradient(ellipse at 12% 0%,rgba(255,79,195,.19),transparent 42%),radial-gradient(ellipse at 100% 100%,rgba(69,239,255,.13),transparent 45%),linear-gradient(145deg,rgba(14,17,49,.98),rgba(8,9,26,.98));
+  box-shadow:0 0 0 1px rgba(139,98,255,.22),0 0 24px rgba(69,239,255,.09),inset 0 0 24px rgba(139,98,255,.08);
+}
+.prysm-video-overlay:before{content:"";position:absolute;inset:5px;pointer-events:none;border:1px solid rgba(255,255,255,.06);clip-path:polygon(0 0,22% 0,22% 1px,78% 1px,78% 0,100% 0,100% 25%,calc(100% - 1px) 25%,calc(100% - 1px) 75%,100% 75%,100% 100%,75% 100%,75% calc(100% - 1px),25% calc(100% - 1px),25% 100%,0 100%)}
+.prysm-video-overlay__header,.prysm-video-overlay__footer{position:relative;z-index:1;display:flex;align-items:center;gap:9px;font-family:"Rajdhani",sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.13em;color:#b5c3e8}
+.prysm-video-overlay__header{min-height:28px;padding:0 3px 9px}.prysm-video-overlay__mark{font-size:1.2rem;color:var(--pink);text-shadow:0 0 10px rgba(255,79,195,.8)}
+.prysm-video-overlay__header i{color:var(--violet);font-style:normal}.prysm-video-overlay__live{margin-left:auto;padding:3px 7px;border:1px solid rgba(69,239,255,.45);color:var(--cyan);font-size:.58rem;letter-spacing:.1em}
+.prysm-video-overlay__screen{position:relative;z-index:1;overflow:hidden;width:100%;aspect-ratio:16/9;border:1px solid rgba(139,98,255,.6);border-radius:3px;background:#050611;box-shadow:0 0 18px rgba(69,239,255,.08)}
+.prysm-video-overlay__screen iframe{display:block;width:100%;height:100%;border:0}
+.prysm-video-overlay__footer{justify-content:space-between;padding:9px 3px 0;font-size:.56rem;letter-spacing:.1em;color:#777fa8}.prysm-video-overlay__footer span:last-child{color:#8f9bc9}
+@media(max-width:600px){.prysm-video-overlay{margin-top:16px;padding:7px}.prysm-video-overlay__header{font-size:.61rem}.prysm-video-overlay__footer{font-size:.48rem;letter-spacing:.06em}}
