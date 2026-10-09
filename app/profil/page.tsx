@@ -39,7 +39,7 @@ export default function ProfilPage() {
     const {error}=await supabase.storage.from("avatars").upload(path,file,{contentType:file.type,upsert:false,cacheControl:"3600"});
     if(error){setMessage("Impossible d’envoyer la photo pour le moment.");setUploading(false);return;}
     const {data:publicData}=supabase.storage.from("avatars").getPublicUrl(path);
-    const {data:updated,error:updateError}=await supabase.from("profiles").update({avatar_url:publicData.publicUrl,updated_at:new Date().toISOString()}).eq("id",data.user.id).select("username,display_name,bio,pronouns,identity,interests,age,location,orientation,looking_for,dating_enabled,profile_visibility,avatar_url,reputation,xp,level,title").single();
+    const {data:updated,error:updateError}=await supabase.from("profiles").update({avatar_url:publicData.publicUrl,updated_at:new Date().toISOString()}).eq("id",data.user.id).select("username,display_name,bio,pronouns,identity,interests,age,location,orientation,looking_for,dating_enabled,profile_visibility,avatar_url,banner_url,reputation,xp,level,title").single();
     if(updateError){await supabase.storage.from("avatars").remove([path]);setMessage("La photo a été envoyée mais n’a pas pu être enregistrée.");}else{setProfile(updated as Profile);setMessage("Photo de profil mise à jour.");}
     setUploading(false);
   }
@@ -64,16 +64,16 @@ export default function ProfilPage() {
   }
   async function removeAvatar(){
     setMessage(""); const {data}=await supabase.auth.getUser(); if(!data.user||!profile?.avatar_url)return; setUploading(true);
-    const {data:updated,error}=await supabase.from("profiles").update({avatar_url:null,updated_at:new Date().toISOString()}).eq("id",data.user.id).select("username,display_name,bio,pronouns,identity,interests,age,location,orientation,looking_for,dating_enabled,profile_visibility,avatar_url,reputation,xp,level,title").single();
+    const {data:updated,error}=await supabase.from("profiles").update({avatar_url:null,updated_at:new Date().toISOString()}).eq("id",data.user.id).select("username,display_name,bio,pronouns,identity,interests,age,location,orientation,looking_for,dating_enabled,profile_visibility,avatar_url,banner_url,reputation,xp,level,title").single();
     if(error){setMessage("Impossible de retirer la photo.");setUploading(false);return;}
     setProfile(updated as Profile); setMessage("Photo de profil retirée."); setUploading(false);
   }
   async function save(event:React.FormEvent){event.preventDefault();setSaving(true);setMessage("");const {data}=await supabase.auth.getUser();if(!data.user){window.location.href="/auth";return;}
     const age=form.age.trim()?Number(form.age):null;if(age!==null&&(!Number.isInteger(age)||age<18||age>120)){setMessage("L’âge doit être compris entre 18 et 120 ans.");setSaving(false);return;}
     const interests=form.interests.split(",").map(item=>item.trim()).filter(Boolean).slice(0,20);
-    const {data:updated,error}=await supabase.from("profiles").update({display_name:form.display_name.trim(),bio:form.bio.trim(),pronouns:form.pronouns.trim()||null,identity:form.identity.trim()||null,interests,age,location:form.location.trim()||null,orientation:form.orientation.trim()||null,looking_for:form.looking_for.trim()||null,dating_enabled:form.dating_enabled,profile_visibility:form.profile_visibility,updated_at:new Date().toISOString()}).eq("id",data.user.id).select("username,display_name,bio,pronouns,identity,interests,age,location,orientation,looking_for,dating_enabled,profile_visibility,avatar_url,reputation,xp,level,title").single();
+    const {data:updated,error}=await supabase.from("profiles").update({display_name:form.display_name.trim(),bio:form.bio.trim(),pronouns:form.pronouns.trim()||null,identity:form.identity.trim()||null,interests,age,location:form.location.trim()||null,orientation:form.orientation.trim()||null,looking_for:form.looking_for.trim()||null,dating_enabled:form.dating_enabled,profile_visibility:form.profile_visibility,updated_at:new Date().toISOString()}).eq("id",data.user.id).select("username,display_name,bio,pronouns,identity,interests,age,location,orientation,looking_for,dating_enabled,profile_visibility,avatar_url,banner_url,reputation,xp,level,title").single();
     if(error)setMessage("Impossible d’enregistrer le profil pour le moment.");else{
-      const {data:refreshed}=await supabase.from("profiles").select("username,display_name,bio,pronouns,identity,interests,age,location,orientation,looking_for,dating_enabled,profile_visibility,avatar_url,reputation,xp,level,title").eq("id",data.user.id).single();
+      const {data:refreshed}=await supabase.from("profiles").select("username,display_name,bio,pronouns,identity,interests,age,location,orientation,looking_for,dating_enabled,profile_visibility,avatar_url,banner_url,reputation,xp,level,title").eq("id",data.user.id).single();
       setProfile((refreshed||updated) as Profile);setMessage("Profil enregistré.");
     }setSaving(false);
   }
