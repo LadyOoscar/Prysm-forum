@@ -490,3 +490,75 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 2px rgba(69,239,255,.1)
   .home-orbit,.topbar nav a,.hero .actions .button:after{transition:none!important}
   .home-orbit:hover,.home-orbit:focus-visible{transform:none}
 }
+
+
+/* PRYSM // MOTION LAYER: living interface, light on the GPU */
+@keyframes prysm-enter{from{opacity:0;translate:0 16px;filter:blur(4px)}to{opacity:1;translate:0 0;filter:blur(0)}}
+@keyframes prysm-card-arrive{from{opacity:0;translate:0 22px;scale:.985}to{opacity:1;translate:0 0;scale:1}}
+@keyframes prysm-halo-spin{to{transform:rotate(360deg)}}
+@keyframes prysm-avatar-breathe{0%,100%{box-shadow:0 0 0 1px rgba(69,239,255,.22),0 0 14px rgba(69,239,255,.08)}50%{box-shadow:0 0 0 1px rgba(255,79,195,.42),0 0 25px rgba(139,98,255,.2)}}
+@keyframes prysm-orbit-signal{0%,100%{opacity:.52;filter:brightness(.9)}50%{opacity:1;filter:brightness(1.3)}}
+@keyframes prysm-starfield{from{background-position:0 0,20px 30px}to{background-position:80px 110px,-70px -45px}}
+@keyframes prysm-line-sweep{0%{transform:translateX(-130%);opacity:0}20%{opacity:.8}70%{opacity:.65}100%{transform:translateX(130%);opacity:0}}
+@keyframes prysm-button-breathe{0%,100%{box-shadow:0 0 0 rgba(69,239,255,0)}50%{box-shadow:0 0 19px rgba(69,239,255,.13)}}
+
+.shell > .page-head,.shell > .section-heading,.shell > .orbit-controls,.shell > .dating-filters{
+  animation:prysm-enter .65s cubic-bezier(.2,.7,.2,1) both;
+}
+.shell > .page-head{animation-delay:.04s}
+.shell > .orbit-controls,.shell > .dating-filters{animation-delay:.13s}
+.dating-card,.cards .card,.forum-row,.topic-row,.profile-box,.post,.conversation-row,.notification-row,.search-result{
+  animation:prysm-card-arrive .58s cubic-bezier(.2,.7,.2,1) both;
+}
+.dating-card:nth-child(2),.cards .card:nth-child(2),.forum-row:nth-child(2),.topic-row:nth-child(2){animation-delay:.07s}
+.dating-card:nth-child(3),.cards .card:nth-child(3),.forum-row:nth-child(3),.topic-row:nth-child(3){animation-delay:.14s}
+.dating-card:nth-child(4),.cards .card:nth-child(4),.forum-row:nth-child(4),.topic-row:nth-child(4){animation-delay:.21s}
+.dating-card:nth-child(n+5){animation-delay:.26s}
+.dating-card{position:relative;isolation:isolate;overflow:hidden;transition:transform .28s ease,border-color .28s ease,box-shadow .28s ease}
+.dating-card:before{
+  content:"";position:absolute;z-index:-1;inset:0 0 auto;height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan),var(--pink),var(--violet),transparent);
+  background-size:220% 100%;opacity:.72;animation:prysm-line-sweep 7s ease-in-out infinite;
+}
+.dating-card:hover,.dating-card:focus-within{transform:translateY(-5px);border-color:rgba(69,239,255,.65);box-shadow:0 12px 30px rgba(0,0,0,.22),0 0 24px rgba(69,239,255,.1)}
+.dating-avatar{position:relative;isolation:isolate;transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s ease}
+.dating-avatar:after{
+  content:"";position:absolute;inset:-5px;border-radius:inherit;border:1px solid transparent;
+  background:linear-gradient(135deg,var(--cyan),transparent 42%,var(--pink),var(--violet)) border-box;
+  -webkit-mask:linear-gradient(#fff 0 0) padding-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;opacity:.6;pointer-events:none;
+  animation:prysm-halo-spin 9s linear infinite;
+}
+.dating-card:hover .dating-avatar,.dating-card:focus-within .dating-avatar{transform:scale(1.055);animation:prysm-avatar-breathe 2.4s ease-in-out infinite}
+.dating-card .interest-tag{transition:transform .2s ease,border-color .2s ease,color .2s ease}
+.dating-card .interest-tag:hover{transform:translateY(-2px);border-color:var(--pink);color:#fff}
+.dating-actions .button{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+.dating-actions .button:hover{transform:translateY(-2px);box-shadow:0 0 16px rgba(69,239,255,.14)}
+.orbit-stage{isolation:isolate}
+.orbit-stars{background-image:radial-gradient(#d4dcff 1px,transparent 1.5px),radial-gradient(#6674ba 1px,transparent 1.5px);background-size:37px 41px,61px 67px;animation:prysm-starfield 38s linear infinite}
+.orbit-ring{filter:drop-shadow(0 0 3px color-mix(in srgb,var(--orbit-color) 30%,transparent));transition:filter .35s ease,border-color .35s ease}
+.orbit-ring:nth-of-type(2){animation:prysm-orbit-signal 5.5s ease-in-out infinite}
+.orbit-ring:nth-of-type(3){animation:prysm-orbit-signal 6.8s ease-in-out infinite .7s}
+.orbit-ring:nth-of-type(4){animation:prysm-orbit-signal 8s ease-in-out infinite 1.4s}
+.orbit-ring:nth-of-type(5){animation:prysm-orbit-signal 9.2s ease-in-out infinite 2.1s}
+.orbit-person{transition:filter .25s ease}
+.orbit-person-face{transition:transform .25s ease,box-shadow .25s ease}
+.orbit-person:hover,.orbit-person:focus-visible{z-index:5;filter:brightness(1.25);outline:none}
+.orbit-person:hover .orbit-person-face,.orbit-person:focus-visible .orbit-person-face{transform:scale(1.22);box-shadow:0 0 0 3px rgba(69,239,255,.18),0 0 22px rgba(69,239,255,.5)}
+.orbit-center-avatar{animation:prysm-avatar-breathe 4s ease-in-out infinite}
+.orbit-controls .button.primary{animation:prysm-button-breathe 4.5s ease-in-out infinite}
+.button:active{transform:scale(.975)}
+@media(max-width:760px){
+  .dating-card:hover,.dating-card:focus-within{transform:none}
+  .dating-card:nth-child(n){animation-delay:0s}
+  .orbit-person:hover .orbit-person-face,.orbit-person:focus-visible .orbit-person-face{transform:scale(1.08)}
+}
+@media(prefers-reduced-motion:reduce){
+  .shell > .page-head,.shell > .section-heading,.shell > .orbit-controls,.shell > .dating-filters,
+  .dating-card,.cards .card,.forum-row,.topic-row,.profile-box,.post,.conversation-row,.notification-row,.search-result,
+  .dating-card:before,.dating-avatar:after,.orbit-stars,.orbit-ring,.orbit-center-avatar,.orbit-controls .button.primary{
+    animation:none!important;filter:none!important;
+  }
+  .dating-card,.cards .card,.forum-row,.topic-row,.profile-box,.post,.conversation-row,.notification-row,.search-result{opacity:1;translate:none;scale:1}
+  .dating-card,.dating-avatar,.dating-actions .button,.dating-card .interest-tag,.orbit-person-face{transition:none!important}
+}
