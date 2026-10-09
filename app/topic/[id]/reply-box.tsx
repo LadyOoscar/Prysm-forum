@@ -25,10 +25,7 @@ export default function ReplyBox({ topicId, locked }: { topicId: string; locked:
     const handleQuote = (event: Event) => {
       const detail = (event as CustomEvent<{ postId: string; body: string; author: string }>).detail;
       if (!detail?.body || !detail?.postId) return;
-      const excerpt = detail.body.length > 700 ? detail.body.slice(0, 700).trimEnd() + "…" : detail.body;
-      const quote = "> " + excerpt.replace(/\n/g, "\n> ");
       const attribution = detail.author || "membre";
-      setBody(current => current ? current + "\n\n" + quote + "\n> - " + attribution + "\n\n" : quote + "\n> - " + attribution + "\n\n");
       setParentPostId(detail.postId);
       setQuotedAuthor(attribution);
       setQuotedBody(detail.body);
@@ -68,7 +65,7 @@ export default function ReplyBox({ topicId, locked }: { topicId: string; locked:
           <button type="button" className="button ghost" onClick={() => { setParentPostId(null); setQuotedBody(""); setQuotedAuthor(""); }}>Répondre au sujet entier</button>
         </div>
         <p>{quotedBody.length > 240 ? quotedBody.slice(0, 240).trimEnd() + "…" : quotedBody}</p>
-        <span className="muted">Ta réponse sera affichée sous ce message. La citation dans ton brouillon peut être modifiée librement.</span>
+        <span className="muted">Ta réponse sera affichée juste sous ce message. Le texte cité reste séparé de ta réponse.</span>
       </aside>}
       <MentionInput required maxLength={10000} placeholder="Écris ta réponse… Utilise @pseudo pour mentionner quelqu’un." value={body} onChange={setBody} />
       <StickerPicker onPick={(token) => setBody(current => current ? current + " " + token : token)} />
