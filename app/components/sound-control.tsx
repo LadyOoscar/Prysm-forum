@@ -47,7 +47,7 @@ export default function SoundControl() {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = type;
-      osc.frequency.setValueAtTime(frequency, now + start);
+      osc.frequency.setValueAtTime(frequency * (0.94 + Math.random() * 0.12), now + start);
       if (detune) osc.detune.setValueAtTime(detune, now + start);
       gain.gain.setValueAtTime(0.0001, now + start);
       gain.gain.linearRampToValueAtTime(peak, now + start + 0.012);
@@ -169,7 +169,7 @@ export default function SoundControl() {
             <span>VOLUME <b>{volume}%</b></span>
             <input aria-label="Volume des effets sonores" type="range" min="0" max="100" step="1" value={volume} onChange={(e) => changeVolume(Number(e.target.value))} />
           </label>
-          <button className="prysm-sound-test" type="button" disabled={!enabled} onClick={() => play("broadcast")}>▶ Tester le signal</button>
+          <button className="prysm-sound-test" type="button" disabled={!enabled} onClick={() => play((["broadcast", "notification", "cut", "error", "confirm", "secret"] as SoundKind[])[Math.floor(Math.random() * 6)])}>▶ Tester un son aléatoire</button>
           <p>Effets synthétiques originaux. Aucun son sans activation.</p>
         </div>
       )}
