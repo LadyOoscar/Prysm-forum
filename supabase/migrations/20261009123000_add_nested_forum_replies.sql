@@ -8,7 +8,8 @@ CREATE INDEX IF NOT EXISTS forum_posts_parent_post_id_idx
 CREATE OR REPLACE FUNCTION public.validate_forum_post_parent()
 RETURNS trigger
 LANGUAGE plpgsql
-AS $$
+SET search_path = public, pg_temp
+AS $
 BEGIN
   IF NEW.parent_post_id IS NULL THEN
     RETURN NEW;
