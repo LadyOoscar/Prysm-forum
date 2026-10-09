@@ -33,6 +33,28 @@ function decodeCaption(value: string): { caption: string; design: StoryDesign | 
 }
 function designCaption(design: StoryDesign) { return "__PRYSM_STORY_V1__" + JSON.stringify({ caption: design.caption, design }); }
 
+function musicEmbedUrl(rawUrl: string): { src: string; provider: string } | null {
+  try {
+    const url = new URL(rawUrl);
+    const host = url.hostname.toLowerCase().replace(/^www\\./, "");
+    if (host === "youtu.be" || host === "youtube.com" || host === "m.youtube.com" || host === "music.youtube.com") {
+      const id = host === "youtu.be" ? url.pathname.split("/").filter(Boolean)[0] : url.searchParams.get("v") || url.pathname.match(/\\/(?:embed|shorts|live)\\/([^/?]+)/)?.[1];
+      if (!id || !/^[a-zA-Z0-9_-]{6,20}$/.test(id)) return null;
+      return { src: "https://www.youtube-nocookie.com/embed/" + id + "?rel=0", provider: "YouTube" };
+    }
+    if (host === "open.spotify.com" || host === "spotify.link") {
+      const match = url.pathname.match(/^\\/(track|album|playlist|episode|show)\\/([a-zA-Z0-9]+)\\/?$/);
+      if (!match) return null;
+      return { src: "https://open.spotify.com/embed/" + match[1] + "/" + match[2] + "?utm_source=generator&theme=0", provider: "Spotify" };
+    }
+    if (host === "soundcloud.com" || host === "m.soundcloud.com") {
+      if (!url.pathname.split("/").filter(Boolean).length) return null;
+      return { src: "https://w.soundcloud.com/player/?url=" + encodeURIComponent(url.origin + url.pathname) + "&color=%2345efff&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&visual=false", provider: "SoundCloud" };
+    }
+  } catch {}
+  return null;
+}
+
 export default function Stories() {
   const supabase = useMemo(() => createSupabaseBrowser(), []);
   const [groups, setGroups] = useState<StoryGroup[]>([]);
@@ -182,7 +204,7 @@ export default function Stories() {
             <label>Ambiance du fond <div className="story-background-grid">{backgrounds.map(bg => <button type="button" key={bg.name} className={"story-background-swatch" + (design.background === bg.value ? " active" : "")} style={{ background: bg.value }} onClick={() => updateDesign("background", bg.value)}>{bg.name}</button>)}</div></label>
             <label>Filtre photo <select value={design.filter} onChange={e => updateDesign("filter", e.target.value)}><option value="none">Naturel</option><option value="vivid">Vibrant</option><option value="mono">Noir et blanc</option><option value="warm">Chaud</option><option value="dream">Rêve violet</option></select></label>
             <label>Stickers <div className="story-sticker-grid">{stickerChoices.map(sticker => <button type="button" key={sticker} className={design.stickers.includes(sticker) ? "active" : ""} onClick={() => updateDesign("stickers", design.stickers.includes(sticker) ? design.stickers.filter(s => s !== sticker) : [...design.stickers, sticker].slice(0, 8))}>{sticker}</button>)}</div></label>
-            <div className="story-music-fields"><span className="story-field-title">♫ Carte musicale (facultatif)</span><label>Titre<input value={design.musicTitle} onChange={e => updateDesign("musicTitle", e.target.value.slice(0, 80))} placeholder="Titre du morceau" /></label><label>Artiste<input value={design.musicArtist} onChange={e => updateDesign("musicArtist", e.target.value.slice(0, 80))} placeholder="Nom de l’artiste" /></label><label>Lien d’écoute<input type="url" value={design.musicUrl} onChange={e => updateDesign("musicUrl", e.target.value.slice(0, 300))} placeholder="https://…" /></label></div>
+            <div className="story-music-fields"><span className="story-field-title">♫ Carte musicale (facultatif)</span><label>Titre<input value={design.musicTitle} onChange={e => updateDesign("musicTitle", e.target.value.slice(0, 80))} placeholder="Titre du morceau" /></label><label>Artiste<input value={design.musicArtist} onChange={e => updateDesign("musicArtist", e.target.value.slice(0, 80))} placeholder="Nom de l’artiste" /></label><label>Lien d’écoute<input type="url" value={design.musicUrl} onChange={e => updateDesign("musicUrl", e.target.value.slice(0, 300))} placeholder="YouTube, Spotify ou SoundCloud" /><small className="story-music-help">Les liens compatibles affichent un lecteur intégré dans la story. Les autres restent ouvrables à l’extérieur.</small></label></div>
             <label>Légende <input value={design.caption} onChange={e => updateDesign("caption", e.target.value.slice(0, 300))} maxLength={300} placeholder="Une légende pour ta story…" /></label>
             <div className="story-editor-actions"><button type="button" className="story-reset" onClick={() => { setDesign(emptyDesign()); setSelectedFile(null); }}>Réinitialiser</button><button type="button" className="button primary" onClick={() => void addStory()} disabled={uploading}>{uploading ? "Publication…" : "Publier la story ↗"}</button></div>
             <p className="stories-hint">Photos et vidéos jusqu’à 10 Mo. Les stories disparaissent après 24 h.</p>
@@ -203,7 +225,7 @@ export default function Stories() {
           {currentStory.design.stickers.length > 0 && <div className="story-design-stickers">{currentStory.design.stickers.join(" ")}</div>}
           {currentStory.design.text && <div className="story-design-text" style={{ color: currentStory.design.textColor, fontFamily: currentStory.design.font }}>{currentStory.design.text}</div>}
         </div>}
-        {currentStory.design?.musicTitle && <div className="story-viewer-music"><span>♫ EN ÉCOUTE</span><strong>{currentStory.design.musicTitle}</strong><small>{currentStory.design.musicArtist}</small>{currentStory.design.musicUrl && <a href={currentStory.design.musicUrl} target="_blank" rel="noreferrer">Écouter ↗</a>}</div>}
+        {currentStory.design?.musicTitle && <div className="story-viewer-music"><span>♫ CARTE MUSICALE{currentStory.design.musicUrl && musicEmbedUrl(currentStory.design.musicUrl) ? " · " + musicEmbedUrl(currentStory.design.musicUrl)!.provider.toUpperCase() : ""}</span><strong>{currentStory.design.musicTitle}</strong><small>{currentStory.design.musicArtist}</small>{currentStory.design.musicUrl && musicEmbedUrl(currentStory.design.musicUrl) ? <iframe className="story-music-embed" src={musicEmbedUrl(currentStory.design.musicUrl)!.src} title={"Écouter " + currentStory.design.musicTitle} loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" referrerPolicy="strict-origin-when-cross-origin" /> : currentStory.design.musicUrl ? <a href={currentStory.design.musicUrl} target="_blank" rel="noreferrer">Ouvrir sur la plateforme ↗</a> : <small>Ajoute un lien YouTube, Spotify ou SoundCloud pour écouter le morceau.</small>}</div>}
         {currentStory.caption && <p className="story-viewer-caption">{currentStory.caption}</p>}
         <button className="story-nav story-prev" onClick={() => moveStory(-1)} aria-label="Story précédente">‹</button>
         <button className="story-nav story-next" onClick={() => moveStory(1)} aria-label="Story suivante">›</button>
