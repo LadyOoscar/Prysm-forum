@@ -30,8 +30,8 @@ export default function ModerationSanction() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     const { data: me } = await supabase.from("profiles").select("is_moderator,is_admin").eq("id", user.id).maybeSingle();
-    if (!me?.is_moderator) return;
-    setRole({ moderator: Boolean(me.is_moderator), admin: Boolean(me.is_admin) });
+    if (!me?.is_moderator && !me?.is_admin) { setMessage("Accès réservé à la modération."); return; }
+    setRole({ moderator: Boolean(me.is_moderator || me.is_admin), admin: Boolean(me.is_admin) });
 
     const { data } = await supabase
       .from("profiles")
