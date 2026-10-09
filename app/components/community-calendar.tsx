@@ -14,7 +14,7 @@ type CommunityEvent = {
   capacity: number | null;
   status: "scheduled" | "cancelled";
 };
-type Participant = { event_id: string; user_id: string };
+type Participant = { event_id: string; user_id: string };\ntype EventCount = { event_id: string; participant_count: number };
 
 const monthNames = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
 const weekdays = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
@@ -29,7 +29,7 @@ function formatDate(value: string) {
 export default function CommunityCalendar() {
   const supabase = useMemo(() => createSupabaseBrowser(), []);
   const [events, setEvents] = useState<CommunityEvent[]>([]);
-  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [participants, setParticipants] = useState<Participant[]>([]);\n  const [eventCounts, setEventCounts] = useState<EventCount[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
@@ -112,7 +112,7 @@ export default function CommunityCalendar() {
       const { error: leaveError } = await supabase.from("community_event_participants").delete().eq("event_id", event.id).eq("user_id", userId);
       if (leaveError) setError("Impossible de retirer ton inscription.");
     } else {
-      const count = participants.filter((p) => p.event_id === event.id).length;
+      const count = eventCounts.find((item) => item.event_id === event.id)?.participant_count ?? 0;
       if (event.capacity && count >= event.capacity) { setError("Ce rendez-vous est complet."); return; }
       const { error: joinError } = await supabase.from("community_event_participants").insert({ event_id: event.id, user_id: userId });
       if (joinError) setError("Impossible de t’inscrire. Le rendez-vous est peut-être complet.");
@@ -164,7 +164,7 @@ export default function CommunityCalendar() {
         <div className="calendar-events">
           <div className="calendar-events-title"><div><p className="eyebrow">{selectedDay ? "Date sélectionnée" : "À l’agenda"}</p><h3>{selectedDay ? new Date(`${selectedDay}T12:00:00`).toLocaleDateString("fr-FR", { day: "numeric", month: "long" }) : "Ce mois-ci"}</h3></div>{selectedDay && <button type="button" className="calendar-clear" onClick={() => setSelectedDay(null)}>Tout le mois</button>}</div>
           {loading ? <p className="calendar-muted">Chargement des rendez-vous…</p> : visibleEvents.length === 0 ? <div className="calendar-empty"><span>✦</span><strong>Rien de prévu pour le moment.</strong><p>Une idée de sortie ou de soirée ? Lance le premier rendez-vous.</p></div> : <div className="calendar-event-list">{visibleEvents.map((event) => {
-            const count = participants.filter((p) => p.event_id === event.id).length;
+            const count = eventCounts.find((item) => item.event_id === event.id)?.participant_count ?? 0;
             const joined = Boolean(userId && participants.some((p) => p.event_id === event.id && p.user_id === userId));
             const full = Boolean(event.capacity && count >= event.capacity && !joined);
             return <article className="calendar-event" key={event.id}><div className={`event-type-mark ${event.event_type}`}>{event.event_type === "online" ? "⌘" : "⌖"}</div><div className="calendar-event-main"><time>{formatDate(event.starts_at)}</time><h4>{event.title}</h4>{event.description && <p>{event.description}</p>}<div className="calendar-event-meta"><span>{event.event_type === "online" ? "En ligne" : "En présentiel"}</span>{event.event_type === "in_person" && event.location_label && <span>{event.location_label}</span>}<span>{count}{event.capacity ? ` / ${event.capacity}` : ""} participant{count > 1 ? "s" : ""}</span></div><div className="calendar-event-actions">{userId && event.creator_id === userId && <button type="button" className="calendar-clear" onClick={() => void cancelEvent(event)}>Annuler</button>}<button type="button" className={`button ${joined ? "" : "primary"}`} disabled={full} onClick={() => void toggleParticipation(event)}>{joined ? "Je me désinscris" : full ? "Complet" : "Je participe"}</button></div></div></article>;
