@@ -817,10 +817,10 @@ footer:before {
   animation: cosmic-birth 21s 7s ease-out infinite;
 }
 .cosmic-eclipse {
-  top: 20%; left: -260px; width: clamp(120px, 18vw, 240px); height: clamp(120px, 18vw, 240px); border-radius: 50%;
+  top: 14%; left: -460px; width: clamp(240px, 34vw, 440px); height: clamp(240px, 34vw, 440px); border-radius: 50%;
   opacity: 0;
   background: radial-gradient(circle at 36% 30%, #090a1c 0 43%, #14142c 48%, #45efff 54%, rgba(139,98,255,.9) 62%, rgba(255,79,195,.45) 68%, transparent 76%);
-  filter: drop-shadow(0 0 20px rgba(69,239,255,.7)) drop-shadow(0 0 48px rgba(139,98,255,.5));
+  filter: drop-shadow(0 0 32px rgba(69,239,255,.8)) drop-shadow(0 0 76px rgba(139,98,255,.65)) drop-shadow(0 0 120px rgba(255,79,195,.2));
   animation: cosmic-eclipse 37s 15s ease-in-out infinite;
 }
 .cosmic-ripple {
@@ -898,7 +898,7 @@ footer:before {
   .cosmic-comet { width: 150px; animation-duration: 35s; }
   .cosmic-shooting-one { animation-duration: 23s; }
   .cosmic-shooting-two { animation-duration: 29s; }
-  .cosmic-eclipse { width: 112px; height: 112px; left: -130px; }
+  .cosmic-eclipse { width: 190px; height: 190px; left: -220px; top: 16%; }
   .cosmic-constellation { transform: scale(.75); transform-origin: top left; }
   .cosmic-pulse { height: 1px; }
 }
