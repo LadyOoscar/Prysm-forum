@@ -8,8 +8,9 @@ export function ForumVoice({ path }: { path: string }) {
   return <VoiceMessage path={path} />;
 }
 
-export default function ForumVoiceRecorder({ topicId, disabled, onSent }: {
+export default function ForumVoiceRecorder({ topicId, parentPostId, disabled, onSent }: {
   topicId: string;
+  parentPostId?: string | null;
   disabled: boolean;
   onSent: () => void;
 }) {
@@ -98,7 +99,7 @@ export default function ForumVoiceRecorder({ topicId, disabled, onSent }: {
       topic_id: topicId,
       author_id: user.id,
       body: "voice:" + path,
-      parent_post_id: null,
+      parent_post_id: parentPostId ?? null,
     });
     if (insertError) {
       await supabase.storage.from("prysm-voice-messages").remove([path]);
