@@ -36,14 +36,14 @@ function designCaption(design: StoryDesign) { return "__PRYSM_STORY_V1__" + JSON
 function musicEmbedUrl(rawUrl: string): { src: string; provider: string } | null {
   try {
     const url = new URL(rawUrl);
-    const host = url.hostname.toLowerCase().replace(/^www\\./, "");
+    const host = url.hostname.toLowerCase().replace(/^www\./, "");
     if (host === "youtu.be" || host === "youtube.com" || host === "m.youtube.com" || host === "music.youtube.com") {
-      const id = host === "youtu.be" ? url.pathname.split("/").filter(Boolean)[0] : url.searchParams.get("v") || url.pathname.match(/\\/(?:embed|shorts|live)\\/([^/?]+)/)?.[1];
+      const id = host === "youtu.be" ? url.pathname.split("/").filter(Boolean)[0] : url.searchParams.get("v") || url.pathname.match(/\/(?:embed|shorts|live)\/([^/?]+)/)?.[1];
       if (!id || !/^[a-zA-Z0-9_-]{6,20}$/.test(id)) return null;
       return { src: "https://www.youtube-nocookie.com/embed/" + id + "?rel=0", provider: "YouTube" };
     }
     if (host === "open.spotify.com" || host === "spotify.link") {
-      const match = url.pathname.match(/^\\/(track|album|playlist|episode|show)\\/([a-zA-Z0-9]+)\\/?$/);
+      const match = url.pathname.match(/^\/(track|album|playlist|episode|show)\/([a-zA-Z0-9]+)\/?$/);
       if (!match) return null;
       return { src: "https://open.spotify.com/embed/" + match[1] + "/" + match[2] + "?utm_source=generator&theme=0", provider: "Spotify" };
     }
