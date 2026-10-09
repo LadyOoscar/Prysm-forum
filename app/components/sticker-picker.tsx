@@ -65,9 +65,11 @@ export default function StickerPicker({ onPick }: { onPick: (token: string) => v
   const supabase = createSupabaseBrowser();
   const [open, setOpen] = useState(false);
   const [custom, setCustom] = useState<CustomSticker[]>([]);
+  const [search, setSearch] = useState("");
   useEffect(() => {
-    void supabase.from("stickers").select("id,name,image_url,category").eq("status", "approved").order("created_at", { ascending: false }).limit(24).then(({ data }) => setCustom((data ?? []) as CustomSticker[]));
+    void supabase.from("stickers").select("id,name,image_url,category,tags").eq("status", "approved").order("created_at", { ascending: false }).limit(200).then(({ data }) => setCustom((data ?? []) as CustomSticker[]));
   }, []);
+  const filtered = custom.filter(sticker => !search.trim() || [sticker.name, sticker.category, ...(sticker.tags ?? [])].join(" ").toLocaleLowerCase().includes(search.trim().replace(/^#/, "").toLocaleLowerCase()));
   const total = STICKERS.length + custom.length;
   return (
     <div className="sticker-picker">
@@ -75,9 +77,11 @@ export default function StickerPicker({ onPick }: { onPick: (token: string) => v
       {open && (
         <div className="sticker-panel" role="dialog" aria-label="Stickers PRYSM">
           <div className="sticker-panel-head"><strong>Stickers PRYSM</strong><span>{total} disponibles</span></div>
+          <input className="sticker-search" value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher par nom ou #tag…" aria-label="Rechercher un sticker par nom ou tag" />
           <div className="sticker-grid">
             {!search.trim() && STICKERS.map(sticker => <button key={sticker.key} type="button" className="sticker-card" onClick={() => { onPick(stickerToken(sticker.key)); setOpen(false); }} title={sticker.label}><span>{sticker.emoji}</span><small>{sticker.label}</small></button>)}
             {filtered.map(sticker => <button key={sticker.id} type="button" className="sticker-card custom" onClick={() => { onPick(stickerToken(sticker.id)); setOpen(false); }} title={sticker.name}><img src={sticker.image_url} alt={sticker.name} /><small>{sticker.name}</small></button>)}
+            {filtered.length === 0 && search.trim() && <p className="sticker-search-empty">Aucun sticker trouvé pour cette recherche.</p>}
           </div>
           <a className="sticker-create-link" href="/stickers">＋ Créer mon sticker</a>
         </div>
