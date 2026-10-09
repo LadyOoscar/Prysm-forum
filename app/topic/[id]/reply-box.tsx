@@ -3,6 +3,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { createSupabaseBrowser } from "../../../lib/supabase-browser";
 import MentionInput from "../../components/mention-input";
 import StickerPicker from "../../components/sticker-picker";
+import ForumVoiceRecorder from "./forum-voice";
 
 function friendlyError(message: string) {
   if (message.includes("ANTI_SPAM_DUPLICATE")) return "Cette réponse ressemble trop à un message récent. Modifie-la avant de réessayer.";
@@ -71,6 +72,7 @@ export default function ReplyBox({ topicId, locked }: { topicId: string; locked:
       </aside>}
       <MentionInput required maxLength={10000} placeholder="Écris ta réponse… Utilise @pseudo pour mentionner quelqu’un." value={body} onChange={setBody} />
       <StickerPicker onPick={(token) => setBody(current => current ? current + " " + token : token)} />
+      <ForumVoiceRecorder topicId={topicId} parentPostId={parentPostId} disabled={loading} onSent={() => window.location.reload()} />
       {error && <div className="notice error">{error}</div>}
       <button className="button primary" disabled={loading}>{loading ? "Envoi…" : "Publier la réponse"}</button>
     </form>
