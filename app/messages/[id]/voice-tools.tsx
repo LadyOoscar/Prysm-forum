@@ -190,7 +190,7 @@ export function VoiceAudioPlayer({ src, label = "Message vocal", durationMs: dec
         preload="metadata"
         onTimeUpdate={(event) => {
           const audio = event.currentTarget;
-          setCurrent(audio.currentTime);
+          setCurrent(declaredDurationMs && declaredDurationMs > 0 ? Math.min(audio.currentTime, declaredDurationMs / 1000) : audio.currentTime);
           readDuration(audio);
         }}
         onLoadedMetadata={(event) => recoverWebmDuration(event.currentTarget)}
@@ -341,6 +341,7 @@ export function VoiceRecorder({
           return;
         }
         const actualDurationMs = Math.max(0, performance.now() - recordingStartedAtRef.current);
+        recordingDurationMsRef.current = actualDurationMs;
         const blob = await fixWebmDuration(rawBlob, actualDurationMs);
         if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
         const url = URL.createObjectURL(blob);
@@ -381,8 +382,9 @@ export function VoiceRecorder({
       setSending(false);
       return;
     }
+    const durationMs = Math.round(recordingDurationMsRef.current);
     const { data, error } = await supabase.from("messages")
-      .insert({ conversation_id: conversationId, sender_id: userId, body: "voice:" + path })
+      .insert({ conversation_id: conversationId, sender_id: userId, body: "voice:" + path + "|durationMs=" + durationMs })
       .select("id, body, sender_id, created_at")
       .single();
     if (error || !data) {
