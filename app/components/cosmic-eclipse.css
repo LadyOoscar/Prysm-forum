@@ -1,0 +1,23 @@
+/* The eclipse dims the entire viewport while it crosses the sky. */
+.cosmic-eclipse-dim {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  opacity: 0;
+  animation: cosmic-eclipse-dim 37s 15s ease-in-out infinite;
+}
+.cosmic-overlay span:not(.cosmic-eclipse-dim) {
+  z-index: 1;
+}
+@keyframes cosmic-eclipse-dim {
+  0%, 100% { opacity: 0; }
+  4% { opacity: .72; }
+  75% { opacity: .72; }
+  88% { opacity: 0; }
+}
+@media(prefers-reduced-motion: reduce) {
+  .cosmic-eclipse-dim { animation: none; opacity: 0; }
+}
