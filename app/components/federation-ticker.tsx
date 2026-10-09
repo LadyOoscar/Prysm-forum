@@ -33,18 +33,10 @@ const TRANSMISSIONS: Transmission[] = [
   { name: "SIGNAL INCONNU", label: "FRAGMENT INTERCEPTÉ • SOURCE NON IDENTIFIÉE", text: "LE PROGRAMME CONTINUE. NE CHERCHEZ PAS LA SALLE DE CONTRÔLE. SI CETTE TRANSMISSION VOUS EST PARVENUE, C'EST QUE QUELQU'UN A OUBLIÉ DE FERMER LA PORTE.", speaker: "ORIGINE INCONNUE // NE PAS ARCHIVER", theme: "technician", secret: true },
 ];
 
-const WEATHER_INDEX = TRANSMISSIONS.findIndex((item) => item.theme === "weather");
-const MILITARY_INDEX = TRANSMISSIONS.findIndex((item) => item.theme === "military");
-const SECRET_INDEX = TRANSMISSIONS.findIndex((item) => item.secret);
-const REGULAR_ORDER = [1, 0, 3, 4, 5, 7, 8, 9, 11, 6, 13, 14, 15, 16];
 
 export default function FederationTicker() {
   const [messageIndex, setMessageIndex] = useState<number | null>(null);
   const [cycle, setCycle] = useState(0);
-  const [idleAlert, setIdleAlert] = useState(false);
-  const broadcastCount = useRef(0);
-  const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastSecretAt = useRef(0);
   const previousMessage = useRef<number | null>(null);
 
   useEffect(() => {
@@ -61,63 +53,31 @@ export default function FederationTicker() {
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout>;
-    let orderIndex = 0;
-
-    const markActive = () => {
-      setIdleAlert(false);
-      if (idleTimer.current) clearTimeout(idleTimer.current);
-      idleTimer.current = setTimeout(() => setIdleAlert(true), 90000);
-    };
-
-    const activityEvents: Array<keyof WindowEventMap> = ["pointerdown", "keydown", "touchstart", "scroll"];
-    activityEvents.forEach((event) => window.addEventListener(event, markActive, { passive: true }));
-    idleTimer.current = setTimeout(() => setIdleAlert(true), 90000);
-
-    const chooseNext = () => {
-      broadcastCount.current += 1;
-      const count = broadcastCount.current;
-
-      // Première diffusion garantie : journal. Météo revient toutes les quatre diffusions.
-      if (count === 1) return 1;
-      // Le signal du Technicien est rare, mais garanti après 12 à 16 diffusions.
-      if (count - lastSecretAt.current >= 12 + Math.floor(Math.random() * 5)) {
-        lastSecretAt.current = count;
-        return SECRET_INDEX;
-      }
-      if (idleAlert && count > 1) return MILITARY_INDEX;
-      if (count % 4 === 0) return WEATHER_INDEX;
-
-      const next = REGULAR_ORDER[orderIndex % REGULAR_ORDER.length];
-      orderIndex += 1;
-      return next;
-    };
 
     const schedule = (delay: number) => {
       timer = setTimeout(() => {
         if (cancelled) return;
-        setMessageIndex(chooseNext());
+        // Chaque diffusion est tirée uniformément au hasard, sans ordre ni priorité.
+        setMessageIndex(Math.floor(Math.random() * TRANSMISSIONS.length));
         setCycle((value) => value + 1);
         timer = setTimeout(() => {
           if (cancelled) return;
           setMessageIndex(null);
           schedule(35000 + Math.random() * 10000);
-        }, 50000);
+        }, 15000);
       }, delay);
     };
 
-    // La bannière démarre rapidement, y compris si le système limite les animations.
     schedule(4500);
     return () => {
       cancelled = true;
       clearTimeout(timer);
-      if (idleTimer.current) clearTimeout(idleTimer.current);
-      activityEvents.forEach((event) => window.removeEventListener(event, markActive));
     };
-  }, [idleAlert]);
+  }, []);
 
   if (messageIndex === null) return null;
   const transmission = TRANSMISSIONS[messageIndex];
-  const tickerText = `${transmission.text}     ✦     ${transmission.text}     ✦     `;
+  const tickerText = `${transmission.text}     ✦     `;
 
   return (
     <div className={`federation-broadcast federation-broadcast--${transmission.theme}${transmission.secret ? " federation-broadcast--secret" : ""}`} key={cycle} role="status" aria-live="polite">
