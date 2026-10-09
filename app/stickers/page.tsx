@@ -18,7 +18,7 @@ export default function StickersPage() {
         <Link className="back" href="/forum">← Forum</Link>
         <p className="eyebrow">Création communautaire</p>
         <h1>Créer un <span>sticker</span></h1>
-        <p className="lead">Transforme une image en sticker PRYSM. Les stickers envoyés passent en modération avant d'apparaître dans la galerie commune.</p>
+        <p className="lead">Crée un sticker visible par toute la communauté. Ajoute des tags pour que les autres puissent le retrouver dans le sélecteur de messages.</p>
       </section>
       <StickerCreator />
     </main>
