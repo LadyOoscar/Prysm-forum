@@ -28,7 +28,6 @@ export default function StickerCreator() {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("Général");
   const [tagsText, setTagsText] = useState("");
-  const [tagsText, setTagsText] = useState("");
   const [mine, setMine] = useState<Sticker[]>([]);
   const [community, setCommunity] = useState<Sticker[]>([]);
   const [gallerySearch, setGallerySearch] = useState("");
