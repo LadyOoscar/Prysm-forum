@@ -905,3 +905,10 @@ footer:before {
 @media(prefers-reduced-motion:reduce) {
   .cosmic-overlay { display: none !important; }
 }
+
+
+/* Quoted-message preview in the reply composer */
+.quote-preview{margin:0 0 1rem;padding:1rem 1.1rem;border:1px solid rgba(69,239,255,.32);border-left:3px solid var(--cyan);border-radius:12px;background:rgba(69,239,255,.06);}
+.quote-preview-head{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;color:var(--cyan);}
+.quote-preview p{margin:.7rem 0;white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink);}
+.quote-preview .muted{display:block;color:var(--muted);font-size:.85rem;}
