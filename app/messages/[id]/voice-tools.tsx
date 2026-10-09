@@ -5,6 +5,69 @@ import { createSupabaseBrowser } from "../../../lib/supabase-browser";
 
 type Message = { id: string; body: string; sender_id: string; created_at: string };
 
+export function VoiceAudioPlayer({ src, label = "Message vocal" }: { src: string; label?: string }) {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const [current, setCurrent] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  function formatTime(value: number) {
+    if (!Number.isFinite(value)) return "0:00";
+    return Math.floor(value / 60) + ":" + String(Math.floor(value % 60)).padStart(2, "0");
+  }
+
+  async function togglePlayback() {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (audio.paused) {
+      try { await audio.play(); } catch { setPlaying(false); }
+    } else {
+      audio.pause();
+    }
+  }
+
+  return (
+    <div className="prysm-audio-player" aria-label={label}>
+      <audio
+        ref={audioRef}
+        src={src}
+        preload="metadata"
+        onTimeUpdate={(event) => setCurrent(event.currentTarget.currentTime)}
+        onLoadedMetadata={(event) => setDuration(Number.isFinite(event.currentTarget.duration) ? event.currentTarget.duration : 0)}
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onEnded={() => { setPlaying(false); setCurrent(0); if (audioRef.current) audioRef.current.currentTime = 0; }}
+      />
+      <button className="audio-play-button" type="button" onClick={() => void togglePlayback()} aria-label={playing ? "Mettre en pause" : "Lire le vocal"}>
+        {playing ? "Ⅱ" : "▶"}
+      </button>
+      <div className="audio-player-main">
+        <div className="audio-player-topline">
+          <span className="audio-player-label"><span className={playing ? "audio-live-dot is-playing" : "audio-live-dot"} /> VOCAL PRYSM</span>
+          <span className="audio-player-time">{formatTime(current)} <span>/</span> {formatTime(duration)}</span>
+        </div>
+        <input
+          className="audio-progress"
+          type="range"
+          min={0}
+          max={duration || 1}
+          step={0.1}
+          value={Math.min(current, duration || 1)}
+          aria-label="Position dans le vocal"
+          onChange={(event) => {
+            const next = Number(event.currentTarget.value);
+            if (audioRef.current) audioRef.current.currentTime = next;
+            setCurrent(next);
+          }}
+        />
+        <div className="audio-waveform" aria-hidden="true">
+          {Array.from({ length: 32 }, (_, index) => <i key={index} style={{ height: `${[5,9,13,7,17,11,21,8,14,24,12,18,7,15,22,10,17,6,12,20,9,15,24,8,17,11,19,7,13,21,9,15][index]}px` }} />)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function VoiceMessage({ path }: { path: string }) {
   const supabase = createSupabaseBrowser();
   const [url, setUrl] = useState("");
@@ -23,7 +86,7 @@ export function VoiceMessage({ path }: { path: string }) {
 
   if (failed) return <span className="field-hint">Vocal indisponible.</span>;
   if (!url) return <span className="field-hint">Chargement du vocal…</span>;
-  return <audio controls preload="metadata" src={url} aria-label="Message vocal" style={{ display: "block", width: "min(100%, 340px)", marginTop: 6 }} />;
+  return <VoiceAudioPlayer src={url} />;
 }
 
 export function VoiceRecorder({
@@ -166,7 +229,7 @@ export function VoiceRecorder({
         </>
       ) : preview ? (
         <>
-          <audio controls src={preview} aria-label="Écouter le vocal avant envoi" style={{ width: "min(100%, 280px)" }} />
+          <VoiceAudioPlayer src={preview} label="Écouter le vocal avant envoi" />
           <button className="button primary" type="button" onClick={() => void sendVoice()} disabled={disabled || sending}>{sending ? "Envoi…" : "Envoyer le vocal"}</button>
           <button className="button" type="button" onClick={discardPreview} disabled={sending}>Annuler</button>
         </>
