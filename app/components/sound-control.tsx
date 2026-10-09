@@ -242,11 +242,10 @@ export default function SoundControl() {
     const timer = window.setInterval(() => {
       if (document.visibilityState === "visible") {
         const roll = Math.random();
-        if (roll < 0.52) play("ambient");
-        else if (roll < 0.7) play("static");
-        else if (roll < 0.84) play("military");
-        else if (roll < 0.93) play("arcade");
-        else play("crt");
+        if (roll < 0.45) play("static");
+        else if (roll < 0.7) play("military");
+        else if (roll < 0.88) play("crt");
+        else play("arcade");
       }
     }, 26000);
     return () => window.clearInterval(timer);
