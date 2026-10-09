@@ -18,7 +18,7 @@ export const STICKERS = [
   { key: "cat", label: "Chat", emoji: "😺" },
 ] as const;
 
-export type CustomSticker = { id: string; name: string; image_url: string; category: string };
+export type CustomSticker = { id: string; name: string; image_url: string; category: string; tags?: string[] };
 
 export function stickerToken(key: string) {
   return `[[sticker:${key}]]`;
@@ -76,8 +76,8 @@ export default function StickerPicker({ onPick }: { onPick: (token: string) => v
         <div className="sticker-panel" role="dialog" aria-label="Stickers PRYSM">
           <div className="sticker-panel-head"><strong>Stickers PRYSM</strong><span>{total} disponibles</span></div>
           <div className="sticker-grid">
-            {STICKERS.map(sticker => <button key={sticker.key} type="button" className="sticker-card" onClick={() => { onPick(stickerToken(sticker.key)); setOpen(false); }} title={sticker.label}><span>{sticker.emoji}</span><small>{sticker.label}</small></button>)}
-            {custom.map(sticker => <button key={sticker.id} type="button" className="sticker-card custom" onClick={() => { onPick(stickerToken(sticker.id)); setOpen(false); }} title={sticker.name}><img src={sticker.image_url} alt={sticker.name} /><small>{sticker.name}</small></button>)}
+            {!search.trim() && STICKERS.map(sticker => <button key={sticker.key} type="button" className="sticker-card" onClick={() => { onPick(stickerToken(sticker.key)); setOpen(false); }} title={sticker.label}><span>{sticker.emoji}</span><small>{sticker.label}</small></button>)}
+            {filtered.map(sticker => <button key={sticker.id} type="button" className="sticker-card custom" onClick={() => { onPick(stickerToken(sticker.id)); setOpen(false); }} title={sticker.name}><img src={sticker.image_url} alt={sticker.name} /><small>{sticker.name}</small></button>)}
           </div>
           <a className="sticker-create-link" href="/stickers">＋ Créer mon sticker</a>
         </div>
