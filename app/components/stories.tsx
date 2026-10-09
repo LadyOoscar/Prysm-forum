@@ -102,18 +102,7 @@ export default function Stories() {
       ctx.fillStyle = gradient; ctx.fillRect(0, 0, 1080, 1920);
       ctx.strokeStyle = "#ffffff28"; ctx.lineWidth = 2; ctx.strokeRect(42, 42, 996, 1836);
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      if (design.stickers.length) { ctx.font = "100px sans-serif"; ctx.fillText(design.stickers.join(" "), 540, 720, 950); }
-      if (design.text.trim()) {
-        ctx.fillStyle = design.textColor; ctx.font = "bold 74px " + JSON.stringify(design.font);
-        const words = design.text.split(/\s+/); const lines: string[] = []; let line = "";
-        for (const word of words) { const test = line ? line + " " + word : word; if (ctx.measureText(test).width > 900 && line) { lines.push(line); line = word; } else line = test; }
-        if (line) lines.push(line);
-        const y = design.position === "top" ? 320 : design.position === "bottom" ? 1450 : 960;
-        lines.slice(0, 8).forEach((l, i) => { ctx.shadowColor = design.textColor; ctx.shadowBlur = 22; ctx.fillText(l, 540, y + (i - (Math.min(lines.length, 8) - 1) / 2) * 92, 930); });
-        ctx.shadowBlur = 0;
-      }
-      if (design.musicTitle.trim()) { ctx.fillStyle = "#08091acc"; ctx.fillRect(75, 1650, 930, 150); ctx.fillStyle = "#45efff"; ctx.font = "bold 25px sans-serif"; ctx.textAlign = "left"; ctx.fillText("♫  EN ÉCOUTE", 110, 1690); ctx.fillStyle = "#fff"; ctx.font = "bold 38px sans-serif"; ctx.fillText(design.musicTitle.slice(0, 38), 110, 1740); ctx.fillStyle = "#c4b5fd"; ctx.font = "28px sans-serif"; ctx.fillText(design.musicArtist.slice(0, 48), 110, 1790); }
-      const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, "image/png", .95));
+      // Text, stickers and music are rendered as editable overlays in the story viewer.\n      const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, "image/png", .95));
       if (!blob) { setNotice("Impossible de générer l’image de la story."); setUploading(false); return; }
       fileToUpload = new File([blob], "prysm-story.png", { type: "image/png" });
     }
