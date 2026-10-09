@@ -49,24 +49,66 @@ export default function OrbitePage() {
   }, [supabase, loadMembers]);
 
   async function enable() {
-    setBusy(true); setMessage("");
-    if (!navigator.geolocation) { setMessage("La géolocalisation n’est pas prise en charge par ce navigateur."); setBusy(false); return; }
-    navigator.geolocation.getCurrentPosition(async pos => {
-      const { error } = await supabase.from("orbit_locations").upsert({
-        user_id: userId, latitude: pos.coords.latitude, longitude: pos.coords.longitude,
-        enabled: true, updated_at: new Date().toISOString(),
-      }, { onConflict: "user_id" });
-      if (error) setMessage("Impossible d’enregistrer la position. Vérifie les autorisations puis réessaie.");
-      else {
-        setEnabled(true);
-        await loadMembers();
-        setMessage("Orbite est activée. Ta position exacte reste privée.");
-      }
+    setBusy(true);
+    setMessage("");
+
+    if (!window.isSecureContext) {
+      setMessage("La géolocalisation exige une connexion HTTPS. Ouvre PRYSM directement dans Chrome à l’adresse https://prysm-clean.onrender.com/orbite.");
       setBusy(false);
-    }, err => {
-      setMessage(err.code === err.PERMISSION_DENIED ? "Autorise la géolocalisation dans ton navigateur pour activer Orbite." : "Position indisponible. Réessaie lorsque la géolocalisation fonctionne.");
+      return;
+    }
+    if (!navigator.geolocation) {
+      setMessage("Ce navigateur ne propose pas la géolocalisation. Ouvre PRYSM dans Chrome plutôt que dans un navigateur intégré.");
       setBusy(false);
-    }, { enableHighAccuracy: false, timeout: 12000, maximumAge: 300000 });
+      return;
+    }
+    if (!userId) {
+      setMessage("Ta session n’est pas encore prête. Actualise la page puis réessaie.");
+      setBusy(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const { error } = await supabase.from("orbit_locations").upsert({
+            user_id: userId,
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+            enabled: true,
+            updated_at: new Date().toISOString(),
+          }, { onConflict: "user_id" });
+
+          if (error) {
+            console.error("PRYSM Orbite: sauvegarde de position impossible", error);
+            setMessage(`Position obtenue, mais l’enregistrement a échoué : ${error.message}`);
+          } else {
+            setEnabled(true);
+            await loadMembers();
+            setMessage("Orbite est activée. Ta position exacte reste privée.");
+          }
+        } catch (error) {
+          console.error("PRYSM Orbite: erreur inattendue", error);
+          setMessage("La position a été obtenue, mais PRYSM n’a pas pu l’enregistrer. Vérifie ta connexion puis réessaie.");
+        } finally {
+          setBusy(false);
+        }
+      },
+      (err) => {
+        console.warn("PRYSM Orbite: géolocalisation refusée ou indisponible", { code: err.code, message: err.message });
+        if (err.code === err.PERMISSION_DENIED) {
+          setMessage("Autorisation refusée. Dans Chrome Android : appuie sur le cadenas à gauche de l’adresse → Autorisations → Position → Autoriser, puis recharge PRYSM.");
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          setMessage("Le téléphone n’arrive pas à déterminer ta position. Active la localisation Android, puis réessaie près d’une fenêtre ou en extérieur.");
+        } else if (err.code === err.TIMEOUT) {
+          setMessage("La recherche de position a expiré. Active la localisation Android et réessaie.");
+        } else {
+          setMessage(`Géolocalisation indisponible : ${err.message || "erreur inconnue"}`);
+        }
+        setBusy(false);
+      },
+      { enableHighAccuracy: false, timeout: 20000, maximumAge: 300000 }
+    );
   }
 
   async function disable() {
