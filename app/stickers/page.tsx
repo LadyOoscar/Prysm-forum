@@ -18,7 +18,7 @@ export default function StickersPage() {
         <Link className="back" href="/forum">← Forum</Link>
         <p className="eyebrow">Création communautaire</p>
         <h1>Créer un <span>sticker</span></h1>
-        <p className="lead">Crée un sticker visible par toute la communauté. Ajoute des tags pour que les autres puissent le retrouver dans le sélecteur de messages.</p>
+        <p className="lead">Crée un sticker visible par toute la communauté. Ajoute des tags pour que les autres puissent le retrouver dans le sélecteur de messages et dans la galerie commune.</p>
       </section>
       <StickerCreator />
     </main>
