@@ -1338,10 +1338,10 @@ footer:before {
 .story-preview-content.pos-top{justify-content:flex-start;padding-top:8%}.story-preview-content.pos-bottom{justify-content:flex-end;padding-bottom:8%}
 .story-preview-stickers{font-size:clamp(1.4rem,4vw,2.3rem);line-height:1.6;overflow-wrap:anywhere;filter:drop-shadow(0 3px 8px #0009)}
 .story-preview-text{max-width:100%;font-size:clamp(1rem,3vw,1.65rem);font-weight:700;line-height:1.2;white-space:pre-wrap;overflow-wrap:anywhere;text-shadow:0 2px 12px #000a,0 0 20px currentColor}
-.story-preview-music,.story-viewer-music{position:absolute;z-index:4;left:7%;right:7%;bottom:9%;display:grid;gap:3px;padding:10px 12px;border:1px solid #45efff7a;border-left:3px solid var(--pink);border-radius:4px;background:linear-gradient(115deg,#08091aeF,#171536ed);box-shadow:0 5px 20px #0006;backdrop-filter:blur(8px)}
-.story-preview-music span,.story-viewer-music>span{font:700 .52rem Rajdhani,sans-serif;letter-spacing:.13em;color:var(--cyan)}
-.story-preview-music strong,.story-viewer-music strong{font:700 .88rem "Space Grotesk",sans-serif;color:#fff;overflow-wrap:anywhere}
-.story-preview-music small,.story-viewer-music small{font-size:.65rem;color:#b5b9d6}
+.story-preview-music,.story-viewer-music{position:absolute;z-index:4;left:7%;right:7%;bottom:9%;display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid #45efff7a;border-left:3px solid var(--pink);border-radius:5px;background:linear-gradient(115deg,#08091af5,#171536ed);box-shadow:0 5px 20px #0006;backdrop-filter:blur(8px);min-width:0}
+.story-preview-music>span,.story-viewer-music>span{display:none}
+.story-preview-music strong,.story-viewer-music strong{font:700 .72rem "Space Grotesk",sans-serif;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.story-preview-music small,.story-viewer-music small{font-size:.58rem;color:#b5b9d6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .story-preview-brand{position:absolute;z-index:2;bottom:3%;left:7%;font:700 .5rem Rajdhani,sans-serif;letter-spacing:.15em;color:#ffffffa8}
 .story-editor-controls{display:grid;gap:13px;min-width:0}
 .story-editor-controls label{display:grid;gap:6px;color:#aeb5d7;font-size:.72rem;font-weight:700}
@@ -1369,7 +1369,7 @@ footer:before {
 .story-design-stickers{font-size:clamp(1.5rem,6vw,2.5rem);line-height:1.6;overflow-wrap:anywhere;filter:drop-shadow(0 3px 8px #0009)}
 .story-design-text{max-width:100%;font-size:clamp(1.15rem,4.4vw,2rem);font-weight:700;line-height:1.2;white-space:pre-wrap;overflow-wrap:anywhere;text-shadow:0 2px 12px #000b,0 0 20px currentColor}
 .story-viewer-music{bottom:9%;pointer-events:auto}
-.story-viewer-music a{margin-top:4px;color:var(--cyan);font:700 .7rem Rajdhani,sans-serif}
+.story-viewer-music a{margin-top:0;color:var(--cyan);font:700 .7rem Rajdhani,sans-serif}
 .story-viewer-caption{bottom:0;z-index:5}
 @media(max-width:650px){
  .story-editor{padding:12px}.story-editor-layout{grid-template-columns:minmax(0,1fr);gap:17px}
@@ -1381,10 +1381,10 @@ footer:before {
 
 
 /* Embedded music player inside PRYSM story cards */
-.story-viewer-music{max-height:38%;overflow-y:auto;gap:5px}
-.story-music-embed{display:block;width:100%;height:82px;margin-top:3px;border:1px solid #45efff55;border-radius:5px;background:#08091a;flex-shrink:0}
+.story-viewer-music{max-height:none;overflow:hidden;gap:8px}
+.story-music-link{display:flex;align-items:center;gap:8px;min-width:0;width:100%;color:inherit;text-decoration:none}.story-music-note{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;border-radius:4px;background:#45efff18;border:1px solid #45efff55;color:var(--cyan);font-size:1.15rem}.story-music-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:2px}.story-music-play{flex:0 0 auto;padding:5px 7px;border:1px solid #ff62c477;border-radius:3px;color:#ff91d9;font:700 .58rem Rajdhani,sans-serif;white-space:nowrap}
 .story-music-help{font-size:.64rem;font-weight:400;line-height:1.45;color:#777fa8}
 @media(max-width:650px){
- .story-viewer-music{left:4%;right:4%;bottom:7%;padding:8px 9px}
- .story-music-embed{height:76px}
+ .story-viewer-music{left:4%;right:4%;bottom:7%;padding:6px 8px}.story-music-note{flex-basis:26px;width:26px;height:26px}.story-music-play{font-size:.52rem;padding:4px 5px}
+
 }
