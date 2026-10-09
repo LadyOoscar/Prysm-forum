@@ -97,7 +97,7 @@ export default function Stories() {
 
   async function addStory() {
     setNotice("");
-    if (!selectedFile && !design.text.trim() && !design.stickers.length && !design.musicTitle.trim()) {
+    if (!selectedFile && !design.text.trim() && !design.stickers.length && !design.musicTitle.trim() && !design.musicArtist.trim() && !design.musicUrl.trim()) {
       setNotice("Ajoute une photo, une vidéo ou du texte pour créer ta story."); return;
     }
     if (selectedFile && !["image/jpeg", "image/png", "image/webp", "video/mp4", "video/webm"].includes(selectedFile.type)) {
@@ -189,7 +189,7 @@ export default function Stories() {
               {design.stickers.length > 0 && <div className="story-preview-stickers">{design.stickers.join(" ")}</div>}
               {design.text && <div className="story-preview-text" style={{ color: design.textColor, fontFamily: design.font }}>{design.text}</div>}
             </div>
-            {design.musicTitle && <div className="story-preview-music"><span>♫ EN ÉCOUTE</span><strong>{design.musicTitle}</strong><small>{design.musicArtist || "Artiste"}</small></div>}
+            {(design.musicTitle || design.musicArtist || design.musicUrl) && <div className="story-preview-music"><span>♫ EN ÉCOUTE</span><strong>{design.musicTitle || "Écouter le morceau"}</strong><small>{design.musicArtist || "YouTube / musique"}</small></div>}
             <span className="story-preview-brand">◆ PRYSM / STORY</span>
           </div>
           <div className="story-editor-controls">
@@ -225,7 +225,7 @@ export default function Stories() {
           {currentStory.design.stickers.length > 0 && <div className="story-design-stickers">{currentStory.design.stickers.join(" ")}</div>}
           {currentStory.design.text && <div className="story-design-text" style={{ color: currentStory.design.textColor, fontFamily: currentStory.design.font }}>{currentStory.design.text}</div>}
         </div>}
-        {currentStory.design?.musicTitle && <div className="story-viewer-music"><span>♫ CARTE MUSICALE{currentStory.design.musicUrl && musicEmbedUrl(currentStory.design.musicUrl) ? " · " + musicEmbedUrl(currentStory.design.musicUrl)!.provider.toUpperCase() : ""}</span><strong>{currentStory.design.musicTitle}</strong><small>{currentStory.design.musicArtist}</small>{currentStory.design.musicUrl && musicEmbedUrl(currentStory.design.musicUrl) ? <><iframe className="story-music-embed" src={musicEmbedUrl(currentStory.design.musicUrl)!.src} title={"Écouter " + currentStory.design.musicTitle} loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" /><a href={currentStory.design.musicUrl} target="_blank" rel="noopener noreferrer">Ouvrir sur {musicEmbedUrl(currentStory.design.musicUrl)!.provider} ↗</a></> : currentStory.design.musicUrl ? <a href={currentStory.design.musicUrl} target="_blank" rel="noopener noreferrer">Ouvrir sur la plateforme ↗</a> : <small>Ajoute un lien YouTube, Spotify ou SoundCloud pour écouter le morceau.</small>}</div>}
+        {currentStory.design && (currentStory.design.musicTitle || currentStory.design.musicArtist || currentStory.design.musicUrl) && <div className="story-viewer-music"><span>♫ CARTE MUSICALE{currentStory.design.musicUrl && musicEmbedUrl(currentStory.design.musicUrl) ? " · " + musicEmbedUrl(currentStory.design.musicUrl)!.provider.toUpperCase() : ""}</span><strong>{currentStory.design.musicTitle || "Écouter le morceau"}</strong><small>{currentStory.design.musicArtist || "YouTube / musique"}</small>{currentStory.design.musicUrl && musicEmbedUrl(currentStory.design.musicUrl) ? <><iframe className="story-music-embed" src={musicEmbedUrl(currentStory.design.musicUrl)!.src} title={"Écouter " + currentStory.design.musicTitle} loading="lazy" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" /><a href={currentStory.design.musicUrl} target="_blank" rel="noopener noreferrer">Ouvrir sur {musicEmbedUrl(currentStory.design.musicUrl)!.provider} ↗</a></> : currentStory.design.musicUrl ? <a href={currentStory.design.musicUrl} target="_blank" rel="noopener noreferrer">Ouvrir sur la plateforme ↗</a> : <small>Ajoute un lien YouTube, Spotify ou SoundCloud pour écouter le morceau.</small>}</div>}
         {currentStory.caption && <p className="story-viewer-caption">{currentStory.caption}</p>}
         <button className="story-nav story-prev" onClick={() => moveStory(-1)} aria-label="Story précédente">‹</button>
         <button className="story-nav story-next" onClick={() => moveStory(1)} aria-label="Story suivante">›</button>
