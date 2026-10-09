@@ -1,6 +1,9 @@
+import "./cosmic-eclipse.css";
+
 export default function CosmicOverlay() {
   return (
     <div className="cosmic-overlay" aria-hidden="true">
+      <span className="cosmic-eclipse-dim" />
       <span className="cosmic-comet" />
       <span className="cosmic-shooting cosmic-shooting-one" />
       <span className="cosmic-shooting cosmic-shooting-two" />
