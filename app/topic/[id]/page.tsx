@@ -17,9 +17,10 @@ export const revalidate = 10;
 
 type ForumPost = any;
 
-function ForumPostCard({ post, childrenByParent, badgesByProfile, topicLocked, depth = 0 }: {
+function ForumPostCard({ post, childrenByParent, postsById, badgesByProfile, topicLocked, depth = 0 }: {
   post: ForumPost;
   childrenByParent: Map<string, ForumPost[]>;
+  postsById: Map<string, ForumPost>;
   badgesByProfile: Map<string, any[]>;
   topicLocked: boolean;
   depth?: number;
@@ -27,6 +28,12 @@ function ForumPostCard({ post, childrenByParent, badgesByProfile, topicLocked, d
   const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles;
   const profileHref = "/membre/" + (profile?.username || "");
   const children = childrenByParent.get(post.id) ?? [];
+  const parent = post.parent_post_id ? postsById.get(post.parent_post_id) : null;
+  const parentProfile = parent ? (Array.isArray(parent.profiles) ? parent.profiles[0] : parent.profiles) : null;
+  const rawBody = typeof post.body === "string" ? post.body : "";
+  const legacyQuoteMatch = rawBody.match(/^(?:(?:> ?.*)(?:\\n|$))+\\s*\\n?/);
+  const legacyQuote = legacyQuoteMatch?.[0]?.trim();
+  const visibleBody = legacyQuote ? rawBody.slice(legacyQuoteMatch[0].length).trim() : rawBody;
   return (
     <div className="post-thread-node" style={depth ? { marginLeft: `clamp(0px, ${Math.min(depth, 4) * 1.25}rem, 5rem)`, borderLeft: "2px solid var(--line)", paddingLeft: "clamp(.5rem, 2vw, 1rem)", marginTop: ".85rem" } : undefined}>
       <article className="post" id={`post-${post.id}`}>
@@ -41,7 +48,9 @@ function ForumPostCard({ post, childrenByParent, badgesByProfile, topicLocked, d
         </aside>
         <div className="post-body">
           <time>{new Date(post.created_at).toLocaleString("fr-FR")}</time>
-          {typeof post.body === "string" && post.body.startsWith("voice:") ? <ForumVoice path={post.body.slice(6)} /> : <p><StickerText text={post.body} /></p>}
+          {parent && <aside className="post-quoted-context"><span className="post-quoted-label">↪ En réponse à {parentProfile?.display_name || parentProfile?.username || "un membre"}</span><p>{typeof parent.body === "string" && parent.body.startsWith("voice:") ? "Message vocal" : (parent.body || "").slice(0, 220) + ((parent.body || "").length > 220 ? "…" : "")}</p></aside>}
+          {legacyQuote && <aside className="post-quoted-context legacy-quote"><span className="post-quoted-label">Citation</span><p>{legacyQuote.split("\\n").map((line: string) => line.replace(/^> ?/, "")).join("\\n")}</p></aside>}
+          {typeof post.body === "string" && post.body.startsWith("voice:") ? <ForumVoice path={post.body.slice(6)} /> : visibleBody ? <p><StickerText text={visibleBody} /></p> : null}
           <Votes postId={post.id} />
           <Reactions postId={post.id} />
           <ReportButton postId={post.id} />
@@ -49,7 +58,7 @@ function ForumPostCard({ post, childrenByParent, badgesByProfile, topicLocked, d
           <ForumModerationActions postId={post.id} />
         </div>
       </article>
-      {children.length > 0 && <div className="post-thread-children">{children.map(child => <ForumPostCard key={child.id} post={child} childrenByParent={childrenByParent} badgesByProfile={badgesByProfile} topicLocked={topicLocked} depth={depth + 1} />)}</div>}
+      {children.length > 0 && <div className="post-thread-children">{children.map(child => <ForumPostCard key={child.id} post={child} childrenByParent={childrenByParent} postsById={postsById} badgesByProfile={badgesByProfile} topicLocked={topicLocked} depth={depth + 1} />)}</div>}
     </div>
   );
 }
@@ -73,6 +82,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
       childrenByParent.set(post.parent_post_id, children);
     }
   }
+  const postsById = new Map<string, ForumPost>((posts ?? []).map((post: ForumPost) => [post.id, post]));
   const category = Array.isArray(topic.forum_categories) ? topic.forum_categories[0] : topic.forum_categories;
   const rootPosts = (posts ?? []).filter((post: any) => !post.parent_post_id);
 
@@ -86,7 +96,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
         <>
           {poll?.id && <Poll pollId={poll.id} />}
           <section className="post-list">
-            {rootPosts.map((post: any) => <ForumPostCard key={post.id} post={post} childrenByParent={childrenByParent} badgesByProfile={badgesByProfile} topicLocked={topic.locked} />)}
+            {rootPosts.map((post: any) => <ForumPostCard key={post.id} post={post} childrenByParent={childrenByParent} postsById={postsById} badgesByProfile={badgesByProfile} topicLocked={topic.locked} />)}
           </section>
           <ReplyBox topicId={topic.id} locked={topic.locked} />
         </>
