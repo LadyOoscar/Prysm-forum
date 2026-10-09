@@ -9,6 +9,7 @@ type Sticker = {
   image_url: string;
   status: "pending" | "approved" | "rejected";
   category: string;
+  tags?: string[];
 };
 
 function fileInfo(file: File) {
@@ -29,6 +30,8 @@ export default function StickerCreator() {
   const [tagsText, setTagsText] = useState("");
   const [tagsText, setTagsText] = useState("");
   const [mine, setMine] = useState<Sticker[]>([]);
+  const [community, setCommunity] = useState<Sticker[]>([]);
+  const [gallerySearch, setGallerySearch] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [saving, setSaving] = useState(false);
@@ -40,7 +43,12 @@ export default function StickerCreator() {
     setMine((data ?? []) as Sticker[]);
   }
 
-  useEffect(() => { void loadMine(); }, []);
+  async function loadCommunity() {
+    const { data } = await supabase.from("stickers").select("id,name,image_url,status,category,tags").eq("status", "approved").order("created_at", { ascending: false }).limit(200);
+    setCommunity((data ?? []) as Sticker[]);
+  }
+
+  useEffect(() => { void loadMine(); void loadCommunity(); }, []);
 
   function chooseFile(e: ChangeEvent<HTMLInputElement>) {
     const next = e.target.files?.[0] ?? null;
@@ -110,6 +118,7 @@ export default function StickerCreator() {
       setPreview("");
       if (inputRef.current) inputRef.current.value = "";
       await loadMine();
+      await loadCommunity();
     } catch (err) {
       const detail =
         err instanceof Error
@@ -145,6 +154,12 @@ export default function StickerCreator() {
           {message && <div className="notice">{message}</div>}
           <button className="button primary" type="submit" disabled={saving}>{saving ? "Création…" : "Créer le sticker"}</button>
         </form>
+      </div>
+      <div className="sticker-community">
+        <div className="section-heading"><div><p className="eyebrow">Galerie commune</p><h2>Les stickers de la communauté</h2></div><span className="sticker-community-count">{community.length} stickers</span></div>
+        <input className="sticker-search sticker-gallery-search" value={gallerySearch} onChange={e => setGallerySearch(e.target.value)} placeholder="Rechercher par nom, catégorie ou #tag…" aria-label="Rechercher dans la galerie de stickers" />
+        <div className="sticker-mine-grid">{community.filter(sticker => !gallerySearch.trim() || [sticker.name, sticker.category, ...(sticker.tags ?? [])].join(" ").toLocaleLowerCase().includes(gallerySearch.trim().replace(/^#/, "").toLocaleLowerCase())).map(sticker => <article className="sticker-mine-card" key={sticker.id}><img src={sticker.image_url} alt={sticker.name} /><div><strong>{sticker.name}</strong><span className="sticker-status approved">Disponible</span></div>{(sticker.tags ?? []).length > 0 && <div className="sticker-tag-list">{(sticker.tags ?? []).map(tag => <span key={tag}>#{tag}</span>)}</div>}</article>)}</div>
+        {community.filter(sticker => !gallerySearch.trim() || [sticker.name, sticker.category, ...(sticker.tags ?? [])].join(" ").toLocaleLowerCase().includes(gallerySearch.trim().replace(/^#/, "").toLocaleLowerCase())).length === 0 && <div className="empty"><p>Aucun sticker ne correspond à cette recherche.</p></div>}
       </div>
       <div className="sticker-mine">
         <div className="section-heading"><div><p className="eyebrow">Mes créations</p><h2>Mes créations</h2></div></div>
