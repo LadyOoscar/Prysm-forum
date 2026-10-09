@@ -11,6 +11,7 @@ import ForumModerationActions from "../../components/forum-moderation-actions";
 import { getReputationTitle } from "../../../lib/reputation";
 import { StickerText } from "../../components/sticker-picker";
 import QuoteReplyButton from "./quote-reply-button";
+import { ForumVoice } from "./forum-voice";
 
 export const revalidate = 10;
 
@@ -40,7 +41,7 @@ function ForumPostCard({ post, childrenByParent, badgesByProfile, topicLocked, d
         </aside>
         <div className="post-body">
           <time>{new Date(post.created_at).toLocaleString("fr-FR")}</time>
-          <p><StickerText text={post.body} /></p>
+          {typeof post.body === "string" && post.body.startsWith("voice:") ? <ForumVoice path={post.body.slice(6)} /> : <p><StickerText text={post.body} /></p>}
           <Votes postId={post.id} />
           <Reactions postId={post.id} />
           <ReportButton postId={post.id} />
