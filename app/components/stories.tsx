@@ -117,12 +117,16 @@ export default function Stories() {
       canvas.width = 1080; canvas.height = 1920;
       const ctx = canvas.getContext("2d");
       if (!ctx) { setNotice("Impossible de créer cette story sur cet appareil."); setUploading(false); return; }
-      const gradient = ctx.createLinearGradient(0, 0, 1080, 1920);
-      if (design.background.includes("linear-gradient")) {
-        const colors = design.background.match(/#[0-9a-fA-F]{3,8}/g) || ["#151338", "#5b1e71", "#092f48"];
-        gradient.addColorStop(0, colors[0]); gradient.addColorStop(.52, colors[1] || colors[0]); gradient.addColorStop(1, colors[2] || colors[1] || colors[0]);
-      } else { gradient.addColorStop(0, "#4c1d95"); gradient.addColorStop(.5, "#111827"); gradient.addColorStop(1, "#020617"); }
-      ctx.fillStyle = gradient; ctx.fillRect(0, 0, 1080, 1920);
+      if (/^#[0-9a-fA-F]{6}$/.test(design.background)) {
+        ctx.fillStyle = design.background; ctx.fillRect(0, 0, 1080, 1920);
+      } else {
+        const gradient = ctx.createLinearGradient(0, 0, 1080, 1920);
+        if (design.background.includes("linear-gradient")) {
+          const colors = design.background.match(/#[0-9a-fA-F]{3,8}/g) || ["#151338", "#5b1e71", "#092f48"];
+          gradient.addColorStop(0, colors[0]); gradient.addColorStop(.52, colors[1] || colors[0]); gradient.addColorStop(1, colors[2] || colors[1] || colors[0]);
+        } else { gradient.addColorStop(0, "#4c1d95"); gradient.addColorStop(.5, "#111827"); gradient.addColorStop(1, "#020617"); }
+        ctx.fillStyle = gradient; ctx.fillRect(0, 0, 1080, 1920);
+      }
       ctx.strokeStyle = "#ffffff28"; ctx.lineWidth = 2; ctx.strokeRect(42, 42, 996, 1836);
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
       // Text, stickers and music are rendered as editable overlays in the story viewer.
@@ -206,6 +210,7 @@ export default function Stories() {
             <div className="story-control-grid"><label>Alignement<select value={design.textAlign || "center"} onChange={e => updateDesign("textAlign", e.target.value)}><option value="left">À gauche</option><option value="center">Centré</option><option value="right">À droite</option></select></label><label>Style du texte<select value={design.textBold === false ? "normal" : "bold"} onChange={e => updateDesign("textBold", e.target.value === "bold")}><option value="bold">Gras</option><option value="normal">Fin</option></select></label></div>
             <div className="story-style-toggles"><label><input type="checkbox" checked={!!design.textPlate} onChange={e => updateDesign("textPlate", e.target.checked)} /> Fond derrière le texte</label><label><input type="checkbox" checked={design.textShadow !== false} onChange={e => updateDesign("textShadow", e.target.checked)} /> Ombre lumineuse</label></div>
             <label>Ambiance du fond <div className="story-background-grid">{backgrounds.map(bg => <button type="button" key={bg.name} className={"story-background-swatch" + (design.background === bg.value ? " active" : "")} style={{ background: bg.value }} onClick={() => updateDesign("background", bg.value)}>{bg.name}</button>)}</div></label>
+            <label>Couleur unie personnalisée <div className="story-custom-background"><input type="color" aria-label="Choisir une couleur de fond" value={/^#[0-9a-fA-F]{6}$/.test(design.background) ? design.background : "#151338"} onChange={e => updateDesign("background", e.target.value)} /><span>{/^#[0-9a-fA-F]{6}$/.test(design.background) ? "Fond personnalisé actif" : "Choisis ta propre couleur"}</span><button type="button" onClick={() => updateDesign("background", backgrounds[0].value)}>Réinitialiser</button></div></label>
             <label>Filtre photo <select value={design.filter} onChange={e => updateDesign("filter", e.target.value)}><option value="none">Naturel</option><option value="vivid">Vibrant</option><option value="mono">Noir et blanc</option><option value="warm">Chaud</option><option value="dream">Rêve violet</option></select></label>
             <label>Stickers <div className="story-sticker-grid">{stickerChoices.map(sticker => <button type="button" key={sticker} className={design.stickers.includes(sticker) ? "active" : ""} onClick={() => updateDesign("stickers", design.stickers.includes(sticker) ? design.stickers.filter(s => s !== sticker) : [...design.stickers, sticker].slice(0, 8))}>{sticker}</button>)}</div></label>
             <div className="story-music-fields"><span className="story-field-title">♫ Carte musicale (facultatif)</span><label>Titre<input value={design.musicTitle} onChange={e => updateDesign("musicTitle", e.target.value.slice(0, 80))} placeholder="Titre du morceau" /></label><label>Artiste<input value={design.musicArtist} onChange={e => updateDesign("musicArtist", e.target.value.slice(0, 80))} placeholder="Nom de l’artiste" /></label><label>Lien d’écoute<input type="url" value={design.musicUrl} onChange={e => updateDesign("musicUrl", e.target.value.slice(0, 300))} placeholder="YouTube, Spotify ou SoundCloud" /><small className="story-music-help">Les liens compatibles affichent un lecteur intégré dans la story. Les autres restent ouvrables à l’extérieur.</small></label></div>
