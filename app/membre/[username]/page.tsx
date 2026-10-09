@@ -6,7 +6,7 @@ import DatingFavorite from "../../components/dating-favorite";
 import CompatibilityScore from "../../components/compatibility-score";
 import { getReputationTitle } from "../../../lib/reputation";
 
-export const revalidate = 30;
+export const revalidate = 0;
 
 type PublicProfile = {
   id:string;
