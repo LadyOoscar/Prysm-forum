@@ -340,3 +340,39 @@ input:focus,textarea:focus,select:focus{box-shadow:0 0 0 2px rgba(69,239,255,.1)
 @keyframes home-orbit-rotation{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.home-orbit-ring{animation:none!important}}
 @media(max-width:700px){.home-orbit{width:min(82vw,320px);margin:24px auto 0}.home-orbit-sun{width:58px;height:58px}}
+
+
+/* Community calendar on the homepage */
+.community-calendar{padding:70px 0 30px;border-top:1px solid var(--line)}
+.calendar-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;margin-bottom:28px}
+.calendar-heading h2{font-size:clamp(2.2rem,4vw,3.5rem)}
+.calendar-intro{max-width:650px;color:var(--muted);line-height:1.7;margin:15px 0 0}
+.calendar-layout{display:grid;grid-template-columns:minmax(280px,.85fr) minmax(0,1.15fr);gap:18px;align-items:start}
+.calendar-month,.calendar-events{border:1px solid var(--line);background:linear-gradient(180deg,rgba(20,24,63,.96),rgba(10,12,34,.96));border-radius:4px;padding:20px;min-width:0}
+.calendar-month-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:20px}
+.calendar-month-nav h3{margin:0;font-size:1.2rem;text-transform:capitalize}.calendar-month-nav h3 span{color:var(--muted);font-weight:500}
+.calendar-arrow{width:35px;height:35px;border:1px solid #42497d;border-radius:3px;background:#101433;color:var(--cyan);font-size:1.5rem;cursor:pointer}
+.calendar-arrow:hover{border-color:var(--cyan);background:#171d4b}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.calendar-weekday{text-align:center;color:#7e87b0;font:700 .7rem "Rajdhani",sans-serif;text-transform:uppercase;padding:6px 0}
+.calendar-day{position:relative;aspect-ratio:1;display:grid;place-items:center;min-width:0;padding:0;border:1px solid transparent;border-radius:3px;background:#101433;color:#cbd0e8;cursor:pointer}
+.calendar-day:hover{border-color:#737bb5;color:#fff}.calendar-day.blank{background:transparent;cursor:default}.calendar-day.today{border-color:var(--violet);color:#fff}.calendar-day.has-events{background:rgba(69,239,255,.11);border-color:rgba(69,239,255,.4);color:#fff}.calendar-day.selected{background:var(--cyan);border-color:var(--cyan);color:#07101c;font-weight:800}
+.calendar-day i,.calendar-legend i{width:5px;height:5px;border-radius:50%;background:var(--pink);position:absolute;bottom:5px;left:calc(50% - 2px);box-shadow:0 0 8px rgba(255,79,195,.6)}.calendar-day.selected i{background:#111535}
+.calendar-legend{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:.75rem;margin:17px 0 0}.calendar-legend i{position:static;display:inline-block;flex:none}
+.calendar-events-title{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:16px}.calendar-events-title .eyebrow{margin-bottom:6px}.calendar-events-title h3{font-size:1.25rem;text-transform:capitalize;margin:0}
+.calendar-muted{color:var(--muted);padding:20px 0}
+.calendar-empty{min-height:190px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:22px;border:1px dashed #42497d;background:rgba(9,11,31,.5)}.calendar-empty>span{font-size:1.6rem;color:var(--pink);margin-bottom:10px}.calendar-empty strong{color:#fff}.calendar-empty p{color:var(--muted);font-size:.9rem;line-height:1.6;margin:7px 0 0}
+.calendar-event-list{display:grid;gap:10px}.calendar-event{display:grid;grid-template-columns:40px minmax(0,1fr);gap:13px;padding:15px;border:1px solid #30365f;background:rgba(8,10,29,.65);border-left:2px solid var(--cyan);border-radius:3px}.event-type-mark{width:38px;height:38px;display:grid;place-items:center;border:1px solid #42497d;background:#151a43;color:var(--cyan);font-size:1.25rem}.event-type-mark.in_person{color:var(--pink);border-color:#70406d}
+.calendar-event-main{min-width:0}.calendar-event time{color:var(--gold);font:700 .75rem "Rajdhani",sans-serif;text-transform:capitalize;letter-spacing:.03em}.calendar-event h4{font-family:"Space Grotesk",sans-serif;font-size:1rem;margin:5px 0 7px;overflow-wrap:anywhere}.calendar-event-main>p{color:#aeb5d1;font-size:.86rem;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;margin:0 0 10px}
+.calendar-event-meta{display:flex;gap:7px;flex-wrap:wrap}.calendar-event-meta span{font-size:.68rem;color:#aeb5d1;border:1px solid #363d68;padding:4px 7px;border-radius:2px}
+.calendar-event-actions{display:flex;justify-content:flex-end;align-items:center;gap:10px;flex-wrap:wrap;margin-top:13px}.calendar-event-actions .button{font-size:.68rem;min-height:34px;padding:7px 10px}.calendar-event-actions .button:disabled{opacity:.45;cursor:not-allowed}
+.calendar-clear{border:0;background:transparent;color:var(--cyan);font-size:.75rem;cursor:pointer;padding:5px}.calendar-clear:hover{color:#fff}
+.calendar-privacy{color:#7f87aa;font-size:.74rem;line-height:1.6;margin:18px 0 0}
+.event-create-form{display:grid;gap:14px;margin:0 0 22px;padding:22px;border:1px solid #514b8d;background:linear-gradient(135deg,rgba(25,28,72,.98),rgba(13,15,41,.98));border-radius:4px}
+.event-create-form h3{font-size:1.25rem;margin:0 0 2px}.event-create-form label{display:grid;gap:7px;color:#c4c9e1;font-size:.8rem;font-weight:600}
+.event-create-form input,.event-create-form textarea,.event-create-form select{width:100%;min-width:0;border:1px solid #3b4274;border-radius:3px;background:#090c25;color:#f4f5ff;padding:11px 12px;outline:none}
+.event-create-form input:focus,.event-create-form textarea:focus,.event-create-form select:focus{border-color:var(--cyan);box-shadow:0 0 0 2px rgba(69,239,255,.1)}
+.event-create-form textarea{resize:vertical}.event-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.event-create-form .button{justify-self:start}
+.calendar-error{border:1px solid var(--danger);background:#35152b;color:#ffd8e7;padding:11px 14px;border-radius:3px;font-size:.85rem;margin:0 0 16px}
+@media(max-width:760px){.community-calendar{padding-top:48px}.calendar-heading{align-items:flex-start;flex-direction:column;gap:18px}.calendar-heading>.button{width:100%}.calendar-layout{grid-template-columns:1fr}.calendar-month,.calendar-events{padding:15px}.calendar-day{font-size:.85rem}.calendar-day i{bottom:4px}.event-form-grid{grid-template-columns:1fr}}
+@media(max-width:420px){.calendar-grid{gap:3px}.calendar-weekday{font-size:.62rem}.calendar-day{font-size:.76rem}.calendar-month,.calendar-events{padding:12px}.calendar-event{grid-template-columns:30px minmax(0,1fr);gap:9px;padding:11px}.event-type-mark{width:30px;height:30px}.calendar-event-actions{justify-content:flex-start}.calendar-event-actions .button{font-size:.62rem}}
