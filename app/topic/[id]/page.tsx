@@ -9,7 +9,7 @@ import Poll from "../poll";
 import FollowTopic from "../follow-topic";
 import ForumModerationActions from "../../components/forum-moderation-actions";
 import { getReputationTitle } from "../../../lib/reputation";
-import { StickerText } from "../../components/sticker-picker";
+import RichPostBody from "./rich-post-body";
 import QuoteReplyButton from "./quote-reply-button";
 import { ForumVoice } from "./forum-voice";
 
@@ -50,7 +50,7 @@ function ForumPostCard({ post, childrenByParent, postsById, badgesByProfile, top
           <time>{new Date(post.created_at).toLocaleString("fr-FR")}</time>
           {parent && <aside className="post-quoted-context"><span className="post-quoted-label">↪ En réponse à {parentProfile?.display_name || parentProfile?.username || "un membre"}</span><p>{typeof parent.body === "string" && parent.body.startsWith("voice:") ? "Message vocal" : (parent.body || "").slice(0, 220) + ((parent.body || "").length > 220 ? "…" : "")}</p></aside>}
           {legacyQuote && <aside className="post-quoted-context legacy-quote"><span className="post-quoted-label">Citation</span><p>{legacyQuote.split("\n").map((line: string) => line.replace(/^> ?/, "")).join("\n")}</p></aside>}
-          {typeof post.body === "string" && post.body.startsWith("voice:") ? <ForumVoice path={post.body.slice(6).split("|durationMs=")[0]} durationMs={Number(post.body.split("|durationMs=")[1]) || undefined} /> : visibleBody ? <p><StickerText text={visibleBody} /></p> : null}
+          {typeof post.body === "string" && post.body.startsWith("voice:") ? <ForumVoice path={post.body.slice(6).split("|durationMs=")[0]} durationMs={Number(post.body.split("|durationMs=")[1]) || undefined} /> : visibleBody ? <RichPostBody text={visibleBody} /> : null}
           <Votes postId={post.id} />
           <Reactions postId={post.id} />
           <ReportButton postId={post.id} />
