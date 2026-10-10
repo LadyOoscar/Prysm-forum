@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { createSupabaseBrowser } from "../../lib/supabase-browser";
 import ModerationSanction from "../components/moderation-sanction";
+import BadgeWorkshop from "./badge-workshop";
 
 type Report = {
   id: string;
@@ -158,5 +159,6 @@ export default function ModerationPage() {
         </article>;
       })}
     </section>
+    <BadgeWorkshop />
   </main>;
 }
