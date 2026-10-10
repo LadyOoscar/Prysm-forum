@@ -206,7 +206,7 @@ export default function BadgeWorkshop() {
 
   const visible = useMemo(() => badges.filter(b => (b.name + " " + b.slug + " " + b.description).toLocaleLowerCase("fr").includes(search.trim().toLocaleLowerCase("fr"))), [badges, search]);
 
-  if (allowed === null) return <section className="badge-workshop"><p>Vérification des droits…</p></section>;
+  if (allowed === null) return <section className="badge-workshop" id="badges"><p>Vérification des droits…</p></section>;
   if (!allowed) return <section className="badge-workshop"><h2>Atelier indisponible</h2><p>Réservé aux modérateurs et administrateurs.</p></section>;
 
   return <section className="badge-workshop">
