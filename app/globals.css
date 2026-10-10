@@ -2179,7 +2179,7 @@ footer:before {
 }
 
 
-/* Onche-inspired badge display: the badge itself is the medal, never a text capsule. */
+/* PRYSM badges: compact circular medals, icon only. */
 .profile-badge,
 .profile-badge-chip {
   position: relative;
@@ -2194,10 +2194,10 @@ footer:before {
   padding: 2px;
   gap: 0;
   overflow: hidden;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
+  border: 1px solid rgba(174, 199, 255, .62);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 22%, #536aa1 0%, #20294f 68%, #10152d 100%);
+  box-shadow: inset 0 1px 2px rgba(255,255,255,.2), 0 1px 3px rgba(0,0,0,.3);
   font-size: 0 !important;
   line-height: 0 !important;
   color: transparent;
@@ -2218,7 +2218,7 @@ footer:before {
   flex: 0 0 100%;
   padding: 0;
   border: 0;
-  border-radius: 0;
+  border-radius: 50%;
   background: transparent;
   box-shadow: none;
   object-fit: contain;
@@ -2233,7 +2233,7 @@ footer:before {
   height: 100%;
   min-width: 0;
   flex: 0 0 100%;
-  font-size: 1.25rem !important;
+  font-size: 1.2rem !important;
   line-height: 1;
   color: initial;
 }
@@ -2259,6 +2259,6 @@ footer:before {
   }
   .profile-badge > .badge-mark-emoji,
   .profile-badge-chip > .badge-mark-emoji {
-    font-size: 1.1rem !important;
+    font-size: 1.05rem !important;
   }
 }
