@@ -33,6 +33,74 @@ function messageOf(error: unknown) {
   return String(error || "Erreur inconnue");
 }
 
+async function prepareBadgePng(file: File): Promise<{ blob: Blob; method: string }> {
+  const bitmap = await createImageBitmap(file);
+  try {
+    const width = bitmap.width;
+    const height = bitmap.height;
+    const scan = document.createElement("canvas");
+    scan.width = width;
+    scan.height = height;
+    const scanContext = scan.getContext("2d", { willReadFrequently: true });
+    if (!scanContext) throw new Error("Impossible d’analyser cette image dans le navigateur.");
+    scanContext.drawImage(bitmap, 0, 0);
+    const pixels = scanContext.getImageData(0, 0, width, height).data;
+    let minX = width, minY = height, maxX = -1, maxY = -1;
+    let transparentPixels = 0;
+    const stride = Math.max(1, Math.floor(Math.max(width, height) / 900));
+    for (let y = 0; y < height; y += stride) {
+      for (let x = 0; x < width; x += stride) {
+        const alpha = pixels[(y * width + x) * 4 + 3];
+        if (alpha < 245) transparentPixels++;
+        if (alpha > 12) {
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+    let subject: { x: number; y: number; w: number; h: number } | null = null;
+    let method = "";
+    const hasTransparency = transparentPixels > (width * height) / (stride * stride) * 0.005;
+    if (hasTransparency && maxX >= minX && maxY >= minY) {
+      subject = { x: minX, y: minY, w: maxX - minX + 1, h: maxY - minY + 1 };
+      method = "marges transparentes retirées";
+    } else {
+      const Detector = (window as Window & { FaceDetector?: new (options?: { fastMode?: boolean; maxDetectedFaces?: number }) => { detect(source: CanvasImageSource): Promise<Array<{ boundingBox: DOMRectReadOnly }>> } }).FaceDetector;
+      if (Detector) {
+        try {
+          const faces = await new Detector({ fastMode: true, maxDetectedFaces: 5 }).detect(bitmap);
+          const face = faces.sort((a, b) => (b.boundingBox.width * b.boundingBox.height) - (a.boundingBox.width * a.boundingBox.height))[0]?.boundingBox;
+          if (face) {
+            subject = { x: face.x - face.width * 0.55, y: face.y - face.height * 0.8, w: face.width * 2.1, h: face.height * 2.6 };
+            method = "visage détecté automatiquement";
+          }
+        } catch { /* La détection de visage est expérimentale selon le navigateur. */ }
+      }
+    }
+    if (!subject) return { blob: file, method: "cadrage centré de secours" };
+
+    const side = Math.min(Math.max(subject.w, subject.h) * (method === "visage détecté automatiquement" ? 1.08 : 1.18), Math.max(width, height));
+    const centerX = subject.x + subject.w / 2;
+    const centerY = subject.y + subject.h / 2;
+    const sx = Math.max(0, Math.min(width - side, centerX - side / 2));
+    const sy = Math.max(0, Math.min(height - side, centerY - side / 2));
+    const cropSide = Math.max(1, Math.min(side, width - sx, height - sy));
+    const output = document.createElement("canvas");
+    const outputSize = Math.min(1400, Math.max(256, Math.round(cropSide)));
+    output.width = outputSize;
+    output.height = outputSize;
+    const context = output.getContext("2d");
+    if (!context) return { blob: file, method: "cadrage centré de secours" };
+    context.drawImage(bitmap, sx, sy, cropSide, cropSide, 0, 0, outputSize, outputSize);
+    const blob = await new Promise<Blob | null>(resolve => output.toBlob(resolve, "image/png"));
+    return blob ? { blob, method } : { blob: file, method: "cadrage centré de secours" };
+  } finally {
+    bitmap.close();
+  }
+}
+
 export default function BadgeWorkshop() {
   const supabase = createSupabaseBrowser();
   const [allowed, setAllowed] = useState<boolean | null>(null);
@@ -95,10 +163,12 @@ export default function BadgeWorkshop() {
     if (file.size === 0 || file.size > 5 * 1024 * 1024) { setNotice("Le PNG doit peser entre 1 octet et 5 Mo."); return; }
 
     setUploading(true);
-    setNotice("Vérification de la session…");
+    setNotice("Analyse du sujet et préparation du cadrage…");
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 20000);
     try {
+      const prepared = await prepareBadgePng(file);
+      if (prepared.blob.size === 0 || prepared.blob.size > 5 * 1024 * 1024) throw new Error("Le PNG après préparation dépasse la limite de 5 Mo.");
       const { data: { session }, error: authError } = await supabase.auth.getSession();
       if (authError) throw authError;
       if (!session?.access_token) throw new Error("Session expirée. Reconnecte-toi puis réessaie.");
@@ -112,7 +182,7 @@ export default function BadgeWorkshop() {
       const response = await fetch(base.replace(/\/$/, "") + "/storage/v1/object/prysm-badges/" + encoded, {
         method: "POST",
         headers: { apikey: key, Authorization: "Bearer " + session.access_token, "Content-Type": "image/png", "Cache-Control": "max-age=31536000", "x-upsert": "false" },
-        body: file,
+        body: prepared.blob,
         signal: controller.signal,
       });
       const raw = await response.text();
@@ -127,7 +197,7 @@ export default function BadgeWorkshop() {
       const { data } = supabase.storage.from("prysm-badges").getPublicUrl(path);
       setDraft(current => ({ ...current, icon: data.publicUrl }));
       setPreviewFailed(false);
-      setNotice("PNG reçu. Vérifie l’aperçu, puis enregistre le badge.");
+      setNotice("PNG reçu, " + prepared.method + ". Vérifie l’aperçu, puis enregistre le badge.");
     } catch (error) {
       setNotice(error instanceof DOMException && error.name === "AbortError" ? "Délai dépassé après 20 secondes. Envoi interrompu." : messageOf(error));
     } finally {
@@ -227,7 +297,7 @@ export default function BadgeWorkshop() {
         <label className="badge-workshop-wide">Description<textarea value={draft.description} maxLength={240} rows={2} onChange={e => setDraft(d => ({ ...d, description: e.target.value }))} placeholder="À quoi correspond ce badge ?" /></label>
         <label>Catégorie<select value={draft.tone} onChange={e => setDraft(d => ({ ...d, tone: e.target.value as Draft["tone"] }))}><option value="positive">Positif</option><option value="neutral">Neutre</option><option value="negative">Négatif</option></select></label>
         <label>Icône emoji<input value={/^https?:\/\//i.test(draft.icon) ? "" : draft.icon} maxLength={16} onChange={e => { setPreviewFailed(false); setDraft(d => ({ ...d, icon: e.target.value })); }} placeholder="🏷️" /></label>
-        <label className="badge-workshop-wide">Importer un PNG (5 Mo maximum)<input type="file" accept=".png,image/png" onChange={e => void uploadPng(e)} disabled={uploading} /><small>{uploading ? "Envoi en cours, attends la confirmation…" : "PNG transparent conseillé. L’image remplit le médaillon sans être étirée."}</small></label>
+        <label className="badge-workshop-wide">Importer un PNG (5 Mo maximum)<input type="file" accept=".png,image/png" onChange={e => void uploadPng(e)} disabled={uploading} /><small>{uploading ? "Envoi en cours, attends la confirmation…" : "Recadrage auto des marges transparentes et des visages si le navigateur le permet. Le cadrage reste ajustable."}</small></label>
         <label>Fond<input type="color" value={draft.background_color} onChange={e => setDraft(d => ({ ...d, background_color: e.target.value }))} /><div className="badge-workshop-colors">{colors.map(color => <button key={color} type="button" style={{ background: color }} aria-label={"Fond " + color} onClick={() => setDraft(d => ({ ...d, background_color: color }))} />)}</div></label>
         <label>Contour<input type="color" value={draft.border_color} onChange={e => setDraft(d => ({ ...d, border_color: e.target.value }))} /></label>
         <label>Épaisseur du contour · {draft.border_width}px<input type="range" min="0" max="8" value={draft.border_width} onChange={e => setDraft(d => ({ ...d, border_width: Number(e.target.value) }))} /></label>
