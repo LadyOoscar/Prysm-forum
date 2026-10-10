@@ -1,12 +1,12 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { createSupabaseBrowser } from "../../lib/supabase-browser";
 
 type Member = { id: string; username: string; display_name: string; avatar_url: string | null; distance_band: 1 | 2 | 3 | 4 };
 type Profile = { username: string; display_name: string; avatar_url: string | null };
 const rings = [
-  { id: 1, label: "0 à 5 km", name: "Proximité", color: "#b58cff", size: "42%", duration: "30s" },
+  { id: 1, label: "0 à 5 km", name: "Proximité", color: "#b58cff", size: "50%", duration: "30s" },
   { id: 2, label: "6 à 10 km", name: "Voisinage", color: "#66a5ff", size: "59%", duration: "38s" },
   { id: 3, label: "11 à 25 km", name: "Horizon local", color: "#52e0d0", size: "77%", duration: "46s" },
   { id: 4, label: "26 à 50 km", name: "Grand voisinage", color: "#f2c56b", size: "95%", duration: "56s" },
@@ -22,6 +22,22 @@ export default function OrbitePage() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [failedAvatars, setFailedAvatars] = useState<string[]>([]);
+  const orbitStageRef = useRef<HTMLDivElement | null>(null);
+  const [orbitStageWidth, setOrbitStageWidth] = useState(0);
+
+  useEffect(() => {
+    const stage = orbitStageRef.current;
+    if (!stage) return;
+    const measure = () => setOrbitStageWidth(stage.getBoundingClientRect().width);
+    measure();
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", measure);
+      return () => window.removeEventListener("resize", measure);
+    }
+    const observer = new ResizeObserver(measure);
+    observer.observe(stage);
+    return () => observer.disconnect();
+  }, []);
 
   const loadMembers = useCallback(async () => {
     const { data, error } = await supabase.rpc("get_orbit_members");
@@ -136,12 +152,12 @@ export default function OrbitePage() {
     </section>
     {message && <p className="orbit-message" role="status">{message}</p>}
     <section className="orbit-layout">
-      <div className="orbit-stage" aria-label="Carte orbitale des membres à proximité">
+      <div ref={orbitStageRef} className="orbit-stage" aria-label="Carte orbitale des membres à proximité">
         <div className="orbit-stars" />
         {rings.map(r => <div key={r.id} className="orbit-ring" style={{ "--orbit-size": r.size, "--orbit-color": r.color } as React.CSSProperties}><span>{r.label}</span></div>)}
         {grouped.map(r => r.members.map((m, i) => {
           const angle = (i * 360 / Math.max(1, r.members.length) + r.id * 29) % 360;
-          const style = { "--radius": `${Number(r.size.slice(0, -1)) / 2}cqw`, "--start-angle": `${angle}deg`, "--duration": r.duration } as React.CSSProperties;
+          const style = { "--radius": `${orbitStageWidth * Number(r.size.slice(0, -1)) / 200}px`, "--start-angle": `${angle}deg`, "--duration": r.duration } as React.CSSProperties;
           return <Link key={m.id} className="orbit-person" href={`/membre/${encodeURIComponent(m.username)}`} style={style} title={`${m.display_name || m.username} · ${r.label}`} aria-label={`Voir le profil de ${m.display_name || m.username}, ${r.label}`}>
             <span className="orbit-person-face">{m.avatar_url && !failedAvatars.includes(m.id) ? <img src={m.avatar_url} alt="" loading="eager" decoding="async" onError={() => setFailedAvatars(current => current.includes(m.id) ? current : [...current, m.id])} /> : (m.display_name || m.username).slice(0, 1).toUpperCase()}</span>
           </Link>;
