@@ -32,6 +32,7 @@ export default function BadgeManager() {
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [uploadingPng, setUploadingPng] = useState(false);
+  const [pngStatus, setPngStatus] = useState("");
   const [message, setMessage] = useState("");
   const [targetId, setTargetId] = useState<string | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -78,9 +79,9 @@ export default function BadgeManager() {
     const file = event.target.files?.[0]; event.target.value = "";
     if (!file) return;
     const isPng = file.type === "image/png" || (file.type === "" && file.name.toLowerCase().endsWith(".png"));
-    if (!isPng) { setMessage("Choisis une image PNG. Les photos JPEG/WebP ne sont pas acceptées pour les badges."); return; }
-    if (file.size > 5 * 1024 * 1024) { setMessage("Le PNG doit peser 5 Mo maximum."); return; }
-    setUploadingPng(true); setMessage("Envoi du PNG vers le stockage…");
+    if (!isPng) { setPngStatus("Choisis une image PNG. Les photos JPEG/WebP ne sont pas acceptées pour les badges."); return; }
+    if (file.size > 5 * 1024 * 1024) { setPngStatus("Le PNG doit peser 5 Mo maximum."); return; }
+    setUploadingPng(true); setPngStatus("Envoi du PNG vers le stockage…"); setMessage("");
     const base = makeSlug(draft.slug || draft.name || "badge") || "badge";
     const path = base + "/" + Date.now() + ".png";
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -95,7 +96,7 @@ export default function BadgeManager() {
       const { error } = uploadResult;
       if (error) {
         const details = error.message || "Erreur inconnue";
-        setMessage(details.includes("Payload too large") || details.toLowerCase().includes("size")
+        setPngStatus(details.includes("Payload too large") || details.toLowerCase().includes("size")
           ? "Le PNG dépasse la limite de 5 Mo."
           : details.toLowerCase().includes("row-level security") || details.toLowerCase().includes("permission")
             ? "Import refusé : ton compte doit avoir les droits modo/admin."
@@ -104,10 +105,10 @@ export default function BadgeManager() {
       }
       const { data } = supabase.storage.from("prysm-badges").getPublicUrl(path);
       setDraft(current => ({ ...current, icon: data.publicUrl }));
-      setMessage("PNG importé avec succès. Enregistre le badge pour conserver ce visuel.");
+      setPngStatus("PNG importé avec succès. Enregistre le badge pour conserver ce visuel.");
     } catch (error) {
       const details = error instanceof Error ? error.message : String(error);
-      setMessage(details === "TIMEOUT_UPLOAD"
+      setPngStatus(details === "TIMEOUT_UPLOAD"
         ? "L’envoi n’a pas confirmé sa réponse après 30 secondes. Vérifie ta connexion puis réessaie."
         : "L’import a échoué : " + details);
     } finally {
@@ -192,7 +193,7 @@ export default function BadgeManager() {
       <div className="badge-editor-grid">
         <label>Nom du badge<input value={draft.name} maxLength={40} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value, slug: d.slug ? d.slug : makeSlug(e.target.value) }))} placeholder="Ex. Pilier de la communauté" /></label>
         <label>Identifiant unique<input value={draft.slug} maxLength={48} onChange={(e) => setDraft((d) => ({ ...d, slug: makeSlug(e.target.value) }))} placeholder="pilier-communaute" /><small>Généré à partir du nom, modifiable.</small></label>
-        <label>Icône / emoji<input value={draft.icon.startsWith("http://") || draft.icon.startsWith("https://") ? "" : draft.icon} maxLength={16} onChange={(e) => setDraft((d) => ({ ...d, icon: e.target.value }))} placeholder="🏷️" /><small>PNG transparent accepté, jusqu’à 5 Mo.</small><input type="file" accept="image/png" onChange={(e) => void uploadBadgePng(e)} disabled={uploadingPng} aria-label="Importer une icône PNG" />{uploadingPng && <small>Import du PNG en cours…</small>}{(draft.icon.startsWith("http://") || draft.icon.startsWith("https://")) && <button className="badge-plain-action" type="button" onClick={() => setDraft((d) => ({ ...d, icon: "🏷️" }))}>Retirer le PNG</button>}</label>
+        <label>Icône / emoji<input value={draft.icon.startsWith("http://") || draft.icon.startsWith("https://") ? "" : draft.icon} maxLength={16} onChange={(e) => setDraft((d) => ({ ...d, icon: e.target.value }))} placeholder="🏷️" /><small>PNG transparent accepté, jusqu’à 5 Mo.</small><input type="file" accept="image/png" onChange={(e) => void uploadBadgePng(e)} disabled={uploadingPng} aria-label="Importer une icône PNG" />{uploadingPng && <small role="status">Import du PNG en cours… (30 s maximum)</small>}{pngStatus && <small role="status">{pngStatus}</small>}{(draft.icon.startsWith("http://") || draft.icon.startsWith("https://")) && <button className="badge-plain-action" type="button" onClick={() => setDraft((d) => ({ ...d, icon: "🏷️" }))}>Retirer le PNG</button>}</label>
         <label>Fond du badge<input type="color" value={draft.background_color} onChange={(e) => setDraft((d) => ({ ...d, background_color: e.target.value }))} /><div className="badge-color-palette">{badgeColors.map(color => <button key={color} type="button" className={draft.background_color.toLowerCase() === color.toLowerCase() ? "selected" : ""} style={{ backgroundColor: color }} aria-label={"Fond " + color} title={color} onClick={() => setDraft(d => ({ ...d, background_color: color }))} />)}</div><small>Le fond choisi s’applique à tous les affichages du badge.</small></label>
         <label>Catégorie<select value={draft.tone} onChange={(e) => setDraft((d) => ({ ...d, tone: e.target.value as Badge["tone"] }))}><option value="positive">Positif</option><option value="neutral">Neutre / communautaire</option><option value="negative">Négatif</option></select></label>
         <label>Couleur du contour<input type="color" value={draft.border_color} onChange={(e) => setDraft((d) => ({ ...d, border_color: e.target.value }))} /><small>Contour hexagonal propre à ce badge.</small></label>
