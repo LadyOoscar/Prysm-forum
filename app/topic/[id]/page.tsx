@@ -13,6 +13,7 @@ import RichPostBody from "./rich-post-body";
 import QuoteReplyButton from "./quote-reply-button";
 import { ForumVoice } from "./forum-voice";
 import BadgeMedal from "../../components/badge-medal";
+import BadgeAwardQuickAction from "../../components/badge-award-quick-action";
 
 export const revalidate = 10;
 
@@ -44,6 +45,7 @@ function ForumPostCard({ post, childrenByParent, postsById, badgesByProfile, top
             <span className={profile?.is_admin ? "role-name role-admin" : profile?.is_moderator ? "role-name role-moderator" : "role-name"}>{profile?.display_name || profile?.username || "Membre"}</span>
           </Link>
           <Link className="member-handle" href={profileHref}>@{profile?.username || "membre"}</Link>
+          {profile?.id && <BadgeAwardQuickAction profileId={profile.id} />}
           <span className="member-reputation"><strong>{profile?.reputation ?? 0}</strong> réputation · {getReputationTitle(profile?.reputation ?? 0)}</span>
           {(badgesByProfile.get(post.author_id) ?? []).length > 0 && <div className="member-badges">{(badgesByProfile.get(post.author_id) ?? []).map((badge: any, index: number) => <BadgeMedal key={badge?.id || badge?.name || index} badge={badge} size="small" />)}</div>}
           </aside>
