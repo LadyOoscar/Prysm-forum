@@ -12,6 +12,7 @@ import { getReputationTitle } from "../../../lib/reputation";
 import RichPostBody from "./rich-post-body";
 import QuoteReplyButton from "./quote-reply-button";
 import { ForumVoice } from "./forum-voice";
+import { getBadgeFrameStyle } from "../../../lib/badge-style";
 
 export const revalidate = 10;
 
@@ -44,7 +45,7 @@ function ForumPostCard({ post, childrenByParent, postsById, badgesByProfile, top
           </Link>
           <Link className="member-handle" href={profileHref}>@{profile?.username || "membre"}</Link>
           <span className="member-reputation"><strong>{profile?.reputation ?? 0}</strong> réputation · {getReputationTitle(profile?.reputation ?? 0)}</span>
-          <div className="member-badges">{(badgesByProfile.get(post.author_id) ?? []).map((badge: any) => <span className={badge?.tone === "negative" ? "profile-badge negative" : "profile-badge"} key={badge?.name} title={`${badge?.name || "Badge"}${badge?.description ? " · " + badge.description : ""}`} aria-label={badge?.name || "Badge"} style={{backgroundColor:badge?.border_color||"#45efff",boxShadow:badge?.glow_intensity?`0 0 ${(badge.glow_intensity/7).toFixed(1)}px ${(badge.border_color||"#45efff")}80`:"none","--badge-fill":badge?.background_color||"#171b43","--badge-border-width":`${badge?.border_width??2}px`,"--badge-zoom":(badge?.image_zoom??100)/100,"--badge-position-x":`${badge?.image_position_x??50}%`,"--badge-position-y":`${badge?.image_position_y??50}%`} as React.CSSProperties}>{badge?.icon?.startsWith("http")?<img className="badge-mark" src={badge.icon} alt="" />:<span className="badge-mark-emoji" aria-hidden="true">{badge?.icon||"🏷️"}</span>}</span>)}</div>
+          <div className="member-badges">{(badgesByProfile.get(post.author_id) ?? []).map((badge: any) => <span className={badge?.tone === "negative" ? "profile-badge negative" : "profile-badge"} key={badge?.name} title={`${badge?.name || "Badge"}${badge?.description ? " · " + badge.description : ""}`} aria-label={badge?.name || "Badge"} style={getBadgeFrameStyle(badge)}>{badge?.icon?.startsWith("http")?<img className="badge-mark" src={badge.icon} alt="" />:<span className="badge-mark-emoji" aria-hidden="true">{badge?.icon||"🏷️"}</span>}</span>)}</div>
         </aside>
         <div className="post-body">
           <time>{new Date(post.created_at).toLocaleString("fr-FR")}</time>
