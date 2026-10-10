@@ -80,15 +80,40 @@ export default function BadgeManager() {
     const isPng = file.type === "image/png" || (file.type === "" && file.name.toLowerCase().endsWith(".png"));
     if (!isPng) { setMessage("Choisis une image PNG. Les photos JPEG/WebP ne sont pas acceptées pour les badges."); return; }
     if (file.size > 5 * 1024 * 1024) { setMessage("Le PNG doit peser 5 Mo maximum."); return; }
-    setUploadingPng(true); setMessage("");
+    setUploadingPng(true); setMessage("Envoi du PNG vers le stockage…");
     const base = makeSlug(draft.slug || draft.name || "badge") || "badge";
     const path = base + "/" + Date.now() + ".png";
-    const { error } = await supabase.storage.from("prysm-badges").upload(path, file, { contentType: "image/png", upsert: false, cacheControl: "31536000" });
-    if (error) { setMessage(error.message.includes("Payload too large") || error.message.toLowerCase().includes("size") ? "Le PNG dépasse la limite de 5 Mo." : error.message.toLowerCase().includes("row-level security") || error.message.toLowerCase().includes("permission") ? "Import refusé : ton compte doit avoir les droits modo/admin." : "Échec de l’import PNG : " + error.message); setUploadingPng(false); return; }
-    const { data } = supabase.storage.from("prysm-badges").getPublicUrl(path);
-    setDraft(current => ({ ...current, icon: data.publicUrl }));
-    setMessage("PNG importé. Enregistre le badge pour conserver ce visuel.");
-    setUploadingPng(false);
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    try {
+      const uploadResult = await Promise.race([
+        supabase.storage.from("prysm-badges").upload(path, file, { contentType: "image/png", upsert: false, cacheControl: "31536000" }),
+        new Promise<never>((_, reject) => {
+          timeoutId = setTimeout(() => reject(new Error("TIMEOUT_UPLOAD")), 30000);
+        }),
+      ]);
+      if (timeoutId) clearTimeout(timeoutId);
+      const { error } = uploadResult;
+      if (error) {
+        const details = error.message || "Erreur inconnue";
+        setMessage(details.includes("Payload too large") || details.toLowerCase().includes("size")
+          ? "Le PNG dépasse la limite de 5 Mo."
+          : details.toLowerCase().includes("row-level security") || details.toLowerCase().includes("permission")
+            ? "Import refusé : ton compte doit avoir les droits modo/admin."
+            : "Échec de l’import PNG : " + details);
+        return;
+      }
+      const { data } = supabase.storage.from("prysm-badges").getPublicUrl(path);
+      setDraft(current => ({ ...current, icon: data.publicUrl }));
+      setMessage("PNG importé avec succès. Enregistre le badge pour conserver ce visuel.");
+    } catch (error) {
+      const details = error instanceof Error ? error.message : String(error);
+      setMessage(details === "TIMEOUT_UPLOAD"
+        ? "L’envoi n’a pas confirmé sa réponse après 30 secondes. Vérifie ta connexion puis réessaie."
+        : "L’import a échoué : " + details);
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId);
+      setUploadingPng(false);
+    }
   }
 
   async function saveBadge() {
