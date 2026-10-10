@@ -8,9 +8,9 @@ type Award = { profile_id: string; badge_id: string; reason: string; awarded_at:
 type BadgeDraft = { slug: string; name: string; description: string; icon: string; tone: Badge["tone"]; background_color: string; image_zoom: number; image_position_x: number; image_position_y: number; border_color: string; border_width: number; glow_intensity: number };
 const emptyDraft: BadgeDraft = { slug: "", name: "", description: "", icon: "🏷️", tone: "neutral", background_color: "#171b43", image_zoom: 100, image_position_x: 50, image_position_y: 50, border_color: "#45efff", border_width: 2, glow_intensity: 25 };
 const badgeColors = ["#171b43", "#182d4a", "#164e63", "#14532d", "#365314", "#713f12", "#7c2d12", "#7f1d1d", "#831843", "#581c87", "#3730a3", "#334155", "#f1f5f9", "#fef3c7"];
-function BadgeMark({ icon, label }: { icon: string; label: string }) {
+function BadgeMark({ icon, label, onImageError }: { icon: string; label: string; onImageError?: () => void }) {
   return icon.startsWith("https://") || icon.startsWith("http://")
-    ? <img className="badge-mark" src={icon} alt={label} />
+    ? <img className="badge-mark" src={icon} alt={label} onError={onImageError} />
     : <span className="badge-mark-emoji" aria-hidden="true">{icon || "🏷️"}</span>;
 }
 const toneLabels: Record<Badge["tone"], string> = { positive: "Positif", negative: "Négatif", neutral: "Neutre" };
@@ -187,7 +187,7 @@ export default function BadgeManager() {
     {isEditorOpen && <div className="badge-editor">
       <div className="section-heading"><div><p className="eyebrow">{editingId ? "Personnalisation" : "Nouveau badge"}</p><h3>{editingId ? "Modifier le badge" : "Créer un badge"}</h3></div><button className="badge-plain-action" type="button" onClick={() => setIsEditorOpen(false)}>Fermer ✕</button></div>
       <div className="badge-editor-preview">
-        <span className={"badge-preview-chip tone-" + draft.tone} style={badgeStyle(draft)}><BadgeMark icon={draft.icon} label={draft.name || "Badge"} /></span><strong className="badge-preview-name">{draft.name.trim() || "Nom du badge"}</strong>
+        <span className={"badge-preview-chip tone-" + draft.tone} style={badgeStyle(draft)}><BadgeMark icon={draft.icon} label={draft.name || "Badge"} onImageError={() => setPngStatus("Le PNG a été envoyé au stockage, mais son URL publique ne charge pas. Le visuel ne pourra pas s’afficher tant que l’accès à l’image n’est pas corrigé.")} /></span><strong className="badge-preview-name">{draft.name.trim() || "Nom du badge"}</strong>
         <small>Aperçu</small>
       </div>
       <div className="badge-editor-grid">
