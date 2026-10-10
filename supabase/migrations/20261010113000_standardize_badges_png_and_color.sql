@@ -10,7 +10,7 @@ alter table public.badges
   check (background_color ~ '^#[0-9A-Fa-f]{6}$');
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('prysm-badges', 'prysm-badges', true, 262144, array['image/png'])
+values ('prysm-badges', 'prysm-badges', true, 5242880, array['image/png'])
 on conflict (id) do update set
   public = excluded.public,
   file_size_limit = excluded.file_size_limit,
