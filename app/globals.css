@@ -2177,3 +2177,88 @@ footer:before {
     flex-basis: 27px;
   }
 }
+
+
+/* Onche-inspired badge display: the badge itself is the medal, never a text capsule. */
+.profile-badge,
+.profile-badge-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  max-width: 32px;
+  padding: 2px;
+  gap: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  color: transparent;
+  vertical-align: middle;
+  clip-path: none;
+}
+.profile-badge > img,
+.profile-badge-chip > img,
+.profile-badge > .badge-mark,
+.profile-badge-chip > .badge-mark {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+  flex: 0 0 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  object-fit: contain;
+  clip-path: none;
+  transform: none;
+}
+.profile-badge > .badge-mark-emoji,
+.profile-badge-chip > .badge-mark-emoji {
+  display: inline-grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  flex: 0 0 100%;
+  font-size: 1.25rem !important;
+  line-height: 1;
+  color: initial;
+}
+.profile-badge > :not(img):not(.badge-mark):not(.badge-mark-emoji),
+.profile-badge-chip > :not(img):not(.badge-mark):not(.badge-mark-emoji) {
+  display: none !important;
+}
+.profile-badge::before,
+.profile-badge-chip::before,
+.profile-badge::after,
+.profile-badge-chip::after {
+  content: none !important;
+}
+@media (max-width: 640px) {
+  .profile-badge,
+  .profile-badge-chip {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    max-width: 28px;
+    padding: 1px;
+  }
+  .profile-badge > .badge-mark-emoji,
+  .profile-badge-chip > .badge-mark-emoji {
+    font-size: 1.1rem !important;
+  }
+}
