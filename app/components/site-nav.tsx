@@ -64,7 +64,7 @@ export default function SiteNav() {
           filter: "user_id=eq." + userId,
         }, (payload) => {
           if (!active) return;
-          const item = payload.new as { id: string; type?: string; message?: string; topic_id?: string | null; actor_id?: string | null };
+          const item = payload.new as { id: string; type?: string; message?: string; topic_id?: string | null };
           setUnreadCount((current) => current + 1);
           setNotificationToast({
             id: item.id,
@@ -75,6 +75,17 @@ export default function SiteNav() {
           if (toastTimer.current !== null) window.clearTimeout(toastTimer.current);
           toastTimer.current = window.setTimeout(() => setNotificationToast(null), 6500);
           window.dispatchEvent(new CustomEvent("prysm:sound", { detail: { kind: "notification" } }));
+        })
+        .on("postgres_changes", {
+          event: "UPDATE",
+          schema: "public",
+          table: "notifications",
+          filter: "user_id=eq." + userId,
+        }, (payload) => {
+          if (!active) return;
+          const before = payload.old as { read_at?: string | null };
+          const after = payload.new as { read_at?: string | null };
+          if (!before.read_at && after.read_at) setUnreadCount((current) => Math.max(0, current - 1));
         })
         .subscribe();
     }
@@ -115,11 +126,13 @@ export default function SiteNav() {
         </nav>
       </header>
       {notificationToast && !pathname.startsWith("/notifications") && (
-        <Link className="prysm-notification-toast" href={notificationToast.topic_id ? "/topic/" + notificationToast.topic_id : notificationToast.type === "dating_match" || notificationToast.type === "match" ? "/rencontres/matchs" : notificationToast.type === "direct_message" || notificationToast.type === "message" ? "/messages" : "/notifications"} onClick={dismissToast} role="status" aria-live="polite">
+        <div className="prysm-notification-toast" role="status" aria-live="polite">
           <span className="prysm-notification-toast__signal" aria-hidden="true">✦</span>
-          <span className="prysm-notification-toast__copy"><strong>PRYSM // NOUVELLE ALERTE</strong><span>{notificationToast.message}</span><small>Toucher pour ouvrir</small></span>
-          <button type="button" className="prysm-notification-toast__close" aria-label="Fermer la notification" onClick={(event) => { event.preventDefault(); event.stopPropagation(); dismissToast(); }}>×</button>
-        </Link>
+          <Link className="prysm-notification-toast__copy" href={notificationToast.topic_id ? "/topic/" + notificationToast.topic_id : notificationToast.type === "dating_match" || notificationToast.type === "match" ? "/rencontres/matchs" : notificationToast.type === "direct_message" || notificationToast.type === "message" ? "/messages" : "/notifications"} onClick={dismissToast}>
+            <strong>PRYSM // NOUVELLE ALERTE</strong><span>{notificationToast.message}</span><small>Toucher pour ouvrir</small>
+          </Link>
+          <button type="button" className="prysm-notification-toast__close" aria-label="Fermer la notification" onClick={dismissToast}>×</button>
+        </div>
       )}
     </div>
   );
