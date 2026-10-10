@@ -141,7 +141,7 @@ export default function OrbitePage() {
         {rings.map(r => <div key={r.id} className="orbit-ring" style={{ "--orbit-size": r.size, "--orbit-color": r.color } as React.CSSProperties}><span>{r.label}</span></div>)}
         {grouped.map(r => r.members.map((m, i) => {
           const angle = (i * 360 / Math.max(1, r.members.length) + r.id * 29) % 360;
-          const style = { "--radius": `calc(var(--stage-size) * ${Number(r.size.slice(0, -1)) / 200})`, "--start-angle": `${angle}deg`, "--duration": r.duration } as React.CSSProperties;
+          const style = { "--radius": `${Number(r.size.slice(0, -1)) / 2}cqw`, "--start-angle": `${angle}deg`, "--duration": r.duration } as React.CSSProperties;
           return <Link key={m.id} className="orbit-person" href={`/membre/${encodeURIComponent(m.username)}`} style={style} title={`${m.display_name || m.username} · ${r.label}`} aria-label={`Voir le profil de ${m.display_name || m.username}, ${r.label}`}>
             <span className="orbit-person-face">{m.avatar_url && !failedAvatars.includes(m.id) ? <img src={m.avatar_url} alt="" loading="eager" decoding="async" onError={() => setFailedAvatars(current => current.includes(m.id) ? current : [...current, m.id])} /> : (m.display_name || m.username).slice(0, 1).toUpperCase()}</span>
           </Link>;
@@ -161,7 +161,7 @@ export default function OrbitePage() {
       .orbit-controls p{margin:4px 0 0;color:var(--muted);font-size:.8rem}
       .orbit-message{padding:11px 14px;margin:0 0 14px;border:1px solid #414878;color:#b9c5e8;background:#101433;font-size:.78rem}
       .orbit-layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:22px;align-items:center;padding-bottom:45px}
-      .orbit-stage{--stage-size:min(82vw,650px);position:relative;width:100%;max-width:650px;aspect-ratio:1;margin:auto;overflow:hidden;border:1px solid rgba(69,239,255,.16);border-radius:50%;background:radial-gradient(circle at 50% 50%,rgba(139,98,255,.15),transparent 35%),#080b20;box-shadow:inset 0 0 65px rgba(69,239,255,.07),0 0 38px rgba(139,98,255,.08)}
+      .orbit-stage{--stage-size:min(82vw,650px);container-type:size;position:relative;width:100%;max-width:650px;aspect-ratio:1;margin:auto;overflow:hidden;border:1px solid rgba(69,239,255,.16);border-radius:50%;background:radial-gradient(circle at 50% 50%,rgba(139,98,255,.15),transparent 35%),#080b20;box-shadow:inset 0 0 65px rgba(69,239,255,.07),0 0 38px rgba(139,98,255,.08)}
       .orbit-stars{position:absolute;inset:0;border-radius:50%;opacity:.48;background-image:radial-gradient(#bfcaff 1px,transparent 1.5px),radial-gradient(#5b6caa 1px,transparent 1.5px);background-size:47px 53px,71px 83px;background-position:4px 9px,22px 31px;pointer-events:none}
       .orbit-ring{position:absolute;left:50%;top:50%;width:var(--orbit-size);height:var(--orbit-size);transform:translate(-50%,-50%);border:1px solid color-mix(in srgb,var(--orbit-color),transparent 38%);border-radius:50%;box-shadow:0 0 14px color-mix(in srgb,var(--orbit-color),transparent 90%);pointer-events:none}
       .orbit-ring span{position:absolute;left:50%;top:0;transform:translate(-50%,-50%);padding:2px 7px;border:1px solid var(--orbit-color);border-radius:20px;background:#0b0d25;color:var(--orbit-color);font-size:.58rem;white-space:nowrap}
