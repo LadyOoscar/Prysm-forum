@@ -2317,3 +2317,44 @@ footer:before {
     font-size: .95rem !important;
   }
 }
+
+
+/* PRYSM custom collectible badges: full-bleed artwork with per-badge frame settings. */
+.profile-badge-item { display: inline-flex; flex-direction: column; align-items: center; gap: 5px; width: 54px; text-align: center; }
+.profile-badge-item > strong { max-width: 72px; overflow-wrap: anywhere; color: var(--text); font-size: .65rem; line-height: 1.15; }
+.profile-badge, .profile-badge-chip, .badge-preview-chip {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+  box-sizing: border-box; width: 36px; height: 40px; min-width: 36px; min-height: 40px;
+  max-width: none; padding: 0; gap: 0; overflow: hidden; border: 0; border-radius: 0;
+  clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0 50%);
+  background: var(--badge-border-color, #45efff); box-shadow: none;
+  font-size: 0 !important; line-height: 0 !important; color: transparent; vertical-align: middle;
+}
+.profile-badge > img, .profile-badge-chip > img, .badge-preview-chip > img,
+.profile-badge > .badge-mark, .profile-badge-chip > .badge-mark, .badge-preview-chip > .badge-mark {
+  position: absolute; inset: var(--badge-border-width, 2px); display: block;
+  width: auto; height: auto; min-width: 0; min-height: 0; max-width: none; max-height: none;
+  flex: none; padding: 0; border: 0; border-radius: 0; background: var(--badge-fill, #171b43);
+  box-shadow: none; object-fit: cover; object-position: var(--badge-position-x, 50%) var(--badge-position-y, 50%);
+  clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0 50%);
+  transform: scale(var(--badge-zoom, 1)); transform-origin: center;
+}
+.profile-badge > .badge-mark-emoji, .profile-badge-chip > .badge-mark-emoji, .badge-preview-chip > .badge-mark-emoji {
+  position: absolute; inset: var(--badge-border-width, 2px); display: grid; place-items: center;
+  width: auto; height: auto; min-width: 0; flex: none; overflow: hidden;
+  background: var(--badge-fill, #171b43); clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0 50%);
+  font-size: 1.05rem !important; line-height: 1; color: initial;
+}
+.badge-preview-chip { width: 64px; height: 72px; min-width: 64px; min-height: 72px; flex: 0 0 64px; }
+.badge-preview-chip > img, .badge-preview-chip > .badge-mark { transform: scale(var(--badge-zoom, 1)); }
+.badge-editor-preview { align-items: center; }
+.badge-preview-name { color: var(--text); font-size: .85rem; }
+.badge-library-card-top { align-items: center; }
+.badge-library-name { color: var(--text); font-size: .85rem; overflow-wrap: anywhere; }
+.badge-library-card .badge-preview-chip { width: 36px; height: 40px; min-width: 36px; min-height: 40px; flex-basis: 36px; }
+.profile-badge-chip.negative { background: var(--badge-border-color, #ff5b8d); }
+@media (max-width: 640px) {
+  .profile-badge, .profile-badge-chip { width: 30px; height: 34px; min-width: 30px; min-height: 34px; }
+  .profile-badge-item { width: 44px; }
+  .profile-badge-item > strong { font-size: .58rem; }
+}
