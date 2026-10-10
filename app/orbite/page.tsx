@@ -38,7 +38,7 @@ export default function OrbitePage() {
     const observer = new ResizeObserver(measure);
     observer.observe(stage);
     return () => observer.disconnect();
-  }, []);
+  }, [loading]);
 
   const loadMembers = useCallback(async () => {
     const demoMode = new URLSearchParams(window.location.search).get("testOrbit") === "1";
