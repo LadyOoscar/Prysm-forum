@@ -44,7 +44,7 @@ function ForumPostCard({ post, childrenByParent, postsById, badgesByProfile, top
           </Link>
           <Link className="member-handle" href={profileHref}>@{profile?.username || "membre"}</Link>
           <span className="member-reputation"><strong>{profile?.reputation ?? 0}</strong> réputation · {getReputationTitle(profile?.reputation ?? 0)}</span>
-          <div className="member-badges">{(badgesByProfile.get(post.author_id) ?? []).map((badge: any) => <span className={badge?.tone === "negative" ? "profile-badge negative" : "profile-badge"} key={badge?.name}>{badge?.icon} {badge?.name}</span>)}</div>
+          <div className="member-badges">{(badgesByProfile.get(post.author_id) ?? []).map((badge: any) => <span className={badge?.tone === "negative" ? "profile-badge negative" : "profile-badge"} key={badge?.name} style={{backgroundColor:badge?.background_color||"#171b43"}}>{badge?.icon?.startsWith("http")?<img className="badge-mark" src={badge.icon} alt="" />:badge?.icon} {badge?.name}</span>)}</div>
         </aside>
         <div className="post-body">
           <time>{new Date(post.created_at).toLocaleString("fr-FR")}</time>
@@ -71,7 +71,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
   const { data: posts, error } = await supabase.from("forum_posts").select("id, body, created_at, author_id, parent_post_id, profiles:author_id(username, display_name, avatar_url, reputation, is_admin, is_moderator)").eq("topic_id", id).order("created_at", { ascending: true });
   const { data: poll } = await supabase.from("forum_polls").select("id").eq("topic_id", id).maybeSingle();
   const authorIds = [...new Set((posts ?? []).map((post: any) => post.author_id).filter(Boolean))];
-  const { data: badgeRows } = authorIds.length ? await supabase.from("profile_badges").select("profile_id, badge_id, badges:badge_id(name, icon, tone)").in("profile_id", authorIds) : { data: [] };
+  const { data: badgeRows } = authorIds.length ? await supabase.from("profile_badges").select("profile_id, badge_id, badges:badge_id(name, icon, tone, background_color)").in("profile_id", authorIds) : { data: [] };
   const badgesByProfile = new Map<string, any[]>();
   for (const row of badgeRows ?? []) { const list = badgesByProfile.get(row.profile_id) ?? []; list.push(row.badges); badgesByProfile.set(row.profile_id, list); }
   const childrenByParent = new Map<string, ForumPost[]>();
