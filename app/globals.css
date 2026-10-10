@@ -1916,3 +1916,64 @@ footer:before {
 .badge-editor-grid input[type="file"]{padding:8px;font-size:.72rem}
 .badge-library-card .badge-preview-chip{min-height:34px}
 @media(max-width:640px){.profile-badge,.profile-badge-chip{min-height:30px;padding:4px 8px;gap:6px}.badge-mark{width:18px;height:18px;min-width:18px;flex-basis:18px}.badge-mark-emoji{width:18px;height:18px;min-width:18px;flex-basis:18px}}
+
+
+/* PRYSM collectible medal system: one silhouette across profiles, posts and the badge workshop. */
+.profile-badge,
+.profile-badge-chip,
+.badge-preview-chip {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+  min-height: 36px;
+  padding: 4px 11px 4px 5px;
+  border: 1px solid rgba(164, 181, 255, .55);
+  border-radius: 999px 9px 9px 999px;
+  line-height: 1.1;
+  white-space: nowrap;
+  max-width: 100%;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 2px 5px rgba(0,0,0,.22);
+  position: relative;
+}
+.profile-badge {
+  min-height: 32px;
+  padding: 3px 9px 3px 4px;
+  color: #f4f6ff;
+  font-size: .68rem;
+  letter-spacing: .025em;
+}
+.profile-badge.negative { border-color: #ff5b8d; color: #ffe0e9; }
+.profile-badge-chip { min-height: 38px; padding: 4px 12px 4px 5px; color: #eef2ff; font-size: .8rem; }
+.badge-preview-chip { min-height: 38px; padding: 4px 12px 4px 5px; border-radius: 999px 9px 9px 999px; }
+.badge-mark,
+.badge-mark-emoji,
+.profile-badge > img,
+.profile-badge-chip img,
+.badge-preview-chip img {
+  box-sizing: border-box;
+  display: inline-grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  min-width: 27px;
+  flex: 0 0 27px;
+  padding: 2px;
+  object-fit: contain;
+  vertical-align: middle;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.48);
+  background: radial-gradient(circle at 32% 25%, rgba(255,255,255,.32), rgba(255,255,255,.04) 58%, rgba(0,0,0,.2));
+  box-shadow: inset 0 1px 2px rgba(255,255,255,.18), 0 1px 3px rgba(0,0,0,.28);
+}
+.badge-mark-emoji { font-size: 1rem; line-height: 1; }
+.badge-preview-chip > span { font-size: inherit; }
+.badge-library-card .badge-preview-chip { min-height: 38px; }
+@media (max-width: 640px) {
+  .profile-badge { min-height: 30px; padding: 3px 8px 3px 4px; gap: 5px; }
+  .profile-badge-chip, .badge-preview-chip { min-height: 36px; padding-right: 9px; gap: 6px; }
+  .badge-mark, .badge-mark-emoji, .profile-badge > img, .profile-badge-chip img, .badge-preview-chip img {
+    width: 24px; height: 24px; min-width: 24px; flex-basis: 24px;
+  }
+}
