@@ -81,19 +81,35 @@ async function prepareBadgePng(file: File): Promise<{ blob: Blob; method: string
     }
     if (!subject) return { blob: file, method: "cadrage centré de secours" };
 
-    const side = Math.min(Math.max(subject.w, subject.h) * (method === "visage détecté automatiquement" ? 1.08 : 1.18), Math.max(width, height));
-    const centerX = subject.x + subject.w / 2;
-    const centerY = subject.y + subject.h / 2;
-    const sx = Math.max(0, Math.min(width - side, centerX - side / 2));
-    const sy = Math.max(0, Math.min(height - side, centerY - side / 2));
-    const cropSide = Math.max(1, Math.min(side, width - sx, height - sy));
     const output = document.createElement("canvas");
-    const outputSize = Math.min(1400, Math.max(256, Math.round(cropSide)));
+    const outputSize = 1000;
     output.width = outputSize;
     output.height = outputSize;
     const context = output.getContext("2d");
     if (!context) return { blob: file, method: "cadrage centré de secours" };
-    context.drawImage(bitmap, sx, sy, cropSide, cropSide, 0, 0, outputSize, outputSize);
+
+    let sx: number, sy: number, cropWidth: number, cropHeight: number;
+    if (method === "marges transparentes retirées") {
+      const padX = subject.w * 0.08;
+      const padY = subject.h * 0.08;
+      sx = Math.max(0, subject.x - padX);
+      sy = Math.max(0, subject.y - padY);
+      cropWidth = Math.min(width - sx, subject.w + padX * 2);
+      cropHeight = Math.min(height - sy, subject.h + padY * 2);
+      const scale = Math.min(outputSize * 0.88 / cropWidth, outputSize * 0.88 / cropHeight);
+      const drawWidth = cropWidth * scale;
+      const drawHeight = cropHeight * scale;
+      context.drawImage(bitmap, sx, sy, cropWidth, cropHeight, (outputSize - drawWidth) / 2, (outputSize - drawHeight) / 2, drawWidth, drawHeight);
+    } else {
+      const side = Math.min(Math.max(subject.w, subject.h) * 1.08, width, height);
+      const centerX = subject.x + subject.w / 2;
+      const centerY = subject.y + subject.h / 2;
+      sx = Math.max(0, Math.min(width - side, centerX - side / 2));
+      sy = Math.max(0, Math.min(height - side, centerY - side / 2));
+      cropWidth = Math.max(1, Math.min(side, width - sx, height - sy));
+      cropHeight = cropWidth;
+      context.drawImage(bitmap, sx, sy, cropWidth, cropHeight, 0, 0, outputSize, outputSize);
+    }
     const blob = await new Promise<Blob | null>(resolve => output.toBlob(resolve, "image/png"));
     return blob ? { blob, method } : { blob: file, method: "cadrage centré de secours" };
   } finally {
