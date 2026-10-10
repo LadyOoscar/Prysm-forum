@@ -5,6 +5,7 @@ import BlockButton from "./block-button";
 import DatingFavorite from "../../components/dating-favorite";
 import CompatibilityScore from "../../components/compatibility-score";
 import { getReputationTitle } from "../../../lib/reputation";
+import { getBadgeFrameStyle } from "../../../lib/badge-style";
 
 export const revalidate = 0;
 
