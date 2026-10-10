@@ -2032,3 +2032,31 @@ footer:before {
     font-size:1.35rem;
   }
 }
+
+
+/* Badge artwork auto-scales to use the full medal face without stretching. */
+.profile-badge > img,
+.profile-badge-chip img,
+.badge-preview-chip img,
+.badge-mark:not(.badge-mark-emoji) {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+  flex: 1 1 auto;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+  object-fit: contain;
+  object-position: center;
+}
+.profile-badge:has(> img),
+.profile-badge-chip:has(img) {
+  padding: 2px;
+}
