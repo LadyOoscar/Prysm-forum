@@ -42,6 +42,7 @@ export default function BadgeWorkshop() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [previewFailed, setPreviewFailed] = useState(false);
   const [notice, setNotice] = useState("");
   const [search, setSearch] = useState("");
   const [username, setUsername] = useState("");
@@ -73,6 +74,7 @@ export default function BadgeWorkshop() {
   function startCreate() {
     setEditingId(null);
     setDraft({ ...blank });
+    setPreviewFailed(false);
     setEditorOpen(true);
     setNotice("");
   }
@@ -80,6 +82,7 @@ export default function BadgeWorkshop() {
   function startEdit(badge: Badge) {
     setEditingId(badge.id);
     setDraft({ slug: badge.slug, name: badge.name, description: badge.description || "", icon: badge.icon || "🏷️", tone: badge.tone, background_color: badge.background_color || blank.background_color, image_zoom: badge.image_zoom ?? 100, image_position_x: badge.image_position_x ?? 50, image_position_y: badge.image_position_y ?? 50, border_color: badge.border_color || blank.border_color, border_width: badge.border_width ?? 2, glow_intensity: badge.glow_intensity ?? 25 });
+    setPreviewFailed(false);
     setEditorOpen(true);
     setNotice("");
   }
@@ -123,6 +126,7 @@ export default function BadgeWorkshop() {
       if (!raw || (!confirmation.Key && !confirmation.key && !confirmation.Id)) throw new Error("Réponse du stockage incomplète : le PNG n’a pas été confirmé.");
       const { data } = supabase.storage.from("prysm-badges").getPublicUrl(path);
       setDraft(current => ({ ...current, icon: data.publicUrl }));
+      setPreviewFailed(false);
       setNotice("PNG reçu. Vérifie l’aperçu, puis enregistre le badge.");
     } catch (error) {
       setNotice(error instanceof DOMException && error.name === "AbortError" ? "Délai dépassé après 20 secondes. Envoi interrompu." : messageOf(error));
@@ -153,8 +157,9 @@ export default function BadgeWorkshop() {
     if (!window.confirm("Supprimer le badge « " + badge.name + " » ? Les attributions existantes peuvent empêcher sa suppression.")) return;
     setBusy(true); setNotice("");
     try {
-      const { error } = await supabase.from("badges").delete().eq("id", badge.id);
+      const { data, error } = await supabase.from("badges").delete().eq("id", badge.id).select("id");
       if (error) throw error;
+      if (!data?.length) throw new Error("Supabase n’a confirmé aucune suppression.");
       setBadges(current => current.filter(item => item.id !== badge.id));
       setNotice("Badge supprimé.");
     } catch (error) { setNotice("Suppression impossible : " + messageOf(error)); }
@@ -196,8 +201,9 @@ export default function BadgeWorkshop() {
     if (!targetId || !window.confirm("Retirer ce badge à ce membre ?")) return;
     setBusy(true); setNotice("");
     try {
-      const { error } = await supabase.from("profile_badges").delete().eq("profile_id", targetId).eq("badge_id", badgeId);
+      const { data, error } = await supabase.from("profile_badges").delete().eq("profile_id", targetId).eq("badge_id", badgeId).select("badge_id");
       if (error) throw error;
+      if (!data?.length) throw new Error("Supabase n’a confirmé aucun retrait.");
       await loadMember();
       setNotice("Attribution retirée.");
     } catch (error) { setNotice("Retrait impossible : " + messageOf(error)); }
@@ -214,13 +220,13 @@ export default function BadgeWorkshop() {
     {notice && <p className="badge-workshop-notice" role="status">{notice}</p>}
     {editorOpen && <section className="badge-workshop-editor">
       <header className="badge-workshop-subhead"><div><h3>{editingId ? "Modifier l’insigne" : "Nouvel insigne"}</h3><p>Le visuel est prévisualisé dans sa forme finale.</p></div><button className="button" type="button" onClick={() => { setEditorOpen(false); setDraft({ ...blank }); }}>Fermer</button></header>
-      <div className="badge-workshop-preview"><BadgeMedal badge={{ ...draft, name: draft.name || "Aperçu" }} size="large" onImageError={() => setNotice("Le PNG est enregistré, mais son URL publique ne charge pas. Le badge n’est pas prêt à être enregistré.")} /><div><strong>{draft.name || "Nom du badge"}</strong><p>{draft.description || "Description du badge"}</p><span className={"badge-workshop-tone " + draft.tone}>{draft.tone === "positive" ? "Positif" : draft.tone === "negative" ? "Négatif" : "Neutre"}</span></div></div>
+      <div className="badge-workshop-preview"><BadgeMedal badge={{ ...draft, name: draft.name || "Aperçu" }} size="large" onImageError={() => { setPreviewFailed(true); setNotice("Le PNG est enregistré, mais son URL publique ne charge pas. Corrige l’accès à l’image avant d’enregistrer le badge."); }} /><div><strong>{draft.name || "Nom du badge"}</strong><p>{draft.description || "Description du badge"}</p><span className={"badge-workshop-tone " + draft.tone}>{draft.tone === "positive" ? "Positif" : draft.tone === "negative" ? "Négatif" : "Neutre"}</span></div></div>
       <div className="badge-workshop-fields">
         <label>Nom<input value={draft.name} maxLength={40} onChange={e => setDraft(d => ({ ...d, name: e.target.value, slug: d.slug || slugify(e.target.value) }))} placeholder="Ex. Pilier de la communauté" /></label>
         <label>Identifiant<input value={draft.slug} maxLength={48} onChange={e => setDraft(d => ({ ...d, slug: slugify(e.target.value) }))} placeholder="pilier-communaute" /></label>
         <label className="badge-workshop-wide">Description<textarea value={draft.description} maxLength={240} rows={2} onChange={e => setDraft(d => ({ ...d, description: e.target.value }))} placeholder="À quoi correspond ce badge ?" /></label>
         <label>Catégorie<select value={draft.tone} onChange={e => setDraft(d => ({ ...d, tone: e.target.value as Draft["tone"] }))}><option value="positive">Positif</option><option value="neutral">Neutre</option><option value="negative">Négatif</option></select></label>
-        <label>Icône emoji<input value={/^https?:\/\//i.test(draft.icon) ? "" : draft.icon} maxLength={16} onChange={e => setDraft(d => ({ ...d, icon: e.target.value }))} placeholder="🏷️" /></label>
+        <label>Icône emoji<input value={/^https?:\/\//i.test(draft.icon) ? "" : draft.icon} maxLength={16} onChange={e => { setPreviewFailed(false); setDraft(d => ({ ...d, icon: e.target.value })); }} placeholder="🏷️" /></label>
         <label className="badge-workshop-wide">Importer un PNG (5 Mo maximum)<input type="file" accept=".png,image/png" onChange={e => void uploadPng(e)} disabled={uploading} /><small>{uploading ? "Envoi en cours, attends la confirmation…" : "PNG transparent conseillé. L’image remplit le médaillon sans être étirée."}</small></label>
         <label>Fond<input type="color" value={draft.background_color} onChange={e => setDraft(d => ({ ...d, background_color: e.target.value }))} /><div className="badge-workshop-colors">{colors.map(color => <button key={color} type="button" style={{ background: color }} aria-label={"Fond " + color} onClick={() => setDraft(d => ({ ...d, background_color: color }))} />)}</div></label>
         <label>Contour<input type="color" value={draft.border_color} onChange={e => setDraft(d => ({ ...d, border_color: e.target.value }))} /></label>
@@ -230,7 +236,7 @@ export default function BadgeWorkshop() {
         <label>Position horizontale · {draft.image_position_x}%<input type="range" min="0" max="100" value={draft.image_position_x} onChange={e => setDraft(d => ({ ...d, image_position_x: Number(e.target.value) }))} /></label>
         <label>Position verticale · {draft.image_position_y}%<input type="range" min="0" max="100" value={draft.image_position_y} onChange={e => setDraft(d => ({ ...d, image_position_y: Number(e.target.value) }))} /></label>
       </div>
-      <footer className="badge-workshop-actions"><button className="button primary" type="button" disabled={busy || uploading} onClick={() => void saveBadge()}>{busy ? "Enregistrement…" : editingId ? "Enregistrer" : "Créer le badge"}</button><button className="button" type="button" disabled={busy || uploading} onClick={() => { setEditorOpen(false); setDraft({ ...blank }); }}>Annuler</button></footer>
+      <footer className="badge-workshop-actions"><button className="button primary" type="button" disabled={busy || uploading || previewFailed} onClick={() => void saveBadge()}>{busy ? "Enregistrement…" : editingId ? "Enregistrer" : "Créer le badge"}</button><button className="button" type="button" disabled={busy || uploading} onClick={() => { setEditorOpen(false); setDraft({ ...blank }); }}>Annuler</button></footer>
     </section>}
     <div className="badge-workshop-toolbar"><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher un badge…" aria-label="Rechercher un badge" /><span>{visible.length} badge(s)</span></div>
     <div className="badge-workshop-library">{visible.map(badge => <article className="badge-workshop-card" key={badge.id}><BadgeMedal badge={badge} size="medium" /><div className="badge-workshop-card-copy"><strong>{badge.name}</strong><small>{badge.slug}</small><p>{badge.description || "Aucune description."}</p><span className={"badge-workshop-tone " + badge.tone}>{badge.tone === "positive" ? "Positif" : badge.tone === "negative" ? "Négatif" : "Neutre"}</span></div><div className="badge-workshop-card-actions"><button type="button" onClick={() => startEdit(badge)}>Modifier</button><button type="button" className="danger" disabled={busy} onClick={() => void deleteBadge(badge)}>Supprimer</button></div></article>)}</div>
