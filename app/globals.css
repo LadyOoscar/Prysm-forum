@@ -1920,12 +1920,12 @@ footer:before {
 .profile-badge-item strong{max-width:70px;color:var(--text);font-size:.63rem;line-height:1.15;overflow-wrap:anywhere}
 .profile-badge-empty{margin:12px 0 0;color:var(--muted);font-size:.82rem}
 @media(max-width:680px){
- .post{grid-template-columns:96px minmax(0,1fr)}
- .post-author{padding:10px 5px}
- .post-author-identity{gap:4px;flex-direction:column}
- .post-author .avatar{width:36px;height:36px}
- .post-author-badges{max-width:100%;justify-content:center}
- .post-author-display-name{font-size:.75rem}
+ .post{grid-template-columns:minmax(0,1fr)}
+ .post-author{padding:8px 10px;gap:4px;border-right:0;border-bottom:1px solid var(--line)}
+ .post-author-identity{gap:5px;flex-direction:row}
+ .post-author .avatar{width:34px;height:34px}
+ .post-author-badges{max-width:72px;justify-content:center}
+ .post-author-display-name{font-size:.76rem}
  .post-author .member-reputation{font-size:.62rem}
  .post-author .badge-quick-action>button{font-size:.6rem;padding:4px 5px}
 
