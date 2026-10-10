@@ -1977,3 +1977,58 @@ footer:before {
     width: 24px; height: 24px; min-width: 24px; flex-basis: 24px;
   }
 }
+
+
+/* PRYSM badges: larger collectible medals, icons only for a cleaner interface. */
+.profile-badges,.member-badges,.public-badges,.profile-badge-shelf {
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.profile-badge,.profile-badge-chip {
+  box-sizing:border-box;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:48px;
+  height:48px;
+  min-width:48px;
+  min-height:48px;
+  padding:3px;
+  gap:0;
+  overflow:hidden;
+  border-radius:50%;
+  font-size:0;
+  line-height:0;
+  white-space:normal;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 3px 8px rgba(0,0,0,.3);
+}
+.profile-badge-chip strong { display:none; }
+.profile-badge > img,.profile-badge-chip img,.badge-mark,.badge-mark-emoji {
+  width:40px;
+  height:40px;
+  min-width:40px;
+  flex:0 0 40px;
+  padding:2px;
+  font-size:1.5rem;
+  line-height:1;
+  border-radius:50%;
+  object-fit:contain;
+}
+@media(max-width:640px) {
+  .profile-badge,.profile-badge-chip {
+    width:44px;
+    height:44px;
+    min-width:44px;
+    min-height:44px;
+    padding:2px;
+  }
+  .profile-badge > img,.profile-badge-chip img,.badge-mark,.badge-mark-emoji {
+    width:37px;
+    height:37px;
+    min-width:37px;
+    flex-basis:37px;
+    font-size:1.35rem;
+  }
+}
