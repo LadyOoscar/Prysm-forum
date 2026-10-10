@@ -29,6 +29,9 @@ function ForumPostCard({ post, childrenByParent, postsById, badgesByProfile, top
 }) {
   const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles;
   const profileHref = "/membre/" + (profile?.username || "");
+  const authorBadges = badgesByProfile.get(post.author_id) ?? [];
+  const visibleAuthorBadges = authorBadges.slice(0, 2);
+  const hiddenAuthorBadgeCount = Math.max(0, authorBadges.length - visibleAuthorBadges.length);
   const children = childrenByParent.get(post.id) ?? [];
   const parent = post.parent_post_id ? postsById.get(post.parent_post_id) : null;
   const parentProfile = parent ? (Array.isArray(parent.profiles) ? parent.profiles[0] : parent.profiles) : null;
@@ -37,14 +40,14 @@ function ForumPostCard({ post, childrenByParent, postsById, badgesByProfile, top
   const legacyQuote = legacyQuoteMatch?.[0]?.trim();
   const visibleBody = legacyQuote ? rawBody.slice(legacyQuoteMatch[0].length).trim() : rawBody;
   return (
-    <div className="post-thread-node" style={depth ? { marginLeft: `clamp(0px, ${Math.min(depth, 4) * 1.25}rem, 5rem)`, borderLeft: "2px solid var(--line)", paddingLeft: "clamp(.5rem, 2vw, 1rem)", marginTop: ".85rem" } : undefined}>
+    <div className={"post-thread-node" + (depth ? ` is-nested thread-depth-${Math.min(depth, 4)}` : "")} style={depth ? { borderLeft: "2px solid var(--line)", paddingLeft: "clamp(.35rem, 1vw, .7rem)", marginTop: ".65rem" } : undefined}>
       <article className="post" id={`post-${post.id}`}>
         <aside className="post-author">
           <div className="post-author-identity">
             <Link className="post-author-avatar-link" href={profileHref} aria-label={"Profil de " + (profile?.display_name || "Membre")}>
               <div className="avatar">{profile?.avatar_url ? <img src={profile.avatar_url} alt={"Avatar de " + (profile.display_name || "membre")} /> : (profile?.display_name || "M").slice(0, 1).toUpperCase()}</div>
             </Link>
-            {(badgesByProfile.get(post.author_id) ?? []).length > 0 && <div className="member-badges post-author-badges">{(badgesByProfile.get(post.author_id) ?? []).map((badge: any, index: number) => <BadgeMedal key={badge?.id || badge?.name || index} badge={badge} size="small" />)}</div>}
+            {authorBadges.length > 0 && <div className="member-badges post-author-badges">{visibleAuthorBadges.map((badge: any, index: number) => <BadgeMedal key={badge?.id || badge?.name || index} badge={badge} size="small" />)}{hiddenAuthorBadgeCount > 0 && <span className="post-author-badge-overflow" title={authorBadges.slice(2).map((badge: any) => badge.name).join(", ")}>+{hiddenAuthorBadgeCount}</span>}</div>}
           </div>
           <Link className={"post-author-display-name " + (profile?.is_admin ? "role-name role-admin" : profile?.is_moderator ? "role-name role-moderator" : "role-name")} href={profileHref}>{profile?.display_name?.trim() || "Membre"}</Link>
           <span className="member-reputation"><strong>{profile?.reputation ?? 0}</strong> réputation · {getReputationTitle(profile?.reputation ?? 0)}</span>
