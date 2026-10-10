@@ -59,10 +59,14 @@ function ForumPostCard({ post, childrenByParent, postsById, badgesByProfile, top
           {legacyQuote && <aside className="post-quoted-context legacy-quote"><span className="post-quoted-label">Citation</span><p>{legacyQuote.split("\n").map((line: string) => line.replace(/^> ?/, "")).join("\n")}</p></aside>}
           {typeof post.body === "string" && post.body.startsWith("voice:") ? <ForumVoice path={post.body.slice(6).split("|durationMs=")[0]} durationMs={Number(post.body.split("|durationMs=")[1]) || undefined} /> : visibleBody ? <RichPostBody text={visibleBody} /> : null}
           <Votes postId={post.id} />
-          <Reactions postId={post.id} />
-          <ReportButton postId={post.id} />
-          {!topicLocked && <QuoteReplyButton postId={post.id} body={post.body} author={profile?.display_name || profile?.username || "Membre"} />}
-          <ForumModerationActions postId={post.id} />
+          <div className="post-interactions">
+            <Reactions postId={post.id} />
+            <div className="post-action-buttons">
+              <ReportButton postId={post.id} />
+              {!topicLocked && <QuoteReplyButton postId={post.id} body={post.body} author={profile?.display_name || profile?.username || "Membre"} />}
+              <ForumModerationActions postId={post.id} />
+            </div>
+          </div>
         </div>
       </article>
       {children.length > 0 && <div className="post-thread-children">{children.map(child => <ForumPostCard key={child.id} post={child} childrenByParent={childrenByParent} postsById={postsById} badgesByProfile={badgesByProfile} topicLocked={topicLocked} depth={depth + 1} />)}</div>}
