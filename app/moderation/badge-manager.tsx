@@ -3,10 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowser } from "../../lib/supabase-browser";
 
-type Badge = { id: string; slug: string; name: string; description: string; icon: string; tone: "positive" | "negative" | "neutral"; background_color: string };
+type Badge = { id: string; slug: string; name: string; description: string; icon: string; tone: "positive" | "negative" | "neutral"; background_color: string; image_zoom: number; image_position_x: number; image_position_y: number; border_color: string; border_width: number; glow_intensity: number };
 type Award = { profile_id: string; badge_id: string; reason: string; awarded_at: string; badges: Badge | null };
-type BadgeDraft = { slug: string; name: string; description: string; icon: string; tone: Badge["tone"]; background_color: string };
-const emptyDraft: BadgeDraft = { slug: "", name: "", description: "", icon: "🏷️", tone: "neutral", background_color: "#171b43" };
+type BadgeDraft = { slug: string; name: string; description: string; icon: string; tone: Badge["tone"]; background_color: string; image_zoom: number; image_position_x: number; image_position_y: number; border_color: string; border_width: number; glow_intensity: number };
+const emptyDraft: BadgeDraft = { slug: "", name: "", description: "", icon: "🏷️", tone: "neutral", background_color: "#171b43", image_zoom: 100, image_position_x: 50, image_position_y: 50, border_color: "#45efff", border_width: 2, glow_intensity: 25 };
 const badgeColors = ["#171b43", "#182d4a", "#164e63", "#14532d", "#365314", "#713f12", "#7c2d12", "#7f1d1d", "#831843", "#581c87", "#3730a3", "#334155", "#f1f5f9", "#fef3c7"];
 function BadgeMark({ icon, label }: { icon: string; label: string }) {
   return icon.startsWith("https://") || icon.startsWith("http://")
@@ -14,6 +14,10 @@ function BadgeMark({ icon, label }: { icon: string; label: string }) {
     : <span className="badge-mark-emoji" aria-hidden="true">{icon || "🏷️"}</span>;
 }
 const toneLabels: Record<Badge["tone"], string> = { positive: "Positif", negative: "Négatif", neutral: "Neutre" };
+
+function badgeStyle(badge: Pick<BadgeDraft, "background_color" | "image_zoom" | "image_position_x" | "image_position_y" | "border_color" | "border_width" | "glow_intensity">): React.CSSProperties {
+  return { backgroundColor: badge.border_color, boxShadow: badge.glow_intensity ? `0 0 ${(badge.glow_intensity / 7).toFixed(1)}px ${badge.border_color}80` : "none", "--badge-fill": badge.background_color, "--badge-border-width": `${badge.border_width}px`, "--badge-zoom": badge.image_zoom / 100, "--badge-position-x": `${badge.image_position_x}%`, "--badge-position-y": `${badge.image_position_y}%` } as React.CSSProperties;
+}
 
 function makeSlug(value: string) {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 48);
@@ -37,7 +41,7 @@ export default function BadgeManager() {
   const [badgeSearch, setBadgeSearch] = useState("");
 
   async function loadBadges() {
-    const { data, error } = await supabase.from("badges").select("id, slug, name, description, icon, tone, background_color").order("tone").order("name");
+    const { data, error } = await supabase.from("badges").select("id, slug, name, description, icon, tone, background_color, image_zoom, image_position_x, image_position_y, border_color, border_width, glow_intensity").order("tone").order("name");
     if (error) { setMessage("Impossible de charger les badges."); return; }
     setBadges((data ?? []) as Badge[]);
   }
@@ -52,7 +56,7 @@ export default function BadgeManager() {
     }
     setTargetId(profile.id);
     const { data, error: awardsError } = await supabase.from("profile_badges")
-      .select("profile_id, badge_id, reason, awarded_at, badges:badge_id(id, slug, name, description, icon, tone)")
+      .select("profile_id, badge_id, reason, awarded_at, badges:badge_id(id, slug, name, description, icon, tone, background_color, image_zoom, image_position_x, image_position_y, border_color, border_width, glow_intensity)")
       .eq("profile_id", profile.id).order("awarded_at", { ascending: false });
     if (awardsError) { setMessage("Le membre est chargé, mais ses badges n'ont pas pu être lus."); return; }
     setAwards((data ?? []) as unknown as Award[]);
@@ -66,7 +70,7 @@ export default function BadgeManager() {
 
   function startEdit(badge: Badge) {
     setEditingId(badge.id);
-    setDraft({ slug: badge.slug, name: badge.name, description: badge.description ?? "", icon: badge.icon || "🏷️", tone: badge.tone, background_color: badge.background_color || "#171b43" });
+    setDraft({ slug: badge.slug, name: badge.name, description: badge.description ?? "", icon: badge.icon || "🏷️", tone: badge.tone, background_color: badge.background_color || "#171b43", image_zoom: badge.image_zoom ?? 100, image_position_x: badge.image_position_x ?? 50, image_position_y: badge.image_position_y ?? 50, border_color: badge.border_color || "#45efff", border_width: badge.border_width ?? 2, glow_intensity: badge.glow_intensity ?? 25 });
     setIsEditorOpen(true); setMessage("");
   }
 
@@ -91,7 +95,7 @@ export default function BadgeManager() {
     const slug = makeSlug(draft.slug || name);
     if (!name || !slug || !draft.icon.trim()) { setMessage("Renseigne au minimum le nom, l'identifiant et l'icône."); return; }
     setBusy(true); setMessage("");
-    const values = { slug, name, description: draft.description.trim(), icon: draft.icon.trim(), tone: draft.tone, background_color: /^#[0-9a-fA-F]{6}$/.test(draft.background_color) ? draft.background_color : "#171b43" };
+    const values = { slug, name, description: draft.description.trim(), icon: draft.icon.trim(), tone: draft.tone, background_color: /^#[0-9a-fA-F]{6}$/.test(draft.background_color) ? draft.background_color : "#171b43", image_zoom: Math.min(200, Math.max(100, draft.image_zoom)), image_position_x: Math.min(100, Math.max(0, draft.image_position_x)), image_position_y: Math.min(100, Math.max(0, draft.image_position_y)), border_color: /^#[0-9a-fA-F]{6}$/.test(draft.border_color) ? draft.border_color : "#45efff", border_width: Math.min(8, Math.max(0, draft.border_width)), glow_intensity: Math.min(100, Math.max(0, draft.glow_intensity)) };
     const query = editingId
       ? supabase.from("badges").update(values).eq("id", editingId)
       : supabase.from("badges").insert(values);
@@ -156,7 +160,7 @@ export default function BadgeManager() {
     {isEditorOpen && <div className="badge-editor">
       <div className="section-heading"><div><p className="eyebrow">{editingId ? "Personnalisation" : "Nouveau badge"}</p><h3>{editingId ? "Modifier le badge" : "Créer un badge"}</h3></div><button className="badge-plain-action" type="button" onClick={() => setIsEditorOpen(false)}>Fermer ✕</button></div>
       <div className="badge-editor-preview">
-        <span className={"badge-preview-chip tone-" + draft.tone} style={{ backgroundColor: draft.background_color }}><BadgeMark icon={draft.icon} label={draft.name || "Badge"} />{draft.name.trim() || "Nom du badge"}</span>
+        <span className={"badge-preview-chip tone-" + draft.tone} style={badgeStyle(draft)}><BadgeMark icon={draft.icon} label={draft.name || "Badge"} /></span><strong className="badge-preview-name">{draft.name.trim() || "Nom du badge"}</strong>
         <small>Aperçu</small>
       </div>
       <div className="badge-editor-grid">
@@ -165,6 +169,12 @@ export default function BadgeManager() {
         <label>Icône / emoji<input value={draft.icon.startsWith("http://") || draft.icon.startsWith("https://") ? "" : draft.icon} maxLength={16} onChange={(e) => setDraft((d) => ({ ...d, icon: e.target.value }))} placeholder="🏷️" /><small>Tu peux aussi importer un fichier PNG transparent.</small><input type="file" accept="image/png" onChange={(e) => void uploadBadgePng(e)} disabled={uploadingPng} aria-label="Importer une icône PNG" />{uploadingPng && <small>Import du PNG en cours…</small>}{(draft.icon.startsWith("http://") || draft.icon.startsWith("https://")) && <button className="badge-plain-action" type="button" onClick={() => setDraft((d) => ({ ...d, icon: "🏷️" }))}>Retirer le PNG</button>}</label>
         <label>Fond du badge<input type="color" value={draft.background_color} onChange={(e) => setDraft((d) => ({ ...d, background_color: e.target.value }))} /><div className="badge-color-palette">{badgeColors.map(color => <button key={color} type="button" className={draft.background_color.toLowerCase() === color.toLowerCase() ? "selected" : ""} style={{ backgroundColor: color }} aria-label={"Fond " + color} title={color} onClick={() => setDraft(d => ({ ...d, background_color: color }))} />)}</div><small>Le fond choisi s’applique à tous les affichages du badge.</small></label>
         <label>Catégorie<select value={draft.tone} onChange={(e) => setDraft((d) => ({ ...d, tone: e.target.value as Badge["tone"] }))}><option value="positive">Positif</option><option value="neutral">Neutre / communautaire</option><option value="negative">Négatif</option></select></label>
+        <label>Couleur du contour<input type="color" value={draft.border_color} onChange={(e) => setDraft((d) => ({ ...d, border_color: e.target.value }))} /><small>Contour hexagonal propre à ce badge.</small></label>
+        <label>Épaisseur du contour ({draft.border_width}px)<input type="range" min="0" max="8" value={draft.border_width} onChange={(e) => setDraft((d) => ({ ...d, border_width: Number(e.target.value) }))} /></label>
+        <label>Lueur néon ({draft.glow_intensity}%)<input type="range" min="0" max="100" step="5" value={draft.glow_intensity} onChange={(e) => setDraft((d) => ({ ...d, glow_intensity: Number(e.target.value) }))} /></label>
+        <label>Zoom image ({draft.image_zoom}%)<input type="range" min="100" max="200" step="5" value={draft.image_zoom} onChange={(e) => setDraft((d) => ({ ...d, image_zoom: Number(e.target.value) }))} /></label>
+        <label>Position horizontale ({draft.image_position_x}%)<input type="range" min="0" max="100" value={draft.image_position_x} onChange={(e) => setDraft((d) => ({ ...d, image_position_x: Number(e.target.value) }))} /></label>
+        <label>Position verticale ({draft.image_position_y}%)<input type="range" min="0" max="100" value={draft.image_position_y} onChange={(e) => setDraft((d) => ({ ...d, image_position_y: Number(e.target.value) }))} /></label>
         <label className="badge-editor-wide">Description<textarea value={draft.description} maxLength={240} rows={3} onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))} placeholder="Explique ce que représente ce badge…" /></label>
       </div>
       <div className="badge-editor-actions"><button className="button primary" type="button" disabled={busy} onClick={() => void saveBadge()}>{busy ? "Enregistrement…" : editingId ? "Enregistrer les modifications" : "Créer le badge"}</button><button className="button" type="button" disabled={busy} onClick={() => setIsEditorOpen(false)}>Annuler</button></div>
@@ -176,7 +186,7 @@ export default function BadgeManager() {
     </div>
     <div className="badge-library">
       {visibleBadges.map((badge) => <article className={"badge-library-card tone-" + badge.tone} key={badge.id}>
-        <div className="badge-library-card-top"><span className="badge-preview-chip" style={{ backgroundColor: badge.background_color || "#171b43" }}><BadgeMark icon={badge.icon} label={badge.name} />{badge.name}</span><span className={"badge-tone-label tone-" + badge.tone}>{toneLabels[badge.tone]}</span></div>
+        <div className="badge-library-card-top"><span className="badge-preview-chip" style={badgeStyle(badge)} title={badge.name}><BadgeMark icon={badge.icon} label={badge.name} /></span><strong className="badge-library-name">{badge.name}</strong><span className={"badge-tone-label tone-" + badge.tone}>{toneLabels[badge.tone]}</span></div>
         <p>{badge.description || "Aucune description."}</p><small className="badge-slug">/{badge.slug}</small>
         <div className="badge-library-actions"><button type="button" disabled={busy} onClick={() => startEdit(badge)}>Modifier</button><button type="button" className="danger-text" disabled={busy} onClick={() => void deleteBadge(badge)}>Supprimer</button></div>
       </article>)}
