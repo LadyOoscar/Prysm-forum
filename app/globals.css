@@ -1946,3 +1946,25 @@ footer:before {
  .badge-medal-medium{width:42px;height:48px}
  .badge-medal-large{width:68px;height:77px}
 }
+
+
+/* PRYSM compact post interaction strip */
+.post-interactions{display:flex;flex-direction:column;align-items:stretch;gap:7px;margin-top:10px;padding-top:8px;border-top:1px solid color-mix(in srgb,var(--line) 75%,transparent);min-width:0}
+.post-interactions .reactions{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:0;padding:0;border:0;min-width:0}
+.post-interactions .reaction-hint{font-size:.57rem;line-height:1.25;margin:0 0 3px}
+.post-interactions .reaction{gap:4px;padding:3px 6px;font-size:.68rem;line-height:1.2;min-height:25px}
+.post-interactions .reaction span{font-size:.82rem;line-height:1}
+.post-interactions .reaction strong{font-size:.64rem}
+.post-action-buttons{display:flex;align-items:center;gap:5px;flex-wrap:wrap;min-width:0}
+.post-action-buttons .report-wrap{margin:0}
+.post-action-buttons .report-button{padding:4px 6px;font-size:.67rem;line-height:1.2}
+.post-action-buttons .quote-reply-button,.post-action-buttons .moderation-inline-actions .button{min-height:27px;padding:4px 8px;font-size:.65rem;line-height:1.2;letter-spacing:.025em}
+.post-action-buttons .moderation-inline-actions{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin:0}
+.post-action-buttons .moderation-inline-actions .notice{margin:0;padding:5px 7px;font-size:.65rem}
+@media(max-width:680px){
+ .post-interactions{gap:6px;margin-top:8px;padding-top:7px}
+ .post-interactions .reactions{gap:4px}
+ .post-interactions .reaction{padding:4px 6px;min-height:27px}
+ .post-action-buttons{gap:5px}
+ .post-action-buttons .quote-reply-button,.post-action-buttons .moderation-inline-actions .button{min-height:29px;padding:5px 7px;font-size:.64rem}
+}
