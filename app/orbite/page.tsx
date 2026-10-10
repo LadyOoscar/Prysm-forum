@@ -170,7 +170,6 @@ export default function OrbitePage() {
     {message && <p className="orbit-message" role="status">{message}</p>}
     <section className="orbit-layout">
       <div ref={orbitStageRef} className="orbit-stage" aria-label="Carte orbitale des membres à proximité">
-        <div className="orbit-stars" />
         {rings.map(r => <div key={r.id} className="orbit-ring" style={{ "--orbit-size": r.size, "--orbit-color": r.color } as React.CSSProperties}><span>{r.label}</span></div>)}
         {grouped.map(r => r.members.map((m, i) => {
           const angle = (i * 360 / Math.max(1, r.members.length) + r.id * 29) % 360;
@@ -201,10 +200,12 @@ export default function OrbitePage() {
       .orbit-message{padding:11px 14px;margin:0 0 14px;border:1px solid #414878;color:#b9c5e8;background:#101433;font-size:.78rem}
       .orbit-test-banner{padding:12px 14px;margin:0 0 14px;border:1px solid #f2c56b;background:rgba(80,57,16,.35);color:#ffe4a3;font-size:.8rem;line-height:1.5}
       .orbit-layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:22px;align-items:center;padding-bottom:45px}
-      .orbit-stage{--stage-size:min(82vw,650px);container-type:size;position:relative;width:100%;max-width:650px;aspect-ratio:1;margin:auto;overflow:hidden;border:1px solid rgba(69,239,255,.16);border-radius:50%;background:radial-gradient(circle at 50% 50%,rgba(139,98,255,.15),transparent 35%),#080b20;box-shadow:inset 0 0 65px rgba(69,239,255,.07),0 0 38px rgba(139,98,255,.08)}
-      .orbit-stars{position:absolute;z-index:0;inset:0;border-radius:50%;opacity:.48;background-image:radial-gradient(#bfcaff 1px,transparent 1.5px),radial-gradient(#5b6caa 1px,transparent 1.5px);background-size:47px 53px,71px 83px;background-position:4px 9px,22px 31px;pointer-events:none}
-      .orbit-ring{position:absolute;z-index:1;left:50%;top:50%;width:var(--orbit-size);height:var(--orbit-size);transform:translate(-50%,-50%);border:1px solid color-mix(in srgb,var(--orbit-color),transparent 38%);border-radius:50%;box-shadow:0 0 14px color-mix(in srgb,var(--orbit-color),transparent 90%);pointer-events:none}
-      .orbit-ring span{position:absolute;left:50%;top:0;transform:translate(-50%,-50%);padding:2px 7px;border:1px solid var(--orbit-color);border-radius:20px;background:#0b0d25;color:var(--orbit-color);font-size:.58rem;white-space:nowrap}
+      .orbit-stage{--stage-size:min(82vw,650px);container-type:size;position:relative;width:100%;max-width:650px;aspect-ratio:1;margin:auto;overflow:hidden;border:1px solid rgba(139,151,210,.16);border-radius:50%;background:radial-gradient(circle at 50% 50%,rgba(99,83,170,.10),transparent 42%),#090b1a;box-shadow:inset 0 0 40px rgba(70,78,130,.05)}
+            .orbit-ring{position:absolute;z-index:1;left:50%;top:50%;width:var(--orbit-size);height:var(--orbit-size);transform:translate(-50%,-50%);border:1px solid color-mix(in srgb,var(--orbit-color),transparent 58%);border-radius:50%;box-shadow:none;pointer-events:none}
+      .orbit-ring span{position:absolute;left:50%;top:0;transform:translate(-50%,-50%);padding:3px 8px;border:1px solid color-mix(in srgb,var(--orbit-color),transparent 35%);border-radius:20px;background:#0b0d20;color:var(--orbit-color);font-size:.58rem;line-height:1.3;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+      .orbit-ring:nth-of-type(3) span{left:100%;top:50%;transform:translate(-50%,-50%)}
+      .orbit-ring:nth-of-type(4) span{left:50%;top:100%;transform:translate(-50%,-50%)}
+      .orbit-ring:nth-of-type(5) span{left:0;top:50%;transform:translate(-50%,-50%)}
       .orbit-person{position:absolute;left:0;top:0;width:38px;height:38px;z-index:20;display:block;isolation:isolate;transform:translate(-50%,-50%);border-radius:50%}
       .orbit-person-face{position:relative;z-index:21;left:auto;top:auto;display:grid;place-items:center;width:100%;height:100%;margin:0;border:0 solid transparent;border-radius:50%;overflow:hidden;background:transparent;color:#fff;font-weight:800;font-size:.8rem;box-shadow:none}
       .orbit-person-face img,.orbit-center-avatar img{display:block;width:100%;height:100%;min-width:100%;min-height:100%;object-fit:cover;border-radius:inherit}
