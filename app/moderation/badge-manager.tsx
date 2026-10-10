@@ -81,38 +81,67 @@ export default function BadgeManager() {
     const isPng = file.type === "image/png" || (file.type === "" && file.name.toLowerCase().endsWith(".png"));
     if (!isPng) { setPngStatus("Choisis une image PNG. Les photos JPEG/WebP ne sont pas acceptées pour les badges."); return; }
     if (file.size > 5 * 1024 * 1024) { setPngStatus("Le PNG doit peser 5 Mo maximum."); return; }
-    setUploadingPng(true); setPngStatus("Envoi du PNG vers le stockage…"); setMessage("");
+
+    setUploadingPng(true);
+    setPngStatus("Connexion au stockage sécurisé…");
+    setMessage("");
     const base = makeSlug(draft.slug || draft.name || "badge") || "badge";
     const path = base + "/" + Date.now() + ".png";
-    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000);
+
     try {
-      const uploadResult = await Promise.race([
-        supabase.storage.from("prysm-badges").upload(path, file, { contentType: "image/png", upsert: false, cacheControl: "31536000" }),
-        new Promise<never>((_, reject) => {
-          timeoutId = setTimeout(() => reject(new Error("TIMEOUT_UPLOAD")), 30000);
-        }),
-      ]);
-      if (timeoutId) clearTimeout(timeoutId);
-      const { error } = uploadResult;
-      if (error) {
-        const details = error.message || "Erreur inconnue";
-        setPngStatus(details.includes("Payload too large") || details.toLowerCase().includes("size")
-          ? "Le PNG dépasse la limite de 5 Mo."
-          : details.toLowerCase().includes("row-level security") || details.toLowerCase().includes("permission")
-            ? "Import refusé : ton compte doit avoir les droits modo/admin."
-            : "Échec de l’import PNG : " + details);
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !session?.access_token) {
+        setPngStatus("Ta session n’est plus valide. Reconnecte-toi puis réessaie.");
         return;
       }
+
+      const storageBase = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+      if (!storageBase || !publishableKey) {
+        setPngStatus("Configuration du stockage absente. L’import ne peut pas démarrer.");
+        return;
+      }
+
+      const encodedPath = path.split("/").map(encodeURIComponent).join("/");
+      setPngStatus("Envoi du PNG…");
+      const response = await fetch(storageBase.replace(/\/$/, "") + "/storage/v1/object/prysm-badges/" + encodedPath, {
+        method: "POST",
+        headers: {
+          apikey: publishableKey,
+          Authorization: "Bearer " + session.access_token,
+          "Content-Type": "image/png",
+          "Cache-Control": "max-age=31536000",
+          "x-upsert": "false",
+        },
+        body: file,
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        const raw = await response.text();
+        let details = raw;
+        try {
+          const parsed = JSON.parse(raw) as { message?: string; error?: string; error_description?: string };
+          details = parsed.message || parsed.error_description || parsed.error || raw;
+        } catch {}
+        setPngStatus(response.status === 401 || response.status === 403
+          ? "Import refusé par Supabase (droits ou session). Vérifie que ton compte a bien le rôle modo/admin. " + details
+          : "Supabase a refusé le PNG (HTTP " + response.status + "). " + details.slice(0, 220));
+        return;
+      }
+
       const { data } = supabase.storage.from("prysm-badges").getPublicUrl(path);
       setDraft(current => ({ ...current, icon: data.publicUrl }));
-      setPngStatus("PNG importé avec succès. Enregistre le badge pour conserver ce visuel.");
+      setPngStatus("PNG envoyé et confirmé par Supabase. Enregistre le badge pour conserver ce visuel.");
     } catch (error) {
       const details = error instanceof Error ? error.message : String(error);
-      setPngStatus(details === "TIMEOUT_UPLOAD"
-        ? "L’envoi n’a pas confirmé sa réponse après 30 secondes. Vérifie ta connexion puis réessaie."
-        : "L’import a échoué : " + details);
+      setPngStatus(error instanceof DOMException && error.name === "AbortError"
+        ? "Supabase n’a pas répondu en 20 secondes. La requête a été interrompue ; vérifie la connexion et réessaie."
+        : "Erreur réseau pendant l’import : " + details);
     } finally {
-      if (timeoutId) clearTimeout(timeoutId);
+      clearTimeout(timeoutId);
       setUploadingPng(false);
     }
   }
