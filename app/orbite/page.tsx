@@ -6,7 +6,7 @@ import { createSupabaseBrowser } from "../../lib/supabase-browser";
 type Member = { id: string; username: string; display_name: string; avatar_url: string | null; distance_band: 1 | 2 | 3 | 4 };
 type Profile = { username: string; display_name: string; avatar_url: string | null };
 const rings = [
-  { id: 1, label: "1 à 5 km", name: "Proximité", color: "#b58cff", size: "30%", duration: "30s" },
+  { id: 1, label: "0 à 5 km", name: "Proximité", color: "#b58cff", size: "30%", duration: "30s" },
   { id: 2, label: "6 à 10 km", name: "Voisinage", color: "#66a5ff", size: "51%", duration: "38s" },
   { id: 3, label: "11 à 25 km", name: "Horizon local", color: "#52e0d0", size: "73%", duration: "46s" },
   { id: 4, label: "26 à 50 km", name: "Grand voisinage", color: "#f2c56b", size: "95%", duration: "56s" },
@@ -24,8 +24,13 @@ export default function OrbitePage() {
 
   const loadMembers = useCallback(async () => {
     const { data, error } = await supabase.rpc("get_orbit_members");
-    if (error) { setMessage("Impossible de charger Orbite pour le moment."); return; }
+    if (error) {
+      console.error("PRYSM Orbite: chargement des membres impossible", error);
+      setMessage("Ta position est activée, mais la liste des membres n’a pas pu être chargée. Réessaie dans un instant.");
+      return false;
+    }
     setMembers((data ?? []) as Member[]);
+    return true;
   }, [supabase]);
 
   useEffect(() => {
@@ -84,8 +89,8 @@ export default function OrbitePage() {
             setMessage(`Position obtenue, mais l’enregistrement a échoué : ${error.message}`);
           } else {
             setEnabled(true);
-            await loadMembers();
-            setMessage("Orbite est activée. Ta position exacte reste privée.");
+            const membersLoaded = await loadMembers();
+            if (membersLoaded) setMessage("Orbite est activée. Ta position exacte reste privée.");
           }
         } catch (error) {
           console.error("PRYSM Orbite: erreur inattendue", error);
