@@ -31,6 +31,16 @@ export default function AuthPage() {
           setMessage("Choisis un pseudo avant de créer ton compte.");
           return;
         }
+        if (
+          password.length < 12 ||
+          !/[a-z]/.test(password) ||
+          !/[A-Z]/.test(password) ||
+          !/[0-9]/.test(password) ||
+          !/[^A-Za-z0-9]/.test(password)
+        ) {
+          setMessage("Le mot de passe doit contenir au moins 12 caractères, une minuscule, une majuscule, un chiffre et un symbole.");
+          return;
+        }
         const { data: existing, error: lookupError } = await supabase
           .from("profiles")
           .select("id")
