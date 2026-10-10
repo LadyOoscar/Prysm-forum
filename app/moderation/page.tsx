@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { createSupabaseBrowser } from "../../lib/supabase-browser";
-import BadgeManager from "./badge-manager";
 import ModerationSanction from "../components/moderation-sanction";
 
 type Report = {
@@ -141,7 +140,6 @@ export default function ModerationPage() {
         </select>
       </div>
     </section>
-    <BadgeManager />
     <ModerationSanction />
     <section className="moderation-list">
       {visibleReports.length === 0 ? <div className="empty"><div className="empty-symbol">✓</div><h2>{reports.length ? "Aucun résultat" : "Aucun signalement"}</h2><p>{reports.length ? "Essaie un autre filtre ou une autre recherche." : "La file de modération est vide."}</p></div> : visibleReports.map((report) => {
