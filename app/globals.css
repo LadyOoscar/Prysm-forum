@@ -1899,3 +1899,20 @@ footer:before {
  .badge-manager-form .button{width:100%}
  .badge-library-card-top{align-items:flex-start}
 }
+
+
+/* PRYSM badge standard: consistent capsule geometry and icon sizing everywhere. */
+.profile-badge,.profile-badge-chip,.badge-preview-chip{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:flex-start;gap:7px;min-height:30px;padding:4px 10px;border-radius:7px;line-height:1.1;white-space:nowrap;max-width:100%}
+.profile-badge{border:1px solid #52617f;background:#171b43;color:#eef2ff;font-size:.68rem;letter-spacing:.035em}
+.profile-badge.negative{border-color:#ff5b8d;color:#ffe0e9}
+.profile-badge-chip{min-height:34px;border:1px solid #52617f;background:#171b43;color:#eef2ff;padding:6px 11px;font-size:.8rem}
+.badge-mark{display:inline-block;width:20px;height:20px;min-width:20px;object-fit:contain;vertical-align:middle;flex:0 0 20px}
+.badge-mark-emoji{display:inline-grid;place-items:center;width:20px;height:20px;min-width:20px;line-height:1;flex:0 0 20px;font-size:1rem}
+.badge-preview-chip{min-height:34px;padding:5px 11px;border-radius:7px}
+.badge-color-palette{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+.badge-color-palette button{width:25px;height:25px;border:2px solid #ffffff35;border-radius:6px;cursor:pointer}
+.badge-color-palette button.selected{outline:2px solid var(--cyan);outline-offset:2px;border-color:#fff}
+.badge-editor-grid input[type="color"]{width:58px;height:38px;min-width:58px;padding:3px;cursor:pointer}
+.badge-editor-grid input[type="file"]{padding:8px;font-size:.72rem}
+.badge-library-card .badge-preview-chip{min-height:34px}
+@media(max-width:640px){.profile-badge,.profile-badge-chip{min-height:30px;padding:4px 8px;gap:6px}.badge-mark{width:18px;height:18px;min-width:18px;flex-basis:18px}.badge-mark-emoji{width:18px;height:18px;min-width:18px;flex-basis:18px}}
