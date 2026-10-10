@@ -44,7 +44,7 @@ function ForumPostCard({ post, childrenByParent, postsById, badgesByProfile, top
           </Link>
           <Link className="member-handle" href={profileHref}>@{profile?.username || "membre"}</Link>
           <span className="member-reputation"><strong>{profile?.reputation ?? 0}</strong> réputation · {getReputationTitle(profile?.reputation ?? 0)}</span>
-          <div className="member-badges">{(badgesByProfile.get(post.author_id) ?? []).map((badge: any) => <span className={badge?.tone === "negative" ? "profile-badge negative" : "profile-badge"} key={badge?.name} style={{backgroundColor:badge?.background_color||"#171b43"}}>{badge?.icon?.startsWith("http")?<img className="badge-mark" src={badge.icon} alt="" />:badge?.icon} {badge?.name}</span>)}</div>
+          <div className="member-badges">{(badgesByProfile.get(post.author_id) ?? []).map((badge: any) => <span className={badge?.tone === "negative" ? "profile-badge negative" : "profile-badge"} key={badge?.name} title={`${badge?.name || "Badge"}${badge?.description ? " · " + badge.description : ""}`} aria-label={badge?.name || "Badge"} style={{backgroundColor:badge?.border_color||"#45efff",boxShadow:badge?.glow_intensity?`0 0 ${(badge.glow_intensity/7).toFixed(1)}px ${(badge.border_color||"#45efff")}80`:"none","--badge-fill":badge?.background_color||"#171b43","--badge-border-width":`${badge?.border_width??2}px`,"--badge-zoom":(badge?.image_zoom??100)/100,"--badge-position-x":`${badge?.image_position_x??50}%`,"--badge-position-y":`${badge?.image_position_y??50}%`} as React.CSSProperties}>{badge?.icon?.startsWith("http")?<img className="badge-mark" src={badge.icon} alt="" />:<span className="badge-mark-emoji" aria-hidden="true">{badge?.icon||"🏷️"}</span>}</span>)}</div>
         </aside>
         <div className="post-body">
           <time>{new Date(post.created_at).toLocaleString("fr-FR")}</time>
@@ -71,7 +71,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
   const { data: posts, error } = await supabase.from("forum_posts").select("id, body, created_at, author_id, parent_post_id, profiles:author_id(username, display_name, avatar_url, reputation, is_admin, is_moderator)").eq("topic_id", id).order("created_at", { ascending: true });
   const { data: poll } = await supabase.from("forum_polls").select("id").eq("topic_id", id).maybeSingle();
   const authorIds = [...new Set((posts ?? []).map((post: any) => post.author_id).filter(Boolean))];
-  const { data: badgeRows } = authorIds.length ? await supabase.from("profile_badges").select("profile_id, badge_id, badges:badge_id(name, icon, tone, background_color)").in("profile_id", authorIds) : { data: [] };
+  const { data: badgeRows } = authorIds.length ? await supabase.from("profile_badges").select("profile_id, badge_id, badges:badge_id(name, icon, tone, description, background_color, image_zoom, image_position_x, image_position_y, border_color, border_width, glow_intensity)").in("profile_id", authorIds) : { data: [] };
   const badgesByProfile = new Map<string, any[]>();
   for (const row of badgeRows ?? []) { const list = badgesByProfile.get(row.profile_id) ?? []; list.push(row.badges); badgesByProfile.set(row.profile_id, list); }
   const childrenByParent = new Map<string, ForumPost[]>();
