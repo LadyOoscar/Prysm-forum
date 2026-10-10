@@ -17,6 +17,7 @@ export default function OrbitePage() {
   const [userId, setUserId] = useState("");
   const [profile, setProfile] = useState<Profile | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
+  const [testOrbit, setTestOrbit] = useState(false);
   const [enabled, setEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -40,14 +41,27 @@ export default function OrbitePage() {
   }, []);
 
   const loadMembers = useCallback(async () => {
+    const demoMode = new URLSearchParams(window.location.search).get("testOrbit") === "1";
     const { data, error } = await supabase.rpc("get_orbit_members");
     if (error) {
       console.error("PRYSM Orbite: chargement des membres impossible", error);
-      setMessage("Ta position est activée, mais la liste des membres n’a pas pu être chargée. Réessaie dans un instant.");
-      return false;
+      if (!demoMode) {
+        setMessage("Ta position est activée, mais la liste des membres n’a pas pu être chargée. Réessaie dans un instant.");
+        return false;
+      }
+      console.warn("PRYSM Orbite: mode de test actif, affichage des profils fictifs malgré l’erreur RPC.");
     }
-    setMembers((data ?? []) as Member[]);
-    return true;
+    const demoMembers: Member[] = [
+      { id: "demo-orbit-01", username: "demo-lyra", display_name: "Lyra · test", avatar_url: "https://api.dicebear.com/9.x/avataaars/svg?seed=LyraPrysm", distance_band: 1 },
+      { id: "demo-orbit-02", username: "demo-noa", display_name: "Noa · test", avatar_url: "https://api.dicebear.com/9.x/avataaars/svg?seed=NoaPrysm", distance_band: 2 },
+      { id: "demo-orbit-03", username: "demo-sacha", display_name: "Sacha · test", avatar_url: "https://api.dicebear.com/9.x/avataaars/svg?seed=SachaPrysm", distance_band: 3 },
+      { id: "demo-orbit-04", username: "demo-milo", display_name: "Milo · test", avatar_url: "https://api.dicebear.com/9.x/avataaars/svg?seed=MiloPrysm", distance_band: 4 },
+      { id: "demo-orbit-05", username: "demo-iris", display_name: "Iris · test", avatar_url: "https://api.dicebear.com/9.x/avataaars/svg?seed=IrisPrysm", distance_band: 1 },
+      { id: "demo-orbit-06", username: "demo-jules", display_name: "Jules · test", avatar_url: "https://api.dicebear.com/9.x/avataaars/svg?seed=JulesPrysm", distance_band: 2 },
+    ];
+    setTestOrbit(demoMode);
+    setMembers([...(data ?? []) as Member[], ...(demoMode ? demoMembers : [])]);
+    return !error || demoMode;
   }, [supabase]);
 
   useEffect(() => {
@@ -56,6 +70,8 @@ export default function OrbitePage() {
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) { window.location.href = "/auth"; return; }
       setUserId(auth.user.id);
+      const demoMode = new URLSearchParams(window.location.search).get("testOrbit") === "1";
+      setTestOrbit(demoMode);
       const [{ data: p }, { data: loc }] = await Promise.all([
         supabase.from("profiles").select("username,display_name,avatar_url").eq("id", auth.user.id).maybeSingle(),
         supabase.from("orbit_locations").select("enabled").eq("user_id", auth.user.id).maybeSingle(),
@@ -63,7 +79,7 @@ export default function OrbitePage() {
       if (!active) return;
       setProfile((p as Profile | null) ?? null);
       setEnabled(Boolean(loc?.enabled));
-      if (loc?.enabled) await loadMembers();
+      if (loc?.enabled || demoMode) await loadMembers();
       if (active) setLoading(false);
     }
     void load();
@@ -147,6 +163,7 @@ export default function OrbitePage() {
   return <main className="shell orbit-page">
     <header className="topbar"><Link className="brand" href="/">PRYSM</Link><nav><Link href="/">Accueil</Link><Link href="/forum">Forum</Link><Link href="/rencontres">Rencontres</Link><Link href="/messages">Messages</Link><Link href="/profil">Profil</Link><Link className="active" href="/orbite">Orbite</Link></nav></header>
     <section className="page-head compact"><p className="eyebrow">PRYSM · Système social</p><h1>Orbite<span>.</span></h1><p className="lead">Les membres qui gravitent autour de toi, répartis sur quatre anneaux de distance.</p></section>
+    {testOrbit && <p className="orbit-test-banner" role="status">MODE TEST · 6 profils fictifs avec avatars générés, affichés uniquement dans cette session. Aucune fausse position ni aucun compte n’a été créé en base.</p>}
     <section className="orbit-controls"><div><strong>{enabled ? "Ta présence est activée" : "Entre dans l’Orbite"}</strong><p>{enabled ? "Les membres ayant activé Orbite peuvent te découvrir." : "Active volontairement ta position pour découvrir les membres à proximité."}</p></div>
       {enabled ? <button className="button" disabled={busy} onClick={() => void disable()}>{busy ? "Mise à jour…" : "Désactiver Orbite"}</button> : <button className="button primary" disabled={busy} onClick={() => void enable()}>{busy ? "Localisation…" : "Activer ma position"}</button>}
     </section>
@@ -168,8 +185,8 @@ export default function OrbitePage() {
           </Link>;
         }))}
         <div className="orbit-center"><div className="orbit-center-avatar">{profile?.avatar_url ? <img src={profile.avatar_url} alt="" /> : (profile?.display_name || profile?.username || "P").slice(0, 1).toUpperCase()}</div><strong>{profile?.display_name || profile?.username || "Mon profil"}</strong><small>TOI</small></div>
-        {!enabled && <div className="orbit-overlay"><strong>Ta galaxie t’attend</strong><span>Active ta position pour voir les membres à proximité.</span></div>}
-        {enabled && !members.length && <div className="orbit-overlay"><strong>Ton espace est calme</strong><span>Aucun membre visible dans un rayon de 50 km pour le moment.</span></div>}
+        {!enabled && !testOrbit && <div className="orbit-overlay"><strong>Ta galaxie t’attend</strong><span>Active ta position pour voir les membres à proximité.</span></div>}
+        {enabled && !members.length && !testOrbit && <div className="orbit-overlay"><strong>Ton espace est calme</strong><span>Aucun membre visible dans un rayon de 50 km pour le moment.</span></div>}
       </div>
       <aside className="orbit-legend"><div className="orbit-legend-head"><div><p className="eyebrow">Les anneaux</p><h2>Ton voisinage</h2></div><strong>{members.length}<small> profils</small></strong></div>
         {grouped.map(r => <div className="orbit-legend-row" key={r.id}><span className="orbit-legend-dot" style={{ background: r.color, boxShadow: `0 0 14px ${r.color}` }} /><div><strong>{r.name}</strong><small>{r.label}</small></div><b>{r.members.length}</b></div>)}
@@ -182,6 +199,7 @@ export default function OrbitePage() {
       .orbit-controls{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:17px 20px;margin-bottom:12px;border:1px solid var(--line);background:rgba(14,17,46,.92)}
       .orbit-controls p{margin:4px 0 0;color:var(--muted);font-size:.8rem}
       .orbit-message{padding:11px 14px;margin:0 0 14px;border:1px solid #414878;color:#b9c5e8;background:#101433;font-size:.78rem}
+      .orbit-test-banner{padding:12px 14px;margin:0 0 14px;border:1px solid #f2c56b;background:rgba(80,57,16,.35);color:#ffe4a3;font-size:.8rem;line-height:1.5}
       .orbit-layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:22px;align-items:center;padding-bottom:45px}
       .orbit-stage{--stage-size:min(82vw,650px);container-type:size;position:relative;width:100%;max-width:650px;aspect-ratio:1;margin:auto;overflow:hidden;border:1px solid rgba(69,239,255,.16);border-radius:50%;background:radial-gradient(circle at 50% 50%,rgba(139,98,255,.15),transparent 35%),#080b20;box-shadow:inset 0 0 65px rgba(69,239,255,.07),0 0 38px rgba(139,98,255,.08)}
       .orbit-stars{position:absolute;inset:0;border-radius:50%;opacity:.48;background-image:radial-gradient(#bfcaff 1px,transparent 1.5px),radial-gradient(#5b6caa 1px,transparent 1.5px);background-size:47px 53px,71px 83px;background-position:4px 9px,22px 31px;pointer-events:none}
