@@ -2262,3 +2262,58 @@ footer:before {
     font-size: 1.05rem !important;
   }
 }
+
+
+/* PRYSM badges: unified hexagonal techno-insignia, icon only. */
+.profile-badge,
+.profile-badge-chip {
+  border: 0;
+  border-radius: 0;
+  clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0 50%);
+  background: linear-gradient(145deg, #a8f4ff 0%, #3f8ec6 18%, #172d56 46%, #10182f 72%, #62dfff 100%);
+  box-shadow: none;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .42));
+}
+.profile-badge > img,
+.profile-badge-chip > img,
+.profile-badge > .badge-mark,
+.profile-badge-chip > .badge-mark {
+  width: 82%;
+  height: 82%;
+  max-width: 82%;
+  max-height: 82%;
+  flex: 0 0 82%;
+  border: 0;
+  border-radius: 0;
+  clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0 50%);
+  background: #17213c;
+  object-fit: contain;
+  transform: none;
+}
+.profile-badge > .badge-mark-emoji,
+.profile-badge-chip > .badge-mark-emoji {
+  width: 82%;
+  height: 82%;
+  flex: 0 0 82%;
+  clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0 50%);
+  background: #17213c;
+  font-size: 1.05rem !important;
+  line-height: 1;
+}
+.badge-preview-chip img.badge-mark {
+  clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0 50%);
+  border-radius: 0;
+  background: linear-gradient(145deg, #a8f4ff, #172d56 55%, #62dfff);
+  padding: 2px;
+}
+@media (max-width: 640px) {
+  .profile-badge,
+  .profile-badge-chip {
+    border-radius: 0;
+    clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0 50%);
+  }
+  .profile-badge > .badge-mark-emoji,
+  .profile-badge-chip > .badge-mark-emoji {
+    font-size: .95rem !important;
+  }
+}
