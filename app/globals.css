@@ -2060,3 +2060,44 @@ footer:before {
 .profile-badge-chip:has(img) {
   padding: 2px;
 }
+
+
+/* Zoom into PNG artwork to trim transparent margins inside collectible badges. */
+.profile-badge,
+.profile-badge-chip {
+  overflow: hidden;
+}
+.profile-badge > img.badge-mark,
+.profile-badge-chip img.badge-mark {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+  transform: scale(1.24);
+  transform-origin: center;
+}
+.badge-preview-chip {
+  overflow: hidden;
+}
+.badge-preview-chip img.badge-mark {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  flex: 0 0 34px;
+  object-fit: contain;
+  transform: scale(1.12);
+  transform-origin: center;
+}
+@media (max-width: 640px) {
+  .profile-badge > img.badge-mark,
+  .profile-badge-chip img.badge-mark {
+    transform: scale(1.24);
+  }
+  .badge-preview-chip img.badge-mark {
+    width: 31px;
+    height: 31px;
+    min-width: 31px;
+    flex-basis: 31px;
+  }
+}
