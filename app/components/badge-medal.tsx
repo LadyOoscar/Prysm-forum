@@ -33,7 +33,7 @@ export default function BadgeMedal({ badge, size = "small", onImageError }: {
   const isImage = /^https?:\/\//i.test(icon);
   return (
     <span className={"badge-medal badge-medal-" + size + " tone-" + (badge.tone || "neutral")} style={style} title={badge.name || "Badge"}>
-      {isImage ? <img src={icon} alt={badge.name || "Badge"} onError={onImageError} /> : <span className="badge-medal-emoji" aria-hidden="true">{icon}</span>}
+      {isImage ? <span className="badge-medal-image-window"><img src={icon} alt={badge.name || "Badge"} onError={onImageError} /></span> : <span className="badge-medal-emoji" aria-hidden="true">{icon}</span>}
     </span>
   );
 }
