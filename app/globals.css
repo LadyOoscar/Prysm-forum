@@ -1803,3 +1803,39 @@ footer:before {
     animation-iteration-count:1,5!important;
   }
 }
+
+
+/* PRYSM desktop layout hardening: prevent compressed columns and overflowing content. */
+@media (min-width: 761px) {
+  .shell { width: min(1320px, calc(100% - 48px)); }
+  .shell > *, .profile-box, .profile-editor, .messages-layout,
+  .calendar-layout, .story-editor-layout, .sticker-creator-card { min-width: 0; }
+  .cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .card, .forum-row, .topic-row, .search-result, .conversation-row,
+  .post, .post-body, .post-author, .profile-box, .reply-box,
+  .moderation-card, .admin-action-card, .moderator-action-card,
+  .calendar-month, .calendar-events, .sticker-creator-card { min-width: 0; }
+  .forum-row > *, .topic-row > *, .search-result > *,
+  .conversation-row > *, .profile-summary > *, .profile-actions > * { min-width: 0; }
+  .forum-row h2, .topic-row h2, .post-body, .post-body p,
+  .search-result h2, .conversation-row, .moderation-card,
+  .admin-action-card, .moderator-action-card {
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+  .post { grid-template-columns: minmax(155px, 185px) minmax(0, 1fr); }
+  .post-body img, .post-body video, .post-body iframe,
+  .profile-box img, .profile-cover img { max-width: 100%; }
+  .messages-layout { grid-template-columns: minmax(280px, 340px) minmax(0, 1fr); }
+  .private-chat, .private-message-list, .private-compose { min-width: 0; }
+  .private-message { overflow-wrap: anywhere; }
+  .profile-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-action-grid, .moderator-action-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .calendar-layout { grid-template-columns: minmax(280px, .85fr) minmax(0, 1.15fr); }
+}
+@media (min-width: 761px) and (max-width: 1100px) {
+  .shell { width: calc(100% - 36px); }
+  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-action-grid, .moderator-action-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .messages-layout { grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.2fr); }
+}
