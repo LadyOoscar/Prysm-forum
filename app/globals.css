@@ -2358,3 +2358,29 @@ footer:before {
   .profile-badge-item { width: 44px; }
   .profile-badge-item > strong { font-size: .58rem; }
 }
+
+
+/* Higher-specificity profile override keeps the global hex frame above legacy inline profile styles. */
+.profile-box .profile-badge-shelf .profile-badge-chip {
+  display: inline-flex; position: relative; align-items: center; justify-content: center;
+  width: 36px; height: 40px; min-width: 36px; min-height: 40px; padding: 0; gap: 0;
+  border: 0; border-radius: 0; overflow: hidden;
+  clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0 50%);
+  background: var(--badge-border-color, #45efff); box-shadow: none; font-size: 0; line-height: 0;
+}
+.profile-box .profile-badge-shelf .profile-badge-chip > img,
+.profile-box .profile-badge-shelf .profile-badge-chip > .badge-mark {
+  position: absolute; inset: var(--badge-border-width, 2px); width: auto; height: auto;
+  min-width: 0; min-height: 0; max-width: none; max-height: none; flex: none;
+  object-fit: cover; object-position: var(--badge-position-x, 50%) var(--badge-position-y, 50%);
+  background: var(--badge-fill, #171b43);
+  clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0 50%);
+  transform: scale(var(--badge-zoom, 1)); transform-origin: center;
+}
+.profile-box .profile-badge-shelf .profile-badge-chip > .badge-mark-emoji {
+  position: absolute; inset: var(--badge-border-width, 2px); display: grid; place-items: center;
+  width: auto; height: auto; min-width: 0; flex: none; overflow: hidden;
+  background: var(--badge-fill, #171b43);
+  clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0 50%);
+  font-size: 1.05rem; line-height: 1;
+}
