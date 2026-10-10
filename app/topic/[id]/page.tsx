@@ -40,15 +40,16 @@ function ForumPostCard({ post, childrenByParent, postsById, badgesByProfile, top
     <div className="post-thread-node" style={depth ? { marginLeft: `clamp(0px, ${Math.min(depth, 4) * 1.25}rem, 5rem)`, borderLeft: "2px solid var(--line)", paddingLeft: "clamp(.5rem, 2vw, 1rem)", marginTop: ".85rem" } : undefined}>
       <article className="post" id={`post-${post.id}`}>
         <aside className="post-author">
-          <Link href={profileHref}>
-            <div className="avatar">{profile?.avatar_url ? <img src={profile.avatar_url} alt={"Avatar de " + (profile.display_name || profile.username || "membre")} /> : (profile?.display_name || profile?.username || "?").slice(0, 1).toUpperCase()}</div>
-            <span className={profile?.is_admin ? "role-name role-admin" : profile?.is_moderator ? "role-name role-moderator" : "role-name"}>{profile?.display_name || profile?.username || "Membre"}</span>
-          </Link>
-          <Link className="member-handle" href={profileHref}>@{profile?.username || "membre"}</Link>
-          {profile?.id && <BadgeAwardQuickAction profileId={profile.id} />}
+          <div className="post-author-identity">
+            <Link className="post-author-avatar-link" href={profileHref} aria-label={"Profil de " + (profile?.display_name || "Membre")}>
+              <div className="avatar">{profile?.avatar_url ? <img src={profile.avatar_url} alt={"Avatar de " + (profile.display_name || "membre")} /> : (profile?.display_name || "M").slice(0, 1).toUpperCase()}</div>
+            </Link>
+            {(badgesByProfile.get(post.author_id) ?? []).length > 0 && <div className="member-badges post-author-badges">{(badgesByProfile.get(post.author_id) ?? []).map((badge: any, index: number) => <BadgeMedal key={badge?.id || badge?.name || index} badge={badge} size="small" />)}</div>}
+          </div>
+          <Link className={"post-author-display-name " + (profile?.is_admin ? "role-name role-admin" : profile?.is_moderator ? "role-name role-moderator" : "role-name")} href={profileHref}>{profile?.display_name?.trim() || "Membre"}</Link>
           <span className="member-reputation"><strong>{profile?.reputation ?? 0}</strong> réputation · {getReputationTitle(profile?.reputation ?? 0)}</span>
-          {(badgesByProfile.get(post.author_id) ?? []).length > 0 && <div className="member-badges">{(badgesByProfile.get(post.author_id) ?? []).map((badge: any, index: number) => <BadgeMedal key={badge?.id || badge?.name || index} badge={badge} size="small" />)}</div>}
-          </aside>
+          {profile?.id && <BadgeAwardQuickAction profileId={profile.id} />}
+        </aside>
         <div className="post-body">
           <time>{new Date(post.created_at).toLocaleString("fr-FR")}</time>
           {parent && <aside className="post-quoted-context"><span className="post-quoted-label">↪ En réponse à {parentProfile?.display_name || parentProfile?.username || "un membre"}</span><p>{typeof parent.body === "string" && parent.body.startsWith("voice:") ? "Message vocal" : (parent.body || "").slice(0, 220) + ((parent.body || "").length > 220 ? "…" : "")}</p></aside>}
