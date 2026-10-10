@@ -21,24 +21,58 @@ export default function AuthPage() {
   }, []);
 
   async function submit(e:FormEvent){
-    e.preventDefault(); setLoading(true); setMessage("");
-    if(mode==="signup"){
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
-      const redirectTo = `${siteUrl}/auth/callback?next=/profil`;
-      const {error}=await supabase.auth.signUp({
-        email,
-        password,
-        options:{
-          data:{username,display_name:username},
-          emailRedirectTo: redirectTo,
-        },
-      });
-      setMessage(error ? error.message : "Compte créé. Vérifie ton e-mail pour confirmer ton adresse.");
-    } else {
-      const {error}=await supabase.auth.signInWithPassword({email,password});
-      if(error) setMessage(error.message); else window.location.href="/profil";
+    e.preventDefault();
+    setLoading(true);
+    setMessage("");
+    try {
+      if(mode==="signup"){
+        const cleanUsername = username.trim();
+        if (!cleanUsername) {
+          setMessage("Choisis un pseudo avant de créer ton compte.");
+          return;
+        }
+        const { data: existing, error: lookupError } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("username", cleanUsername)
+          .maybeSingle();
+        if (lookupError) {
+          setMessage("Impossible de vérifier la disponibilité du pseudo. Réessaie dans un instant.");
+          return;
+        }
+        if (existing) {
+          setMessage("Ce pseudo est déjà utilisé. Choisis-en un autre.");
+          return;
+        }
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+        const redirectTo = `${siteUrl}/auth/callback?next=/profil`;
+        const {error}=await supabase.auth.signUp({
+          email: email.trim(),
+          password,
+          options:{
+            data:{username:cleanUsername,display_name:cleanUsername},
+            emailRedirectTo: redirectTo,
+          },
+        });
+        if (error) {
+          const detail = error.message.toLowerCase();
+          setMessage(detail.includes("email") && (detail.includes("already") || detail.includes("registered"))
+            ? "Un compte utilise déjà cette adresse e-mail."
+            : detail.includes("profiles_username_key") || detail.includes("duplicate key")
+              ? "Ce pseudo est déjà utilisé. Choisis-en un autre."
+              : error.message);
+        } else {
+          setMessage("Compte créé. Vérifie ton e-mail pour confirmer ton adresse.");
+        }
+      } else {
+        const {error}=await supabase.auth.signInWithPassword({email:email.trim(),password});
+        if(error) setMessage(error.message); else window.location.href="/profil";
+      }
+    } catch {
+      setMessage("La demande n’a pas abouti à cause d’un problème de connexion. Réessaie.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return <main className="shell auth-shell">
