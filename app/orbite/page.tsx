@@ -6,9 +6,9 @@ import { createSupabaseBrowser } from "../../lib/supabase-browser";
 type Member = { id: string; username: string; display_name: string; avatar_url: string | null; distance_band: 1 | 2 | 3 | 4 };
 type Profile = { username: string; display_name: string; avatar_url: string | null };
 const rings = [
-  { id: 1, label: "0 à 5 km", name: "Proximité", color: "#b58cff", size: "30%", duration: "30s" },
-  { id: 2, label: "6 à 10 km", name: "Voisinage", color: "#66a5ff", size: "51%", duration: "38s" },
-  { id: 3, label: "11 à 25 km", name: "Horizon local", color: "#52e0d0", size: "73%", duration: "46s" },
+  { id: 1, label: "0 à 5 km", name: "Proximité", color: "#b58cff", size: "42%", duration: "30s" },
+  { id: 2, label: "6 à 10 km", name: "Voisinage", color: "#66a5ff", size: "59%", duration: "38s" },
+  { id: 3, label: "11 à 25 km", name: "Horizon local", color: "#52e0d0", size: "77%", duration: "46s" },
   { id: 4, label: "26 à 50 km", name: "Grand voisinage", color: "#f2c56b", size: "95%", duration: "56s" },
 ];
 
