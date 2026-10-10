@@ -114,6 +114,7 @@ export default function AdminPage() {
       <section className="admin-action-grid">
         <Link className="admin-action-card" href="#roles"><span className="admin-action-icon">👑</span><strong>Rôles & permissions</strong><small>Promouvoir ou retirer les droits Admin et Modo.</small></Link>
         <Link className="admin-action-card" href="/moderation"><span className="admin-action-icon">🛡️</span><strong>Centre de modération</strong><small>Accéder à la file des signalements et aux sanctions.</small></Link>
+        <Link className="admin-action-card" href="/moderation#badges"><span className="admin-action-icon">⬡</span><strong>Atelier de badges</strong><small>Créer les insignes PNG et attribuer les badges manuellement.</small></Link>
         <div className="admin-action-card locked"><span className="admin-action-icon">📋</span><strong>Journal sensible</strong><small>Les actions de rôles sont protégées côté base de données et restent traçables.</small></div>
       </section>
 
