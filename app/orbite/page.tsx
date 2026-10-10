@@ -21,6 +21,7 @@ export default function OrbitePage() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [failedAvatars, setFailedAvatars] = useState<string[]>([]);
 
   const loadMembers = useCallback(async () => {
     const { data, error } = await supabase.rpc("get_orbit_members");
@@ -142,7 +143,7 @@ export default function OrbitePage() {
           const angle = (i * 360 / Math.max(1, r.members.length) + r.id * 29) % 360;
           const style = { "--radius": `calc(var(--stage-size) * ${Number(r.size.slice(0, -1)) / 200})`, "--start-angle": `${angle}deg`, "--duration": r.duration } as React.CSSProperties;
           return <Link key={m.id} className="orbit-person" href={`/membre/${encodeURIComponent(m.username)}`} style={style} title={`${m.display_name || m.username} · ${r.label}`} aria-label={`Voir le profil de ${m.display_name || m.username}, ${r.label}`}>
-            <span className="orbit-person-face">{m.avatar_url ? <img src={m.avatar_url} alt="" /> : (m.display_name || m.username).slice(0, 1).toUpperCase()}</span>
+            <span className="orbit-person-face">{m.avatar_url && !failedAvatars.includes(m.id) ? <img src={m.avatar_url} alt="" loading="eager" decoding="async" onError={() => setFailedAvatars(current => current.includes(m.id) ? current : [...current, m.id])} /> : (m.display_name || m.username).slice(0, 1).toUpperCase()}</span>
           </Link>;
         }))}
         <div className="orbit-center"><div className="orbit-center-avatar">{profile?.avatar_url ? <img src={profile.avatar_url} alt="" /> : (profile?.display_name || profile?.username || "P").slice(0, 1).toUpperCase()}</div><strong>{profile?.display_name || profile?.username || "Mon profil"}</strong><small>TOI</small></div>
@@ -166,7 +167,7 @@ export default function OrbitePage() {
       .orbit-ring span{position:absolute;left:50%;top:0;transform:translate(-50%,-50%);padding:2px 7px;border:1px solid var(--orbit-color);border-radius:20px;background:#0b0d25;color:var(--orbit-color);font-size:.58rem;white-space:nowrap}
       .orbit-person{position:absolute;left:50%;top:50%;width:0;height:0;z-index:3;transform:rotate(var(--start-angle)) translateX(var(--radius));animation:orbit-path var(--duration) linear infinite}
       .orbit-person-face{position:absolute;left:0;top:0;display:grid;place-items:center;width:38px;height:38px;margin:-19px;border:2px solid var(--cyan);border-radius:50%;overflow:hidden;background:#20265b;color:#fff;font-weight:800;font-size:.8rem;box-shadow:0 0 15px rgba(69,239,255,.22);animation:face-counter-spin var(--duration) linear infinite}
-      .orbit-person-face img,.orbit-center-avatar img{width:100%;height:100%;object-fit:cover}
+      .orbit-person-face img,.orbit-center-avatar img{display:block;width:100%;height:100%;min-width:100%;min-height:100%;object-fit:cover;border-radius:inherit}
       .orbit-center{position:absolute;z-index:4;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;flex-direction:column;justify-content:center;width:116px;height:116px;padding:9px;border:1px solid var(--cyan);border-radius:50%;background:radial-gradient(circle,#25245b,#0b0d25 75%);box-shadow:0 0 24px rgba(69,239,255,.18);text-align:center}
       .orbit-center-avatar{display:grid;place-items:center;width:46px;height:46px;margin-bottom:4px;border:2px solid var(--pink);border-radius:50%;overflow:hidden;background:#20265b;color:#fff;font-weight:800}
       .orbit-center strong{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.68rem}.orbit-center small{color:var(--cyan);font-size:.55rem;letter-spacing:.2em}
