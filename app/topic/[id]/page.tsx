@@ -12,15 +12,17 @@ import { getReputationTitle } from "../../../lib/reputation";
 import RichPostBody from "./rich-post-body";
 import QuoteReplyButton from "./quote-reply-button";
 import { ForumVoice } from "./forum-voice";
+import BadgeMedal from "../../components/badge-medal";
 
 export const revalidate = 10;
 
 type ForumPost = any;
 
-function ForumPostCard({ post, childrenByParent, postsById, topicLocked, depth = 0 }: {
+function ForumPostCard({ post, childrenByParent, postsById, badgesByProfile, topicLocked, depth = 0 }: {
   post: ForumPost;
   childrenByParent: Map<string, ForumPost[]>;
   postsById: Map<string, ForumPost>;
+  badgesByProfile: Map<string, any[]>;
   topicLocked: boolean;
   depth?: number;
 }) {
@@ -43,6 +45,7 @@ function ForumPostCard({ post, childrenByParent, postsById, topicLocked, depth =
           </Link>
           <Link className="member-handle" href={profileHref}>@{profile?.username || "membre"}</Link>
           <span className="member-reputation"><strong>{profile?.reputation ?? 0}</strong> réputation · {getReputationTitle(profile?.reputation ?? 0)}</span>
+          {(badgesByProfile.get(post.author_id) ?? []).length > 0 && <div className="member-badges">{(badgesByProfile.get(post.author_id) ?? []).map((badge: any, index: number) => <BadgeMedal key={badge?.id || badge?.name || index} badge={badge} size="small" />)}</div>}
           </aside>
         <div className="post-body">
           <time>{new Date(post.created_at).toLocaleString("fr-FR")}</time>
@@ -56,7 +59,7 @@ function ForumPostCard({ post, childrenByParent, postsById, topicLocked, depth =
           <ForumModerationActions postId={post.id} />
         </div>
       </article>
-      {children.length > 0 && <div className="post-thread-children">{children.map(child => <ForumPostCard key={child.id} post={child} childrenByParent={childrenByParent} postsById={postsById} topicLocked={topicLocked} depth={depth + 1} />)}</div>}
+      {children.length > 0 && <div className="post-thread-children">{children.map(child => <ForumPostCard key={child.id} post={child} childrenByParent={childrenByParent} postsById={postsById} badgesByProfile={badgesByProfile} topicLocked={topicLocked} depth={depth + 1} />)}</div>}
     </div>
   );
 }
@@ -68,6 +71,10 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
   if (!topic) notFound();
   const { data: posts, error } = await supabase.from("forum_posts").select("id, body, created_at, author_id, parent_post_id, profiles:author_id(username, display_name, avatar_url, reputation, is_admin, is_moderator)").eq("topic_id", id).order("created_at", { ascending: true });
   const { data: poll } = await supabase.from("forum_polls").select("id").eq("topic_id", id).maybeSingle();
+  const authorIds = [...new Set((posts ?? []).map((post: any) => post.author_id).filter(Boolean))];
+  const { data: badgeRows } = authorIds.length ? await supabase.from("profile_badges").select("profile_id,badge_id,badges:badge_id(name,icon,tone,description,background_color,image_zoom,image_position_x,image_position_y,border_color,border_width,glow_intensity)").in("profile_id", authorIds) : { data: [] };
+  const badgesByProfile = new Map<string, any[]>();
+  for (const row of badgeRows ?? []) { const badge = Array.isArray(row.badges) ? row.badges[0] : row.badges; if (!badge) continue; const list = badgesByProfile.get(row.profile_id) ?? []; list.push({ ...badge, id: row.badge_id }); badgesByProfile.set(row.profile_id, list); }
   const childrenByParent = new Map<string, ForumPost[]>();
   for (const post of posts ?? []) {
     if (post.parent_post_id) {
@@ -90,7 +97,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
         <>
           {poll?.id && <Poll pollId={poll.id} />}
           <section className="post-list">
-            {rootPosts.map((post: any) => <ForumPostCard key={post.id} post={post} childrenByParent={childrenByParent} postsById={postsById} topicLocked={topic.locked} />)}
+            {rootPosts.map((post: any) => <ForumPostCard key={post.id} post={post} childrenByParent={childrenByParent} postsById={postsById} badgesByProfile={badgesByProfile} topicLocked={topic.locked} />)}
           </section>
           <ReplyBox topicId={topic.id} locked={topic.locked} />
         </>
