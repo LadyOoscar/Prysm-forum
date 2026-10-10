@@ -2384,3 +2384,25 @@ footer:before {
   clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0 50%);
   font-size: 1.05rem; line-height: 1;
 }
+
+
+/* Fix: force badge artwork to fill the inner hexagon instead of inheriting legacy 20px icon sizing. */
+.profile-badge > img.badge-mark,
+.profile-badge-chip > img.badge-mark,
+.badge-preview-chip > img.badge-mark,
+.profile-badge > .badge-mark,
+.profile-badge-chip > .badge-mark,
+.badge-preview-chip > .badge-mark {
+  position: absolute !important;
+  inset: var(--badge-border-width, 2px) !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  flex: none !important;
+  object-fit: cover !important;
+  object-position: var(--badge-position-x, 50%) var(--badge-position-y, 50%) !important;
+  clip-path: polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0 50%) !important;
+}
