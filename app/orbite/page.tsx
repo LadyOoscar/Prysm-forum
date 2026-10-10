@@ -157,7 +157,12 @@ export default function OrbitePage() {
         {rings.map(r => <div key={r.id} className="orbit-ring" style={{ "--orbit-size": r.size, "--orbit-color": r.color } as React.CSSProperties}><span>{r.label}</span></div>)}
         {grouped.map(r => r.members.map((m, i) => {
           const angle = (i * 360 / Math.max(1, r.members.length) + r.id * 29) % 360;
-          const style = { "--radius": `${orbitStageWidth * Number(r.size.slice(0, -1)) / 200}px`, "--start-angle": `${angle}deg`, "--duration": r.duration } as React.CSSProperties;
+          const radius = orbitStageWidth * Number(r.size.slice(0, -1)) / 200;
+          const radians = angle * Math.PI / 180;
+          const style = {
+            left: `${orbitStageWidth / 2 + Math.cos(radians) * radius}px`,
+            top: `${orbitStageWidth / 2 + Math.sin(radians) * radius}px`,
+          } as React.CSSProperties;
           return <Link key={m.id} className="orbit-person" href={`/membre/${encodeURIComponent(m.username)}`} style={style} title={`${m.display_name || m.username} · ${r.label}`} aria-label={`Voir le profil de ${m.display_name || m.username}, ${r.label}`}>
             <span className="orbit-person-face">{m.avatar_url && !failedAvatars.includes(m.id) ? <img src={m.avatar_url} alt="" loading="eager" decoding="async" onError={() => setFailedAvatars(current => current.includes(m.id) ? current : [...current, m.id])} /> : (m.display_name || m.username).slice(0, 1).toUpperCase()}</span>
           </Link>;
@@ -182,8 +187,8 @@ export default function OrbitePage() {
       .orbit-stars{position:absolute;inset:0;border-radius:50%;opacity:.48;background-image:radial-gradient(#bfcaff 1px,transparent 1.5px),radial-gradient(#5b6caa 1px,transparent 1.5px);background-size:47px 53px,71px 83px;background-position:4px 9px,22px 31px;pointer-events:none}
       .orbit-ring{position:absolute;left:50%;top:50%;width:var(--orbit-size);height:var(--orbit-size);transform:translate(-50%,-50%);border:1px solid color-mix(in srgb,var(--orbit-color),transparent 38%);border-radius:50%;box-shadow:0 0 14px color-mix(in srgb,var(--orbit-color),transparent 90%);pointer-events:none}
       .orbit-ring span{position:absolute;left:50%;top:0;transform:translate(-50%,-50%);padding:2px 7px;border:1px solid var(--orbit-color);border-radius:20px;background:#0b0d25;color:var(--orbit-color);font-size:.58rem;white-space:nowrap}
-      .orbit-person{position:absolute;left:50%;top:50%;width:0;height:0;z-index:3;transform:rotate(var(--start-angle)) translateX(var(--radius));animation:orbit-path var(--duration) linear infinite}
-      .orbit-person-face{position:absolute;left:0;top:0;display:grid;place-items:center;width:38px;height:38px;margin:-19px;border:2px solid var(--cyan);border-radius:50%;overflow:hidden;background:#20265b;color:#fff;font-weight:800;font-size:.8rem;box-shadow:0 0 15px rgba(69,239,255,.22);animation:face-counter-spin var(--duration) linear infinite}
+      .orbit-person{position:absolute;left:0;top:0;width:38px;height:38px;z-index:3;display:block;transform:translate(-50%,-50%);border-radius:50%}
+      .orbit-person-face{position:relative;left:auto;top:auto;display:grid;place-items:center;width:100%;height:100%;margin:0;border:2px solid var(--cyan);border-radius:50%;overflow:hidden;background:#20265b;color:#fff;font-weight:800;font-size:.8rem;box-shadow:0 0 15px rgba(69,239,255,.3)}
       .orbit-person-face img,.orbit-center-avatar img{display:block;width:100%;height:100%;min-width:100%;min-height:100%;object-fit:cover;border-radius:inherit}
       .orbit-center{position:absolute;z-index:4;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;align-items:center;flex-direction:column;justify-content:center;width:116px;height:116px;padding:9px;border:1px solid var(--cyan);border-radius:50%;background:radial-gradient(circle,#25245b,#0b0d25 75%);box-shadow:0 0 24px rgba(69,239,255,.18);text-align:center}
       .orbit-center-avatar{display:grid;place-items:center;width:46px;height:46px;margin-bottom:4px;border:2px solid var(--pink);border-radius:50%;overflow:hidden;background:#20265b;color:#fff;font-weight:800}
@@ -195,11 +200,9 @@ export default function OrbitePage() {
       .orbit-legend-row{display:flex;align-items:center;gap:10px;padding:13px 0;border-bottom:1px solid rgba(54,58,112,.7)}.orbit-legend-dot{width:9px;height:9px;flex:none;border-radius:50%}.orbit-legend-row div{display:grid;gap:1px;flex:1}.orbit-legend-row strong{font-size:.8rem}.orbit-legend-row small{font-size:.68rem;color:var(--muted)}.orbit-legend-row>b{font-size:1.1rem}
       .orbit-member-list{margin-top:22px;padding-top:16px;border-top:1px solid rgba(54,58,112,.7)}.orbit-member-list h3{margin:0 0 10px;font-size:.88rem}.orbit-member-link{display:flex;align-items:center;gap:10px;padding:9px 0;color:inherit;text-decoration:none;border-bottom:1px solid rgba(54,58,112,.45)}.orbit-member-link:hover .orbit-member-name strong{color:var(--cyan)}.orbit-member-avatar{display:grid;place-items:center;flex:none;width:38px;height:38px;overflow:hidden;border:1px solid var(--cyan);border-radius:50%;background:#20265b;color:#fff;font-weight:800}.orbit-member-avatar img{display:block;width:100%;height:100%;object-fit:cover}.orbit-member-name{display:grid;gap:3px;flex:1;min-width:0}.orbit-member-name strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.8rem}.orbit-member-name small{color:var(--muted);font-size:.68rem}.orbit-member-arrow{color:var(--cyan)}
       .orbit-privacy{margin:19px 0 0;color:#8189ad;font-size:.68rem;line-height:1.65}
-      @keyframes orbit-path{from{transform:rotate(var(--start-angle)) translateX(var(--radius))}to{transform:rotate(calc(var(--start-angle) + 360deg)) translateX(var(--radius))}}
-      @keyframes face-counter-spin{from{transform:rotate(calc(-1 * var(--start-angle)))}to{transform:rotate(calc(-1 * var(--start-angle) - 360deg))}}
       @media(prefers-reduced-motion:reduce){.orbit-person,.orbit-person-face{animation:none!important}}
       @media(max-width:900px){.orbit-layout{grid-template-columns:1fr}.orbit-stage{--stage-size:min(86vw,650px)}}
-      @media(max-width:600px){.orbit-controls{align-items:stretch;flex-direction:column}.orbit-controls .button{width:100%}.orbit-stage{--stage-size:calc(100vw - 40px)}.orbit-center{width:92px;height:92px}.orbit-center-avatar{width:36px;height:36px}.orbit-person-face{width:32px;height:32px;margin:-16px}.orbit-ring span{font-size:.5rem}.orbit-overlay{width:64%;bottom:12%;padding:8px 9px}.orbit-overlay strong{font-size:.78rem}.orbit-overlay span{font-size:.62rem}}
+      @media(max-width:600px){.orbit-controls{align-items:stretch;flex-direction:column}.orbit-controls .button{width:100%}.orbit-stage{--stage-size:calc(100vw - 40px)}.orbit-center{width:92px;height:92px}.orbit-center-avatar{width:36px;height:36px}.orbit-person{width:32px;height:32px}.orbit-ring span{font-size:.5rem}.orbit-overlay{width:64%;bottom:12%;padding:8px 9px}.orbit-overlay strong{font-size:.78rem}.orbit-overlay span{font-size:.62rem}}
     `}</style>
   </main>;
 }
