@@ -16,50 +16,58 @@ const links = [
 
 function SharkCourier({ className = "" }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 128 80" aria-hidden="true" focusable="false" shapeRendering="crispEdges">
-      {/* Deep navy outline: crescent tail, unmistakable dorsal fin, pointed snout */}
-      <path fill="#101b35" d="M25 35 14 25 9 14 21 22 30 29 38 26 44 21 49 7 56 13 63 24 79 23 94 26 107 31 120 35 113 39 110 44 99 46 88 51 73 52 62 48 56 61 48 55 44 46 32 44 25 40Z" />
-      {/* Cool blue upper body, with a clean shark profile rather than a round fish body */}
-      <path fill="#347fae" d="M19 26 30 33 39 30 46 24 51 13 56 18 63 28 80 27 95 30 109 35 115 36 109 39 106 42 97 43 87 48 73 49 63 45 56 55 51 51 47 42 33 40 26 37Z" />
-      <path fill="#5db7dc" d="M31 34 40 32 47 27 52 19 56 23 62 31 80 30 96 33 109 36 103 39 94 40 85 45 73 46 62 42 56 50 53 44 48 38 34 38Z" />
-      {/* Pale belly, clearly separated from the blue back */}
-      <path fill="#e7faff" d="M35 39 48 39 54 45 58 52 63 44 73 47 85 46 94 41 103 40 98 44 87 49 74 51 62 47 56 59 51 53 46 45 34 43Z" />
-      <path fill="#b8efff" d="M43 40h7v3h4v4h4v4h3v-5h8v3h7v-2h9v-2h7v-2h6v-2h-8v3h-8v2h-8v-2h-7v-2h-8v-3h-7z" />
-      {/* Iconic tall dorsal fin and smaller pectoral fin */}
-      <path fill="#101b35" d="M47 23 49 7 56 13 64 25 57 28Z" />
-      <path fill="#4a9bc5" d="M51 19 52 12 56 16 60 24 56 25Z" />
-      <path fill="#101b35" d="M70 43 81 47 73 57 65 49Z" />
-      <path fill="#2d719e" d="M71 45 77 48 72 53 68 49Z" />
-      {/* Forked shark tail, with a visible upper and lower lobe */}
-      <path fill="#101b35" d="M25 35 14 25 9 14 21 22 30 29 29 35 30 40 25 40 14 49 8 58 10 45 17 38Z" />
-      <path fill="#347fae" d="M22 34 15 27 12 20 21 26 28 31 27 35 27 39 20 44 12 52 14 44 20 38Z" />
-      {/* Three gill slits, a shark signature */}
-      <path fill="#20557e" d="M38 32h2v7h-2zM42 30h2v9h-2zM46 28h2v9h-2z" />
-      <path fill="#86dcf5" d="M39 33h1v4h-1zM43 31h1v5h-1z" />
-      {/* Big glossy kawaii eye, placed on the head */}
-      <path fill="#101b35" d="M91 29h8v8h-8z" />
-      <path fill="#fff9ff" d="M93 30h5v5h-5z" />
-      <path fill="#25304e" d="M95 32h3v4h-3z" />
-      <path fill="#ffffff" d="M93 30h2v2h-2zM97 33h1v1h-1z" />
-      {/* Shy pink cheeks */}
-      <path fill="#ff8fbd" d="M83 37h3v2h-3zM86 36h4v3h-4zM89 37h2v2h-2z" />
-      <path fill="#ffc5da" d="M85 36h2v2h-2z" />
-      {/* Smiling mouth with two tiny triangular shark teeth */}
-      <path fill="#101b35" d="M102 39h10v2h-2v2h-6v-2h-2z" />
-      <path fill="#fff9ff" d="M104 39h3v3h-1v-1h-1v-1h-1zM109 39h2v2h-1v1h-1z" />
-      {/* A few pale pixel glints on the back */}
-      <path fill="#c9f6ff" d="M33 29h4v2h-4zM58 27h3v2h-3zM72 29h3v2h-3z" />
-      {/* Pink mail pouch tucked beneath the shark, not covering its silhouette */}
-      <path fill="#101b35" d="M81 50h17v3h4v10h-3v3H80v-3h-3V53h4z" />
-      <path fill="#ff8fbd" d="M82 53h16v2h2v7h-2v2H81v-2h-2v-7h3z" />
-      <path fill="#fff4fa" d="M81 54h17v2l-8 6-9-6z" />
-      <path fill="#e66d9e" d="M79 56l7 6-5 1h-2zM100 56l-7 6 5 1h2z" />
-      <path fill="#ffbdd3" d="M82 61l7 4 7-4v2l-7 4-7-4z" />
-      <path fill="#fffaff" d="M87 56h2v2h2v2h-2v2h-2v-2h-2v-2h2z" />
-      {/* Floating pixel sparkles, kept secondary to the shark */}
-      <path fill="#ffdc72" d="M32 8h3v3h3v3h-3v3h-3v-3h-3v-3h3z" />
-      <path fill="#ff8fbd" d="M109 14h2v3h3v2h-3v3h-2v-3h-3v-2h3z" />
-      <path fill="#b9f2ff" d="M19 56h2v2h2v2h-2v2h-2v-2h-2v-2h2z" />
+    <svg className={className} viewBox="0 0 128 104" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="shark-fur" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#8edcf4" />
+          <stop offset="1" stopColor="#397fae" />
+        </linearGradient>
+        <linearGradient id="shark-belly" x1="0" y1="0" x2="0.8" y2="1">
+          <stop offset="0" stopColor="#fffaff" />
+          <stop offset="1" stopColor="#cceefa" />
+        </linearGradient>
+      </defs>
+      {/* Little tail and dorsal fin: still unmistakably a shark, but plush and soft-edged */}
+      <path d="M29 64 C20 61 17 52 10 48 C12 60 16 65 23 69 C16 74 13 81 14 88 C22 82 29 76 35 72Z" fill="#245779" stroke="#17324e" strokeWidth="2.5" strokeLinejoin="round"/>
+      <path d="M48 27 C49 15 56 8 62 6 C64 16 69 21 76 27Z" fill="#397fae" stroke="#17324e" strokeWidth="2.5" strokeLinejoin="round"/>
+      {/* Round chubby head and body, with tiny tufts to give the silhouette a fluffy plush feel */}
+      <path d="M35 43 C31 36 36 30 43 31 C46 23 55 23 60 27 C67 20 77 24 80 29 C90 26 98 34 97 41 C107 45 112 55 109 64 C115 73 107 83 98 84 C90 94 76 94 68 91 C57 96 43 91 40 84 C29 81 25 72 30 63 C25 55 28 47 35 43Z" fill="#17324e"/>
+      <path d="M36 43 C32 37 38 32 44 34 C48 26 55 27 60 31 C67 24 76 27 79 33 C89 29 96 36 94 43 C104 47 108 55 105 63 C111 71 104 79 96 80 C88 89 77 90 68 87 C57 92 46 87 43 80 C33 78 29 70 34 62 C29 55 31 47 36 43Z" fill="url(#shark-fur)"/>
+      {/* Soft pale muzzle and round tummy */}
+      <path d="M42 56 C49 49 61 50 69 54 C77 48 90 52 96 59 C101 67 96 77 88 81 C78 89 57 88 47 80 C39 74 37 64 42 56Z" fill="url(#shark-belly)"/>
+      <ellipse cx="67" cy="69" rx="18" ry="15" fill="#e8f9ff" opacity=".9"/>
+      {/* Fluffy cheek tufts */}
+      <path d="M36 49 L29 45 L32 54 L27 59 L37 60 M96 47 L103 43 L101 52 L107 57 L97 59" fill="#65b9dc" stroke="#17324e" strokeWidth="2" strokeLinejoin="round"/>
+      {/* Tiny rounded arms make the shark feel like a little person */}
+      <path d="M39 64 C31 63 28 69 31 76 C34 82 41 81 46 76Z" fill="#5eb7d9" stroke="#17324e" strokeWidth="2.5"/>
+      <path d="M91 63 C99 61 104 67 101 74 C99 80 92 80 87 75Z" fill="#5eb7d9" stroke="#17324e" strokeWidth="2.5"/>
+      {/* Tiny feet */}
+      <path d="M48 84 C43 87 43 93 49 95 L59 95 C63 92 60 87 56 84Z" fill="#347fae" stroke="#17324e" strokeWidth="2.5"/>
+      <path d="M73 85 C69 88 70 93 75 95 L85 94 C90 91 86 86 81 84Z" fill="#347fae" stroke="#17324e" strokeWidth="2.5"/>
+      {/* Gill marks */}
+      <path d="M42 49 Q40 54 42 57 M47 47 Q45 52 47 55 M52 46 Q50 50 52 53" fill="none" stroke="#28668e" strokeWidth="2" strokeLinecap="round"/>
+      {/* Big friendly eyes, highlights, blush, and a shy toothy smile */}
+      <ellipse cx="61" cy="46" rx="7" ry="9" fill="#17324e"/>
+      <ellipse cx="63" cy="45" rx="4.5" ry="6.5" fill="#fffaff"/>
+      <ellipse cx="64" cy="47" rx="2.8" ry="4.5" fill="#202e4d"/>
+      <circle cx="61.5" cy="42.5" r="2" fill="#fff"/>
+      <ellipse cx="83" cy="46" rx="6.5" ry="8.5" fill="#17324e"/>
+      <ellipse cx="84" cy="45" rx="4.2" ry="6.2" fill="#fffaff"/>
+      <ellipse cx="85" cy="47" rx="2.6" ry="4.2" fill="#202e4d"/>
+      <circle cx="82.5" cy="42.5" r="1.8" fill="#fff"/>
+      <ellipse cx="51" cy="57" rx="6" ry="3.2" fill="#ff8fbd" opacity=".85"/>
+      <ellipse cx="91" cy="56" rx="5.5" ry="3" fill="#ff8fbd" opacity=".85"/>
+      <path d="M68 56 Q73 62 80 56" fill="none" stroke="#17324e" strokeWidth="2.5" strokeLinecap="round"/>
+      <path d="M72 58 L74 62 L76 59" fill="#fffaff" stroke="#17324e" strokeWidth="1" strokeLinejoin="round"/>
+      {/* Courier satchel worn across the little shark's belly */}
+      <path d="M79 66 Q91 61 98 69 L101 84 Q90 92 77 86 L75 74Z" fill="#17324e" stroke="#17324e" strokeWidth="3" strokeLinejoin="round"/>
+      <path d="M81 69 Q91 65 96 71 L98 82 Q89 87 80 83Z" fill="#ff8fbd"/>
+      <path d="M80 70 L89 77 L97 70" fill="none" stroke="#fff4fa" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M88 77 C84 73 81 78 88 82 C95 78 92 73 88 77Z" fill="#fffaff"/>
+      {/* A few soft sparkles around the character */}
+      <path d="M22 27 L24 32 L29 34 L24 36 L22 41 L20 36 L15 34 L20 32Z" fill="#ffdc72"/>
+      <path d="M105 23 L107 27 L111 29 L107 31 L105 35 L103 31 L99 29 L103 27Z" fill="#ff8fbd"/>
+      <circle cx="19" cy="47" r="2" fill="#b9f2ff"/>
     </svg>
   );
 }
