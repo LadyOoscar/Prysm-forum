@@ -2094,3 +2094,11 @@ footer:before {
 .site-notification-button:focus-visible{box-shadow:0 0 0 3px rgba(255,79,195,.2)}
 .site-notification-button .site-notification-count{position:absolute;top:-6px;right:-6px;min-width:17px;height:17px;padding:0 4px;font-size:.62rem;border:1px solid #0b1025}
 @media(max-width:760px){.site-notification-button{width:32px;height:32px;min-width:32px;flex:0 0 32px}}
+
+
+/* Compact, accessible LGBTQIA+ community flags */
+.pride-flag-list{display:inline-flex;align-items:center;gap:3px;vertical-align:middle;margin-left:6px;flex-wrap:wrap;max-width:100%}
+.pride-flag{display:inline-block;vertical-align:middle;flex:none;border-radius:2px;box-shadow:0 0 0 1px rgba(255,255,255,.2)}
+.post-author-display-name+.pride-flag-list{margin-left:5px}
+.public-profile-hero .pride-flag-list{margin-left:0;gap:5px}
+@media(max-width:600px){.pride-flag-list{gap:2px;margin-left:4px}.pride-flag{width:19px;height:13px}}
