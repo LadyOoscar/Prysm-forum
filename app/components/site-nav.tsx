@@ -16,23 +16,29 @@ const links = [
 
 function SharkCourier({ className = "" }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 32 24" aria-hidden="true" focusable="false" shapeRendering="crispEdges">
-      {/* Tail and unmistakable shark silhouette */}
-      <path fill="#173451" d="M1 8h4V5h3v3h3v2h8v2h-8v2H8v3H5v-3H1v-2H0v-2h1z"/>
-      <path fill="#367fae" d="M5 8h4V5h2v3h4v1h5v2h3v2h-3v2h-5v1H9v-2H5v-2H3v-2h2z"/>
-      <path fill="#65c5e9" d="M6 9h4V7h2v2h4v1h4v2h-4v2h-5v1H7v-2H5v-2h1z"/>
-      <path fill="#24547e" d="M10 5h3V2h3v3h3v3h-3V6h-3v2h-3z"/>
-      <path fill="#24547e" d="M13 15h4v2h3v2h-5v-2h-2z"/>
-      <path fill="#14253b" d="M17 8h3v3h-3z"/>
-      <path fill="#fff3f5" d="M18 8h1v1h-1z"/>
-      <path fill="#b5efff" d="M5 11h2v1H5zM9 13h4v1H9z"/>
-      {/* Separate, readable pink envelope */}
-      <path fill="#14253b" d="M16 11h13v1h2v8h-1v2H16v-1h-1v-8h1z"/>
-      <path fill="#f58cae" d="M17 12h12v1h1v7h-1v1H17v-1h-1v-7h1z"/>
-      <path fill="#fff0f5" d="M18 13h10v2l-5 4-5-4z"/>
-      <path fill="#dc6d9d" d="M16 14l6 5-5 2h-1zM30 14l-6 5 5 2h1z"/>
-      <path fill="#ffb4c9" d="M18 16l4 3 1 1 1-1 4-3v4H18z"/>
-      <path fill="#fff0f5" d="M20 14h6v1h-6z"/>
+    <svg className={className} viewBox="0 0 64 40" aria-hidden="true" focusable="false" shapeRendering="crispEdges">
+      {/* Tail: the two lobes make the silhouette read as a shark, not a fish */}
+      <path fill="#10263d" d="M3 13h7V8h5v7h5v4h-5v5h-5v-5H3v-3H0v-2h3z" />
+      <path fill="#28658e" d="M6 14h5V11h3v6h6v2h-6v4h-3v-4H6z" />
+      {/* Main body, blunt snout and dorsal fin */}
+      <path fill="#10263d" d="M14 15h6v-5h7V5h6v5h5v3h8v3h7v3h-3v4h-5v3H33v3h-8v-3h-6v-4h-5v-7h5z" />
+      <path fill="#367fae" d="M16 16h5v-4h7V8h3v5h6v2h9v3h7v2h-4v3h-7v3H33v2h-6v-3h-6v-4h-5z" />
+      <path fill="#65c5e9" d="M20 19h8v2h8v2h9v-2h6v2h-5v3h-8v2h-7v-2h-6v-3h-5z" />
+      {/* Pectoral fin and gill marks */}
+      <path fill="#10263d" d="M29 25h8v3h5v2h-8v-2h-5z" />
+      <path fill="#24547e" d="M23 17h2v5h-2zM27 17h2v5h-2zM31 17h2v5h-2z" />
+      {/* Bright eye, nostril and unmistakable jagged teeth */}
+      <path fill="#10263d" d="M43 15h5v5h-5z" />
+      <path fill="#fff3f5" d="M45 16h2v2h-2z" />
+      <path fill="#10263d" d="M52 19h4v2h-4z" />
+      <path fill="#fff3f5" d="M48 21h2v3h-2zM52 21h2v2h-2zM46 23h2v2h-2z" />
+      {/* Pink envelope carried at the shark's mouth, with clear flap and folds */}
+      <path fill="#10263d" d="M44 25h14v2h3v8h-2v2H43v-2h-2v-8h3z" />
+      <path fill="#f58cae" d="M45 27h13v2h1v5h-2v1H44v-1h-1v-5h2z" />
+      <path fill="#fff0f5" d="M45 28h13v2l-6 5-7-5z" />
+      <path fill="#dc6d9d" d="M43 30l6 5-5 1h-1zM59 30l-6 5 5 1h1z" />
+      <path fill="#ffb4c9" d="M45 33l5 3h2l5-3v2H45z" />
+      <path fill="#fff0f5" d="M48 28h7v1h-7z" />
     </svg>
   );
 }
