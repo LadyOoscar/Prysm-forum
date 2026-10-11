@@ -2040,3 +2040,49 @@ footer:before {
 
 @media(max-width:760px){.site-decoration-hide-mobile{display:none!important}}
 @media(min-width:761px){.site-decoration-hide-desktop{display:none!important}}
+
+
+/* PRYSM COMMUNITY HUB // queer-first, retro-futurist, quietly colourful */
+.home-community-hero{position:relative}
+.home-community-hero h1 span{color:#ff8bd8;text-shadow:0 0 24px rgba(255,79,195,.22)}
+.home-community-hero .lead{max-width:610px}
+.home-community-note{display:flex;align-items:center;gap:9px;margin:22px 0 0;color:#aeb6d7;font-family:"Rajdhani",sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase}
+.home-community-note span{color:#ff8bd8;font-size:1.2rem}
+.home-community-hub{padding:18px 0 68px}
+.home-community-hub .section-heading{margin-bottom:20px}
+.home-community-hub h2{font-size:clamp(1.8rem,3.8vw,2.8rem)}
+.home-hub-status{display:inline-flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid rgba(69,239,255,.24);border-radius:3px;color:#aeb9d8;font:700 .65rem "Rajdhani",sans-serif;letter-spacing:.12em;white-space:nowrap}
+.home-hub-status i{width:7px;height:7px;border-radius:50%;background:#b9f77a;box-shadow:0 0 10px rgba(185,247,122,.65)}
+.home-hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.home-hub-card{--hub-accent:#45efff;display:flex;align-items:flex-start;gap:17px;min-width:0;padding:22px;border:1px solid rgba(69,239,255,.2);border-radius:5px;background:linear-gradient(135deg,rgba(21,25,65,.92),rgba(10,13,36,.95));position:relative;overflow:hidden;transition:border-color .18s ease,transform .18s ease,background .18s ease}
+.home-hub-card:before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--hub-accent);opacity:.85}
+.home-hub-card:after{content:"";position:absolute;right:-34px;top:-44px;width:120px;height:120px;border:1px solid color-mix(in srgb,var(--hub-accent) 25%,transparent);transform:rotate(45deg);pointer-events:none}
+.home-hub-card:hover{transform:translateY(-2px);border-color:var(--hub-accent);background:linear-gradient(135deg,rgba(29,33,78,.98),rgba(11,14,38,.98))}
+.hub-support{--hub-accent:#ff8bd8}.hub-chat{--hub-accent:#45efff}.hub-culture{--hub-accent:#b5a0ff}.hub-meet{--hub-accent:#ffd45a}
+.home-hub-icon{display:grid;place-items:center;flex:0 0 46px;width:46px;height:46px;border:1px solid color-mix(in srgb,var(--hub-accent) 50%,transparent);border-radius:4px;background:color-mix(in srgb,var(--hub-accent) 10%,transparent);color:var(--hub-accent);font-size:1.8rem;line-height:1}
+.home-hub-copy{display:grid;gap:8px;min-width:0;position:relative;z-index:1}
+.home-hub-copy strong{font-family:"Space Grotesk",sans-serif;font-size:1.06rem;letter-spacing:-.02em}
+.home-hub-copy small{max-width:390px;color:#aeb5d7;font-size:.84rem;line-height:1.6}
+.home-hub-copy>b{display:inline-flex;align-items:center;gap:7px;margin-top:3px;color:var(--hub-accent);font:700 .72rem "Rajdhani",sans-serif;letter-spacing:.1em;text-transform:uppercase}
+.home-community-footnote{display:flex;align-items:flex-start;gap:13px;margin-top:16px;padding:16px 18px;border:1px solid rgba(139,98,255,.25);background:linear-gradient(100deg,rgba(139,98,255,.09),rgba(255,79,195,.035));color:#b8bfde}
+.home-community-footnote>span{color:#c1a9ff;font-size:1.35rem;line-height:1}
+.home-community-footnote p{margin:0;font-size:.82rem;line-height:1.65}
+.home-community-footnote strong{color:#f4f5ff}
+@media(max-width:760px){
+ .home-community-hero{padding:54px 0 42px;gap:30px;min-height:0}
+ .home-community-hero h1{font-size:clamp(2.8rem,12vw,4.8rem)}
+ .home-community-hero .actions{display:grid;grid-template-columns:minmax(0,1fr);max-width:440px}
+ .home-community-hero .actions .button{width:100%}
+ .home-community-hub{padding:8px 0 46px}
+ .home-hub-grid{grid-template-columns:minmax(0,1fr);gap:10px}
+ .home-hub-card{padding:18px;gap:13px}
+ .home-hub-status{font-size:.56rem;padding:6px 7px}
+ .home-community-hub .section-heading{align-items:flex-start}
+}
+@media(max-width:420px){
+ .home-community-hub .section-heading{display:grid;gap:12px}
+ .home-hub-card{padding:16px}
+ .home-hub-icon{flex-basis:40px;width:40px;height:40px}
+ .home-hub-copy strong{font-size:1rem}
+}
+@media(prefers-reduced-motion:reduce){.home-hub-card{transition:none}.home-hub-card:hover{transform:none}}
