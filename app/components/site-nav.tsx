@@ -17,28 +17,39 @@ const links = [
 function SharkCourier({ className = "" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 64 40" aria-hidden="true" focusable="false" shapeRendering="crispEdges">
-      {/* Tail: the two lobes make the silhouette read as a shark, not a fish */}
+      {/* Split tail and dorsal fin: unmistakably a tiny shark */}
       <path fill="#10263d" d="M3 13h7V8h5v7h5v4h-5v5h-5v-5H3v-3H0v-2h3z" />
       <path fill="#28658e" d="M6 14h5V11h3v6h6v2h-6v4h-3v-4H6z" />
-      {/* Main body, blunt snout and dorsal fin */}
       <path fill="#10263d" d="M14 15h6v-5h7V5h6v5h5v3h8v3h7v3h-3v4h-5v3H33v3h-8v-3h-6v-4h-5v-7h5z" />
       <path fill="#367fae" d="M16 16h5v-4h7V8h3v5h6v2h9v3h7v2h-4v3h-7v3H33v2h-6v-3h-6v-4h-5z" />
       <path fill="#65c5e9" d="M20 19h8v2h8v2h9v-2h6v2h-5v3h-8v2h-7v-2h-6v-3h-5z" />
-      {/* Pectoral fin and gill marks */}
-      <path fill="#10263d" d="M29 25h8v3h5v2h-8v-2h-5z" />
+      {/* Sparkly water highlights and tiny gills */}
+      <path fill="#b9f2ff" d="M19 15h3v1h-3zM25 13h2v1h-2zM34 16h3v1h-3zM38 19h2v1h-2z" />
       <path fill="#24547e" d="M23 17h2v5h-2zM27 17h2v5h-2zM31 17h2v5h-2z" />
-      {/* Bright eye, nostril and unmistakable jagged teeth */}
-      <path fill="#10263d" d="M43 15h5v5h-5z" />
-      <path fill="#fff3f5" d="M45 16h2v2h-2z" />
-      <path fill="#10263d" d="M52 19h4v2h-4z" />
-      <path fill="#fff3f5" d="M48 21h2v3h-2zM52 21h2v2h-2zM46 23h2v2h-2z" />
-      {/* Pink envelope carried at the shark's mouth, with clear flap and folds */}
+      <path fill="#10263d" d="M29 25h8v3h5v2h-8v-2h-5z" />
+      {/* Cute expressive eye with a double sparkle */}
+      <path fill="#10263d" d="M42 14h7v7h-7z" />
+      <path fill="#fff8ff" d="M44 15h3v3h-3z" />
+      <path fill="#ffffff" d="M44 15h1v1h-1z" />
+      <path fill="#ff8fbd" d="M52 20h2v2h-2z" />
+      {/* Rosy pixel cheeks make the courier feel kawaii */}
+      <path fill="#ff8fb7" d="M37 21h3v1h-3zM35 22h5v2h-5zM40 21h2v1h-2z" />
+      <path fill="#ffc2d7" d="M36 22h2v1h-2zM39 22h1v1h-1z" />
+      {/* Little toothy smile */}
+      <path fill="#10263d" d="M47 21h5v2h-5z" />
+      <path fill="#fff3f5" d="M48 21h2v2h-2zM51 21h1v1h-1z" />
+      {/* Pink delivery envelope with crisp folds and a tiny heart seal */}
       <path fill="#10263d" d="M44 25h14v2h3v8h-2v2H43v-2h-2v-8h3z" />
       <path fill="#f58cae" d="M45 27h13v2h1v5h-2v1H44v-1h-1v-5h2z" />
       <path fill="#fff0f5" d="M45 28h13v2l-6 5-7-5z" />
       <path fill="#dc6d9d" d="M43 30l6 5-5 1h-1zM59 30l-6 5 5 1h1z" />
       <path fill="#ffb4c9" d="M45 33l5 3h2l5-3v2H45z" />
       <path fill="#fff0f5" d="M48 28h7v1h-7z" />
+      <path fill="#fff7fb" d="M50 29h2v1h1v1h-1v1h-1v-1h-1z" />
+      {/* Floating pixel stars */}
+      <path fill="#ffdc72" d="M7 4h2v2h2v2H9v2H7V8H5V6h2z" />
+      <path fill="#ff8fbd" d="M57 8h2v2h2v2h-2v2h-2v-2h-2v-2h2z" />
+      <path fill="#b9f2ff" d="M16 29h2v2h2v2h-2v2h-2v-2h-2v-2h2z" />
     </svg>
   );
 }
