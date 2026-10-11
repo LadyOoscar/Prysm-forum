@@ -57,11 +57,22 @@ export function PrideFlag({ id, size = "small" }: { id: string; size?: "small" |
       ) : id === "ally" ? (
         <>
           {[0,1,2,3,4,5,6].map((index) => <rect key={index} x={index * (30 / 7)} y="0" width={30 / 7 + .05} height="20" fill={index % 2 === 0 ? "#000000" : "#FFFFFF"} />)}
-          <defs><linearGradient id={allyGradientId} x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#E40303"/><stop offset="20%" stopColor="#FF8C00"/><stop offset="40%" stopColor="#FFED00"/><stop offset="60%" stopColor="#008026"/><stop offset="80%" stopColor="#004DFF"/><stop offset="100%" stopColor="#750787"/></linearGradient></defs>
-          <text x="15" y="17" textAnchor="middle" fontFamily="Arial, Helvetica, sans-serif" fontSize="22" fontWeight="900" fill="none" stroke="#000000" strokeWidth="3.2" paintOrder="stroke">A</text>
-          <text x="15" y="17" textAnchor="middle" fontFamily="Arial, Helvetica, sans-serif" fontSize="22" fontWeight="900" fill={"url(#" + allyGradientId + ")"} stroke="#FFFFFF" strokeWidth="1.1" paintOrder="stroke">A</text>
-        </>
-      ) : (
+          <defs>
+            <clipPath id={allyGradientId}>
+              <path fillRule="evenodd" d="M3.5 19L11 1H19L26.5 19H19.5L17.8 14.7H12.2L10.5 19Z M13.2 11.2H16.8L15 6.7Z" />
+            </clipPath>
+          </defs>
+          <path d="M3.5 19L11 1H19L26.5 19H19.5L17.8 14.7H12.2L10.5 19Z M13.2 11.2H16.8L15 6.7Z" fill="#000000" fillRule="evenodd" stroke="#000000" strokeWidth="2.4" strokeLinejoin="round" />
+          <g clipPath={"url(#" + allyGradientId + ")"}>
+            <rect x="3" y="0" width="4.5" height="20" fill="#E40303" />
+            <rect x="7.5" y="0" width="4.5" height="20" fill="#FF8C00" />
+            <rect x="12" y="0" width="3" height="20" fill="#FFED00" />
+            <rect x="15" y="0" width="4.5" height="20" fill="#008026" />
+            <rect x="19.5" y="0" width="4.5" height="20" fill="#004DFF" />
+            <rect x="24" y="0" width="4" height="20" fill="#750787" />
+          </g>
+          <path d="M3.5 19L11 1H19L26.5 19H19.5L17.8 14.7H12.2L10.5 19Z M13.2 11.2H16.8L15 6.7Z" fill="none" fillRule="evenodd" stroke="#FFFFFF" strokeWidth=".55" strokeLinejoin="round" />
+        </>      ) : (
         <>
           {flag.colors.map((color, index) => <rect key={color + index} x="0" y={stripeHeight * index} width="30" height={stripeHeight + 0.12} fill={color} />)}
           {"symbol" in flag && flag.symbol === "intersex" && <circle cx="15" cy="10" r="5.3" fill="none" stroke="#7B00A8" strokeWidth="2.1" />}
