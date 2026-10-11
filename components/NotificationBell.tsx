@@ -98,7 +98,7 @@ export default function NotificationBell() {
         aria-label={unread > 0 ? `${unread} notifications non lues, ouvrir la plus récente` : "Aucune notification non lue"}
         title={unread > 0 ? "Ouvrir la dernière notification" : "Aucune notification non lue"}
       >
-        ♢
+        <span className="notificationShark"><SharkCourier /></span>
         {unread > 0 && <span className="notificationBadge">{unread > 9 ? "9+" : unread}</span>}
       </button>
       {alert && (
