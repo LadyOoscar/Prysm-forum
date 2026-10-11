@@ -16,40 +16,50 @@ const links = [
 
 function SharkCourier({ className = "" }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 64 40" aria-hidden="true" focusable="false" shapeRendering="crispEdges">
-      {/* Split tail and dorsal fin: unmistakably a tiny shark */}
-      <path fill="#10263d" d="M3 13h7V8h5v7h5v4h-5v5h-5v-5H3v-3H0v-2h3z" />
-      <path fill="#28658e" d="M6 14h5V11h3v6h6v2h-6v4h-3v-4H6z" />
-      <path fill="#10263d" d="M14 15h6v-5h7V5h6v5h5v3h8v3h7v3h-3v4h-5v3H33v3h-8v-3h-6v-4h-5v-7h5z" />
-      <path fill="#367fae" d="M16 16h5v-4h7V8h3v5h6v2h9v3h7v2h-4v3h-7v3H33v2h-6v-3h-6v-4h-5z" />
-      <path fill="#65c5e9" d="M20 19h8v2h8v2h9v-2h6v2h-5v3h-8v2h-7v-2h-6v-3h-5z" />
-      {/* Sparkly water highlights and tiny gills */}
-      <path fill="#b9f2ff" d="M19 15h3v1h-3zM25 13h2v1h-2zM34 16h3v1h-3zM38 19h2v1h-2z" />
-      <path fill="#24547e" d="M23 17h2v5h-2zM27 17h2v5h-2zM31 17h2v5h-2z" />
-      <path fill="#10263d" d="M29 25h8v3h5v2h-8v-2h-5z" />
-      {/* Cute expressive eye with a double sparkle */}
-      <path fill="#10263d" d="M42 14h7v7h-7z" />
-      <path fill="#fff8ff" d="M44 15h3v3h-3z" />
-      <path fill="#ffffff" d="M44 15h1v1h-1z" />
-      <path fill="#ff8fbd" d="M52 20h2v2h-2z" />
-      {/* Rosy pixel cheeks make the courier feel kawaii */}
-      <path fill="#ff8fb7" d="M37 21h3v1h-3zM35 22h5v2h-5zM40 21h2v1h-2z" />
-      <path fill="#ffc2d7" d="M36 22h2v1h-2zM39 22h1v1h-1z" />
-      {/* Little toothy smile */}
-      <path fill="#10263d" d="M47 21h5v2h-5z" />
-      <path fill="#fff3f5" d="M48 21h2v2h-2zM51 21h1v1h-1z" />
-      {/* Pink delivery envelope with crisp folds and a tiny heart seal */}
-      <path fill="#10263d" d="M44 25h14v2h3v8h-2v2H43v-2h-2v-8h3z" />
-      <path fill="#f58cae" d="M45 27h13v2h1v5h-2v1H44v-1h-1v-5h2z" />
-      <path fill="#fff0f5" d="M45 28h13v2l-6 5-7-5z" />
-      <path fill="#dc6d9d" d="M43 30l6 5-5 1h-1zM59 30l-6 5 5 1h1z" />
-      <path fill="#ffb4c9" d="M45 33l5 3h2l5-3v2H45z" />
-      <path fill="#fff0f5" d="M48 28h7v1h-7z" />
-      <path fill="#fff7fb" d="M50 29h2v1h1v1h-1v1h-1v-1h-1z" />
-      {/* Floating pixel stars */}
-      <path fill="#ffdc72" d="M7 4h2v2h2v2H9v2H7V8H5V6h2z" />
-      <path fill="#ff8fbd" d="M57 8h2v2h2v2h-2v2h-2v-2h-2v-2h2z" />
-      <path fill="#b9f2ff" d="M16 29h2v2h2v2h-2v2h-2v-2h-2v-2h2z" />
+    <svg className={className} viewBox="0 0 128 80" aria-hidden="true" focusable="false" shapeRendering="crispEdges">
+      {/* Deep navy outline: crescent tail, unmistakable dorsal fin, pointed snout */}
+      <path fill="#101b35" d="M25 35 14 25 9 14 21 22 30 29 38 26 44 21 49 7 56 13 63 24 79 23 94 26 107 31 120 35 113 39 110 44 99 46 88 51 73 52 62 48 56 61 48 55 44 46 32 44 25 40Z" />
+      {/* Cool blue upper body, with a clean shark profile rather than a round fish body */}
+      <path fill="#347fae" d="M19 26 30 33 39 30 46 24 51 13 56 18 63 28 80 27 95 30 109 35 115 36 109 39 106 42 97 43 87 48 73 49 63 45 56 55 51 51 47 42 33 40 26 37Z" />
+      <path fill="#5db7dc" d="M31 34 40 32 47 27 52 19 56 23 62 31 80 30 96 33 109 36 103 39 94 40 85 45 73 46 62 42 56 50 53 44 48 38 34 38Z" />
+      {/* Pale belly, clearly separated from the blue back */}
+      <path fill="#e7faff" d="M35 39 48 39 54 45 58 52 63 44 73 47 85 46 94 41 103 40 98 44 87 49 74 51 62 47 56 59 51 53 46 45 34 43Z" />
+      <path fill="#b8efff" d="M43 40h7v3h4v4h4v4h3v-5h8v3h7v-2h9v-2h7v-2h6v-2h-8v3h-8v2h-8v-2h-7v-2h-8v-3h-7z" />
+      {/* Iconic tall dorsal fin and smaller pectoral fin */}
+      <path fill="#101b35" d="M47 23 49 7 56 13 64 25 57 28Z" />
+      <path fill="#4a9bc5" d="M51 19 52 12 56 16 60 24 56 25Z" />
+      <path fill="#101b35" d="M70 43 81 47 73 57 65 49Z" />
+      <path fill="#2d719e" d="M71 45 77 48 72 53 68 49Z" />
+      {/* Forked shark tail, with a visible upper and lower lobe */}
+      <path fill="#101b35" d="M25 35 14 25 9 14 21 22 30 29 29 35 30 40 25 40 14 49 8 58 10 45 17 38Z" />
+      <path fill="#347fae" d="M22 34 15 27 12 20 21 26 28 31 27 35 27 39 20 44 12 52 14 44 20 38Z" />
+      {/* Three gill slits, a shark signature */}
+      <path fill="#20557e" d="M38 32h2v7h-2zM42 30h2v9h-2zM46 28h2v9h-2z" />
+      <path fill="#86dcf5" d="M39 33h1v4h-1zM43 31h1v5h-1z" />
+      {/* Big glossy kawaii eye, placed on the head */}
+      <path fill="#101b35" d="M91 29h8v8h-8z" />
+      <path fill="#fff9ff" d="M93 30h5v5h-5z" />
+      <path fill="#25304e" d="M95 32h3v4h-3z" />
+      <path fill="#ffffff" d="M93 30h2v2h-2zM97 33h1v1h-1z" />
+      {/* Shy pink cheeks */}
+      <path fill="#ff8fbd" d="M83 37h3v2h-3zM86 36h4v3h-4zM89 37h2v2h-2z" />
+      <path fill="#ffc5da" d="M85 36h2v2h-2z" />
+      {/* Smiling mouth with two tiny triangular shark teeth */}
+      <path fill="#101b35" d="M102 39h10v2h-2v2h-6v-2h-2z" />
+      <path fill="#fff9ff" d="M104 39h3v3h-1v-1h-1v-1h-1zM109 39h2v2h-1v1h-1z" />
+      {/* A few pale pixel glints on the back */}
+      <path fill="#c9f6ff" d="M33 29h4v2h-4zM58 27h3v2h-3zM72 29h3v2h-3z" />
+      {/* Pink mail pouch tucked beneath the shark, not covering its silhouette */}
+      <path fill="#101b35" d="M81 50h17v3h4v10h-3v3H80v-3h-3V53h4z" />
+      <path fill="#ff8fbd" d="M82 53h16v2h2v7h-2v2H81v-2h-2v-7h3z" />
+      <path fill="#fff4fa" d="M81 54h17v2l-8 6-9-6z" />
+      <path fill="#e66d9e" d="M79 56l7 6-5 1h-2zM100 56l-7 6 5 1h2z" />
+      <path fill="#ffbdd3" d="M82 61l7 4 7-4v2l-7 4-7-4z" />
+      <path fill="#fffaff" d="M87 56h2v2h2v2h-2v2h-2v-2h-2v-2h2z" />
+      {/* Floating pixel sparkles, kept secondary to the shark */}
+      <path fill="#ffdc72" d="M32 8h3v3h3v3h-3v3h-3v-3h-3v-3h3z" />
+      <path fill="#ff8fbd" d="M109 14h2v3h3v2h-3v3h-2v-3h-3v-2h3z" />
+      <path fill="#b9f2ff" d="M19 56h2v2h2v2h-2v2h-2v-2h-2v-2h2z" />
     </svg>
   );
 }
