@@ -14,6 +14,7 @@ import QuoteReplyButton from "./quote-reply-button";
 import { ForumVoice } from "./forum-voice";
 import BadgeMedal from "../../components/badge-medal";
 import BadgeAwardQuickAction from "../../components/badge-award-quick-action";
+import { PrideFlagList } from "../../../lib/pride-flags";
 
 export const revalidate = 10;
 
@@ -49,7 +50,7 @@ function ForumPostCard({ post, childrenByParent, postsById, badgesByProfile, top
             </Link>
             {authorBadges.length > 0 && <div className="member-badges post-author-badges">{visibleAuthorBadges.map((badge: any, index: number) => <BadgeMedal key={badge?.id || badge?.name || index} badge={badge} size="small" />)}{hiddenAuthorBadgeCount > 0 && <span className="post-author-badge-overflow" title={authorBadges.slice(2).map((badge: any) => badge.name).join(", ")}>+{hiddenAuthorBadgeCount}</span>}</div>}
           </div>
-          <Link className={"post-author-display-name " + (profile?.is_admin ? "role-name role-admin" : profile?.is_moderator ? "role-name role-moderator" : "role-name")} href={profileHref}>{profile?.display_name?.trim() || "Membre"}</Link>
+          <Link className={"post-author-display-name " + (profile?.is_admin ? "role-name role-admin" : profile?.is_moderator ? "role-name role-moderator" : "role-name")} href={profileHref}>{profile?.display_name?.trim() || "Membre"}</Link><PrideFlagList flags={profile?.community_flags} />
           <span className="member-reputation"><strong>{profile?.reputation ?? 0}</strong> réputation · {getReputationTitle(profile?.reputation ?? 0)}</span>
           {profile?.id && <BadgeAwardQuickAction profileId={profile.id} />}
         </aside>
@@ -79,7 +80,7 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
   const supabase = getSupabase();
   const { data: topic } = await supabase.from("forum_topics").select("id, title, locked, pinned, category_id, forum_categories:category_id(slug, name)").eq("id", id).maybeSingle();
   if (!topic) notFound();
-  const { data: posts, error } = await supabase.from("forum_posts").select("id, body, created_at, author_id, parent_post_id, profiles:author_id(username, display_name, avatar_url, reputation, is_admin, is_moderator)").eq("topic_id", id).order("created_at", { ascending: true });
+  const { data: posts, error } = await supabase.from("forum_posts").select("id, body, created_at, author_id, parent_post_id, profiles:author_id(username, display_name, avatar_url, reputation, is_admin, is_moderator, community_flags)").eq("topic_id", id).order("created_at", { ascending: true });
   const { data: poll } = await supabase.from("forum_polls").select("id").eq("topic_id", id).maybeSingle();
   const authorIds = [...new Set((posts ?? []).map((post: any) => post.author_id).filter(Boolean))];
   const { data: badgeRows } = authorIds.length ? await supabase.from("profile_badges").select("profile_id,badge_id,badges:badge_id(name,icon,tone,description,background_color,image_zoom,image_position_x,image_position_y,border_color,border_width,glow_intensity)").in("profile_id", authorIds) : { data: [] };
