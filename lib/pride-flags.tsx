@@ -15,7 +15,6 @@ export const PRIDE_FLAGS = [
   { id: "pansexual", label: "Pansexuel·le", colors: ["#FF218C","#FFD800","#21B1FF"] },
   { id: "intersex", label: "Intersexe", colors: ["#FFD800","#FFD800","#FFD800"], symbol: "circle" },
   { id: "aromantic", label: "Aromantique", colors: ["#3DA542","#A7D379","#FFFFFF","#A9A9A9","#000000"] },
-  { id: "sapio", label: "Sapiosexuel·le", colors: ["#147D46","#FFFFFF","#7D7D7D","#FFFFFF","#147D46"] },
 ] as const;
 
 export type PrideFlagId = typeof PRIDE_FLAGS[number]["id"];
