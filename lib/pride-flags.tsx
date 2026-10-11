@@ -53,6 +53,12 @@ export function PrideFlag({ id, size = "small" }: { id: string; size?: "small" |
           <path d="M0 12H30V20H0Z" fill="#A4A4A4" />
           <path d="M0 0L14 10L0 20Z" fill="#000000" />
         </>
+      ) : id === "ally" ? (
+        <>
+          {[0,1,2,3,4,5,6].map((index) => <rect key={index} x={index * (30 / 7)} y="0" width={30 / 7 + .05} height="20" fill={index % 2 === 0 ? "#000000" : "#FFFFFF"} />)}
+          <defs><linearGradient id="ally-rainbow" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stopColor="#750787"/><stop offset="20%" stopColor="#004DFF"/><stop offset="40%" stopColor="#008026"/><stop offset="60%" stopColor="#FFED00"/><stop offset="80%" stopColor="#FF8C00"/><stop offset="100%" stopColor="#E40303"/></linearGradient></defs>
+          <text x="15" y="16" textAnchor="middle" fontSize="19" fontWeight="bold" fill="url(#ally-rainbow)" stroke="#FFFFFF" strokeWidth=".25">A</text>
+        </>
       ) : (
         <>
           {flag.colors.map((color, index) => <rect key={color + index} x="0" y={stripeHeight * index} width="30" height={stripeHeight + 0.12} fill={color} />)}
@@ -62,7 +68,7 @@ export function PrideFlag({ id, size = "small" }: { id: string; size?: "small" |
           {"symbol" in flag && flag.symbol === "twink" && <g fill="none" stroke="#000000" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"><circle cx="12.2" cy="10.5" r="3.5"/><circle cx="17.8" cy="10.5" r="3.5"/><path d="M14.5 8.2L18.6 3.8M15.8 3.8H18.6V6.6M20 8.2L24.1 3.8M21.3 3.8H24.1V6.6"/></g>}
           {"symbol" in flag && flag.symbol === "flower" && <g transform="translate(15 10)" fill="#7B2C91"><ellipse cy="-3" rx="1.6" ry="3"/><ellipse cy="3" rx="1.6" ry="3"/><ellipse cx="-3" rx="3" ry="1.6"/><ellipse cx="3" rx="3" ry="1.6"/><circle r="1.5" fill="#F5D442"/></g>}
           {"symbol" in flag && flag.symbol === "pi" && <text x="15" y="15.5" textAnchor="middle" fontSize="17" fontWeight="bold" fill="#FFD700" stroke="#000000" strokeWidth=".25">π</text>}
-          {"symbol" in flag && flag.symbol === "ally" && <><defs><linearGradient id="ally-rainbow" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stopColor="#750787"/><stop offset="20%" stopColor="#004DFF"/><stop offset="40%" stopColor="#008026"/><stop offset="60%" stopColor="#FFED00"/><stop offset="80%" stopColor="#FF8C00"/><stop offset="100%" stopColor="#E40303"/></linearGradient></defs><text x="15" y="15" textAnchor="middle" fontSize="14" fontWeight="bold" fill="url(#ally-rainbow)">A</text></>}
+
         </>
       )}
       <rect x=".35" y=".35" width="29.3" height="19.3" fill="none" stroke="rgba(0,0,0,.28)" strokeWidth=".7" rx="1.3" />
