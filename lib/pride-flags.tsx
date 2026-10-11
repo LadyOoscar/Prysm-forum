@@ -22,7 +22,7 @@ export const PRIDE_FLAGS = [
   { id: "demisexual", label: "Demi-sexuel·le", colors: ["#FFFFFF","#810081","#A4A4A4","#000000"], symbol: "demisexual" },
   { id: "leather", label: "Leather", colors: ["#000000","#252580","#000000","#252580","#FFFFFF","#252580","#000000","#252580","#000000"], symbol: "heart" },
   { id: "pup", label: "Pup / Puppy", colors: ["#21409A","#000000","#FFFFFF","#000000","#21409A"], symbol: "bone" },
-  { id: "sapphic", label: "Saphique", colors: ["#D62900","#EF7627","#FF9B55","#FFFFFF","#D162A4","#B55690","#A30262"], symbol: "flower" },
+  { id: "sapphic", label: "Saphique", colors: ["#D52D00","#EF7627","#FF9A56","#FFFFFF","#D162A4","#B55690","#A30262"], symbol: "flower" },
   { id: "polyamorous", label: "Polyamoureux·se", colors: ["#0000FF","#FF0000","#000000"], symbol: "pi" },
 ] as const;
 
@@ -61,7 +61,7 @@ export function PrideFlag({ id, size = "small" }: { id: string; size?: "small" |
           {"symbol" in flag && flag.symbol === "heart" && <path d="M2 1.8C2.7.7 4.6.7 5.4 1.9C6.4.6 8.3.8 8.8 2.1C9.8 4.3 6.8 6.1 5.4 7.2C4 6 1 4.2 2 1.8Z" fill="#E80035" stroke="#FFFFFF" strokeWidth=".25" />}
           {"symbol" in flag && flag.symbol === "flower" && <g transform="translate(15 10)" fill="#FFFFFF"><ellipse cy="-3" rx="1.6" ry="3"/><ellipse cy="3" rx="1.6" ry="3"/><ellipse cx="-3" rx="3" ry="1.6"/><ellipse cx="3" rx="3" ry="1.6"/><circle r="1.5" fill="#D62900"/></g>}
           {"symbol" in flag && flag.symbol === "pi" && <text x="15" y="15" textAnchor="middle" fontSize="14" fontWeight="bold" fill="#FFD700" stroke="#000000" strokeWidth=".25">π</text>}
-          {"symbol" in flag && flag.symbol === "ally" && <text x="15" y="15" textAnchor="middle" fontSize="14" fontWeight="bold" fill="#750787">A</text>}
+          {"symbol" in flag && flag.symbol === "ally" && <><defs><linearGradient id="ally-rainbow" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stopColor="#750787"/><stop offset="20%" stopColor="#004DFF"/><stop offset="40%" stopColor="#008026"/><stop offset="60%" stopColor="#FFED00"/><stop offset="80%" stopColor="#FF8C00"/><stop offset="100%" stopColor="#E40303"/></linearGradient></defs><text x="15" y="15" textAnchor="middle" fontSize="14" fontWeight="bold" fill="url(#ally-rainbow)">A</text></>}
         </>
       )}
       <rect x=".35" y=".35" width="29.3" height="19.3" fill="none" stroke="rgba(0,0,0,.28)" strokeWidth=".7" rx="1.3" />
