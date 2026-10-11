@@ -16,19 +16,23 @@ const links = [
 
 function SharkCourier({ className = "" }: { className?: string }) {
   return (
-    <svg className={className} viewBox="0 0 16 16" aria-hidden="true" focusable="false" shapeRendering="crispEdges">
-      <path fill="#367fae" d="M5 2h5v1h2v2h2v2h1v2h-2v2h-2v2H6v-1H4v-2H2V9H1V7h2V5h2z"/>
-      <path fill="#65c5e9" d="M5 3h5v1h2v2h1v2h-2v2H9v1H6v-1H4V8H3V6h2z"/>
-      <path fill="#b5efff" d="M5 9h2v1h3v1H9v1H6v-1H5z"/>
-      <path fill="#24547e" d="M5 2h3V1h2v2H7v1H5zM2 7h2v2H2zM11 12h2v-2h1v3h-3z"/>
-      <path fill="#14253b" d="M10 5h2v2h-2z"/>
-      <path fill="#fff3f5" d="M10 5h1v1h-1z"/>
-      <path fill="#f58cae" d="M8 8h2v1H8z"/>
-      <path fill="#ffb4c9" d="M8 8h1v1H8z"/>
-      <path fill="#f5b5d0" d="M10 9h4v1h1v3h-1v1h-4v-1H9v-3h1z"/>
-      <path fill="#fff0f5" d="M10 10h4v2h-4z"/>
-      <path fill="#dc6d9d" d="M10 10h2v1h-2zM13 12h1v1h-1z"/>
-      <path fill="#f58cae" d="M9 11h1v2h1v1h-2z"/>
+    <svg className={className} viewBox="0 0 32 24" aria-hidden="true" focusable="false" shapeRendering="crispEdges">
+      {/* Tail and unmistakable shark silhouette */}
+      <path fill="#173451" d="M1 8h4V5h3v3h3v2h8v2h-8v2H8v3H5v-3H1v-2H0v-2h1z"/>
+      <path fill="#367fae" d="M5 8h4V5h2v3h4v1h5v2h3v2h-3v2h-5v1H9v-2H5v-2H3v-2h2z"/>
+      <path fill="#65c5e9" d="M6 9h4V7h2v2h4v1h4v2h-4v2h-5v1H7v-2H5v-2h1z"/>
+      <path fill="#24547e" d="M10 5h3V2h3v3h3v3h-3V6h-3v2h-3z"/>
+      <path fill="#24547e" d="M13 15h4v2h3v2h-5v-2h-2z"/>
+      <path fill="#14253b" d="M17 8h3v3h-3z"/>
+      <path fill="#fff3f5" d="M18 8h1v1h-1z"/>
+      <path fill="#b5efff" d="M5 11h2v1H5zM9 13h4v1H9z"/>
+      {/* Separate, readable pink envelope */}
+      <path fill="#14253b" d="M16 11h13v1h2v8h-1v2H16v-1h-1v-8h1z"/>
+      <path fill="#f58cae" d="M17 12h12v1h1v7h-1v1H17v-1h-1v-7h1z"/>
+      <path fill="#fff0f5" d="M18 13h10v2l-5 4-5-4z"/>
+      <path fill="#dc6d9d" d="M16 14l6 5-5 2h-1zM30 14l-6 5 5 2h1z"/>
+      <path fill="#ffb4c9" d="M18 16l4 3 1 1 1-1 4-3v4H18z"/>
+      <path fill="#fff0f5" d="M20 14h6v1h-6z"/>
     </svg>
   );
 }
