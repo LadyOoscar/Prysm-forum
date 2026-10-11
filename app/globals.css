@@ -2086,3 +2086,11 @@ footer:before {
  .home-hub-copy strong{font-size:1rem}
 }
 @media(prefers-reduced-motion:reduce){.home-hub-card{transition:none}.home-hub-card:hover{transform:none}}
+
+/* PRYSM CLEAN // discreet notification access */
+.site-notification-button{position:relative;display:inline-flex!important;align-items:center;justify-content:center;gap:0;width:34px;height:34px;min-width:34px;padding:0!important;border:1px solid rgba(145,157,199,.32);border-radius:9px;background:rgba(16,22,49,.72);color:var(--text,#f4f4ff);text-decoration:none;transition:border-color .18s ease,background .18s ease,transform .18s ease}
+.site-notification-button svg{display:block;width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.site-notification-button:hover,.site-notification-button:focus-visible,.site-notification-button.active{border-color:rgba(255,79,195,.72);background:rgba(255,79,195,.1);color:#ff9bdd;outline:none}
+.site-notification-button:focus-visible{box-shadow:0 0 0 3px rgba(255,79,195,.2)}
+.site-notification-button .site-notification-count{position:absolute;top:-6px;right:-6px;min-width:17px;height:17px;padding:0 4px;font-size:.62rem;border:1px solid #0b1025}
+@media(max-width:760px){.site-notification-button{width:32px;height:32px;min-width:32px;flex:0 0 32px}}
