@@ -27,6 +27,6 @@ export default function SiteDecoration({ slot, children }: { slot: string; child
     return () => { active = false; };
   }, [slot]);
 
-  const image = decoration ? <img className={"site-decoration-image " + (decoration.mobile_visible ? "site-decoration-mobile" : "site-decoration-desktop-only") + (decoration.desktop_visible ? "" : " site-decoration-no-desktop")} src={decoration.image_url} alt={decoration.alt_text || ""} aria-hidden={!decoration.alt_text} style={{ width: decoration.width_px, height: decoration.height_px }} /> : null;
+  const image = decoration ? <img className={"site-decoration-image " + (decoration.mobile_visible ? "" : " site-decoration-hide-mobile") + (decoration.desktop_visible ? "" : " site-decoration-hide-desktop")} src={decoration.image_url} alt={decoration.alt_text || ""} aria-hidden={!decoration.alt_text} style={{ width: decoration.width_px, height: decoration.height_px }} /> : null;
   return <>{decoration?.alignment === "before" && image}{children}{decoration?.alignment !== "before" && image}</>;
 }
