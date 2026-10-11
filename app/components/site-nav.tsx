@@ -4,6 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createSupabaseBrowser } from "../../lib/supabase-browser";
+import SiteDecoration from "./site-decoration";
+
+const decorationSlots: Record<string, string> = { "/forum": "tab-forum", "/rencontres": "tab-rencontres", "/orbite": "tab-orbite", "/messages": "tab-messages", "/profil": "tab-profil" };
 
 const links = [
   { href: "/", label: "Accueil", matches: (path: string) => path === "/" },
@@ -197,7 +200,7 @@ export default function SiteNav() {
         <nav aria-label="Navigation principale">
           {links.map(link => (
             <Link key={link.href} className={link.matches(pathname) ? "active" : ""} href={link.href}>
-              {link.label}
+              {decorationSlots[link.href] ? <SiteDecoration slot={decorationSlots[link.href]}>{link.label}</SiteDecoration> : link.label}
             </Link>
           ))}
           <Link className={"site-notifications-link " + (pathname.startsWith("/notifications") ? "active" : "")} href="/notifications" aria-label={unreadCount ? `Notifications, ${unreadCount} non lue(s)` : "Notifications"}>
