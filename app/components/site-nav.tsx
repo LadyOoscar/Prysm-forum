@@ -122,6 +122,10 @@ export default function SiteNav() {
               {decorationSlots[link.href] ? <SiteDecoration slot={decorationSlots[link.href]}>{link.label}</SiteDecoration> : link.label}
             </Link>
           ))}
+          <Link className={"site-notification-button " + (pathname.startsWith("/notifications") ? "active" : "")} href="/notifications" aria-label={unreadCount ? `Notifications, ${unreadCount} non lue(s)` : "Notifications"} title={unreadCount ? `Notifications (${unreadCount} non lue(s))` : "Notifications"}>
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
+            {unreadCount > 0 && <span className="site-notification-count">{unreadCount > 99 ? "99+" : unreadCount}</span>}
+          </Link>
           {canModerate && <Link className={pathname.startsWith("/moderation") || pathname.startsWith("/admin") ? "active" : ""} href="/moderation">Modo/Admin</Link>}
         </nav>
       </header>
