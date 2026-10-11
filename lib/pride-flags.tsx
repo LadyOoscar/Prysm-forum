@@ -4,10 +4,9 @@ export const PRIDE_FLAGS = [
   { id: "ally", label: "Allié·e LGBTQIA+", colors: ["#000000","#FFFFFF","#000000","#FFFFFF","#000000"], symbol: "ally" },
   { id: "gay", label: "Gay / arc-en-ciel", colors: ["#E40303","#FF8C00","#FFED00","#008026","#004DFF","#750787"] },
   { id: "lesbian", label: "Lesbienne", colors: ["#D52D00","#EF7627","#FF9A56","#FFFFFF","#D162A4","#B55690","#A30262"] },
-  // MTF/FTM are profile labels, not two universally standardised separate flags.
-  // Both use the recognised transgender flag so the colours remain accurate.
+  // MTF uses the classic transgender flag; FTM uses the transmasculine flag.
   { id: "trans-mtf", label: "Trans MTF", colors: ["#5BCEFA","#F5A9B8","#FFFFFF","#F5A9B8","#5BCEFA"] },
-  { id: "trans-ftm", label: "Trans FTM", colors: ["#5BCEFA","#F5A9B8","#FFFFFF","#F5A9B8","#5BCEFA"] },
+  { id: "trans-ftm", label: "Trans FTM", colors: ["#FF8ABE","#CDF5FF","#9AEBFF","#74DFFF","#9AEBFF","#CDF5FF","#FF8ABE"] },
   { id: "bisexual", label: "Bisexuel·le", colors: ["#D60270","#9B4F96","#0038A8"] },
   { id: "agender", label: "Agenre", colors: ["#000000","#B9B9B9","#FFFFFF","#B8F483","#FFFFFF","#B9B9B9","#000000"] },
   { id: "nonbinary", label: "Non-binaire", colors: ["#FFF430","#FFFFFF","#9C59D1","#2D2D2D"] },
