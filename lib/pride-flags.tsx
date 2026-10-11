@@ -33,6 +33,7 @@ export function PrideFlag({ id, size = "small" }: { id: string; size?: "small" |
   const width = size === "small" ? 22 : 30;
   const height = size === "small" ? 15 : 20;
   const stripeHeight = 20 / flag.colors.length;
+  const allyGradientId = `ally-rainbow-${React.useId().replace(/:/g, "")}`;
   return (
     <svg className="pride-flag" width={width} height={height} viewBox="0 0 30 20" role="img" aria-label={flag.label} focusable="false">
       <title>{flag.label}</title>
@@ -56,8 +57,9 @@ export function PrideFlag({ id, size = "small" }: { id: string; size?: "small" |
       ) : id === "ally" ? (
         <>
           {[0,1,2,3,4,5,6].map((index) => <rect key={index} x={index * (30 / 7)} y="0" width={30 / 7 + .05} height="20" fill={index % 2 === 0 ? "#000000" : "#FFFFFF"} />)}
-          <defs><linearGradient id="ally-rainbow" x1="0" y1="1" x2="0" y2="0"><stop offset="0%" stopColor="#750787"/><stop offset="20%" stopColor="#004DFF"/><stop offset="40%" stopColor="#008026"/><stop offset="60%" stopColor="#FFED00"/><stop offset="80%" stopColor="#FF8C00"/><stop offset="100%" stopColor="#E40303"/></linearGradient></defs>
-          <text x="15" y="16" textAnchor="middle" fontSize="19" fontWeight="bold" fill="url(#ally-rainbow)" stroke="#FFFFFF" strokeWidth=".25">A</text>
+          <defs><linearGradient id={allyGradientId} x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#E40303"/><stop offset="20%" stopColor="#FF8C00"/><stop offset="40%" stopColor="#FFED00"/><stop offset="60%" stopColor="#008026"/><stop offset="80%" stopColor="#004DFF"/><stop offset="100%" stopColor="#750787"/></linearGradient></defs>
+          <text x="15" y="17" textAnchor="middle" fontFamily="Arial, Helvetica, sans-serif" fontSize="22" fontWeight="900" fill="none" stroke="#000000" strokeWidth="3.2" paintOrder="stroke">A</text>
+          <text x="15" y="17" textAnchor="middle" fontFamily="Arial, Helvetica, sans-serif" fontSize="22" fontWeight="900" fill={"url(#" + allyGradientId + ")"} stroke="#FFFFFF" strokeWidth="1.1" paintOrder="stroke">A</text>
         </>
       ) : (
         <>
