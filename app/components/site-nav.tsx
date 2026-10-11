@@ -18,66 +18,79 @@ function SharkCourier({ className = "" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 128 104" aria-hidden="true" focusable="false">
       <defs>
-        <linearGradient id="shark-blue" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#a8efff" />
-          <stop offset=".5" stopColor="#5bbfe3" />
-          <stop offset="1" stopColor="#2876a8" />
+        <linearGradient id="shark-skin" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#a9edfb" />
+          <stop offset=".55" stopColor="#59b9df" />
+          <stop offset="1" stopColor="#2876a7" />
         </linearGradient>
-        <linearGradient id="shark-white" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#f8ffff" />
-          <stop offset="1" stopColor="#bce9f5" />
+        <linearGradient id="shark-belly" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#ffffff" />
+          <stop offset="1" stopColor="#d2f3fa" />
         </linearGradient>
-        <linearGradient id="shark-pink" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#ffafd6" />
-          <stop offset="1" stopColor="#ed6eaa" />
+        <linearGradient id="shark-fin-hair" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#284e7a" />
+          <stop offset="1" stopColor="#142746" />
+        </linearGradient>
+        <linearGradient id="shark-coat" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#ffb7d9" />
+          <stop offset="1" stopColor="#df6fa9" />
         </linearGradient>
       </defs>
-      {/* Long expressive shark tail and clear dorsal fin */}
-      <path d="M37 68 C26 65 18 56 12 49 C13 61 19 70 29 73 C21 80 18 87 19 94 C29 87 36 80 42 74Z" fill="#317ca8" />
-      <path d="M52 29 C51 17 57 9 64 5 C66 16 72 23 81 29Z" fill="#347fab" />
-      {/* Distinct shark-girl head: broad smooth cranium, tapered jaw and visible snout */}
-      <path d="M34 39 C34 24 46 15 61 16 C77 14 91 25 93 39 C98 45 97 56 92 63 L82 71 C74 78 57 78 47 70 L38 61 C31 54 30 46 34 39Z" fill="url(#shark-blue)" />
-      {/* Dark blue crown marking, shaped like a sleek shark cap rather than human hair */}
-      <path d="M35 39 C34 25 47 16 61 17 C76 14 88 24 92 37 C82 33 76 29 68 28 C59 37 48 40 35 39Z" fill="#245078" />
-      <path d="M43 28 C50 21 61 19 71 22 C63 23 57 28 53 34Z" fill="#3e7296" opacity=".9" />
-      {/* Fins on the sides of the head */}
-      <path d="M37 43 L26 34 C27 45 30 51 38 53Z" fill="#398bb4" />
-      <path d="M89 43 L100 34 C99 45 96 51 88 53Z" fill="#398bb4" />
-      {/* Pale shark muzzle, clearly projecting from the face */}
-      <path d="M43 49 C48 45 55 46 62 49 C69 45 78 46 84 51 C83 60 76 67 64 68 C52 67 44 61 43 49Z" fill="url(#shark-white)" />
-      <ellipse cx="64" cy="55" rx="14" ry="8" fill="#e7faff" />
-      <path d="M58 54 Q64 57 70 54" fill="none" stroke="#4b91b3" strokeWidth="1.4" strokeLinecap="round" />
-      {/* Feminine, lively eyes with lashes and highlights */}
-      <path d="M43 42 L40 38 M48 40 L47 36 M53 40 L54 36" stroke="#17324e" strokeWidth="1.7" strokeLinecap="round" />
-      <path d="M42 44 Q49 37 57 44 Q57 52 50 53 Q43 52 42 44Z" fill="#17324e" />
-      <ellipse cx="50" cy="46" rx="3.3" ry="4.5" fill="#f8ffff" />
-      <ellipse cx="51" cy="47" rx="2" ry="3.2" fill="#273a67" />
-      <circle cx="49.5" cy="44.5" r="1.3" fill="#fff" />
-      <path d="M70 44 Q78 37 85 44 Q84 52 77 53 Q70 52 70 44Z" fill="#17324e" />
-      <ellipse cx="77" cy="46" rx="3.3" ry="4.5" fill="#f8ffff" />
-      <ellipse cx="78" cy="47" rx="2" ry="3.2" fill="#273a67" />
-      <circle cx="76.5" cy="44.5" r="1.3" fill="#fff" />
-      <path d="M43 40 Q50 35 57 40 M70 40 Q78 35 85 40" fill="none" stroke="#183552" strokeWidth="2.2" strokeLinecap="round" />
-      {/* Gill slits, cheek blush, and a confident smile */}
-      <path d="M36 52 Q33 57 36 61 M40 53 Q37 58 40 61" fill="none" stroke="#2777a2" strokeWidth="1.8" strokeLinecap="round" />
-      <ellipse cx="45" cy="57" rx="4.5" ry="2.5" fill="#ff9dc9" opacity=".8" />
-      <ellipse cx="83" cy="57" rx="4.5" ry="2.5" fill="#ff9dc9" opacity=".8" />
-      <path d="M58 61 Q64 65 70 61" fill="none" stroke="#245078" strokeWidth="1.8" strokeLinecap="round" />
-      {/* Athletic humanoid shoulders, arms and fitted pink courier jacket */}
-      <path d="M48 71 L39 76 C33 81 31 90 33 100 L95 100 C96 89 91 80 82 75 L73 71 C68 77 55 77 48 71Z" fill="url(#shark-pink)" />
-      <path d="M48 73 L56 83 L64 78 L72 83 L80 73 L73 70 C66 76 56 76 50 70Z" fill="#fff0f8" />
-      <path d="M63 80 L63 99" stroke="#b54d86" strokeWidth="1.5" opacity=".7" />
-      <path d="M43 78 C37 82 35 88 37 93 L43 94 L49 82Z" fill="#5bbfe3" />
-      <path d="M84 78 C91 82 93 88 90 93 L84 94 L78 82Z" fill="#5bbfe3" />
-      {/* Courier strap and compact satchel */}
-      <path d="M78 75 L54 99" fill="none" stroke="#263d67" strokeWidth="4.5" strokeLinecap="round" />
-      <path d="M74 85 Q83 80 89 86 L93 99 L73 99 L71 91Z" fill="#263d67" />
-      <path d="M77 88 Q83 85 87 89 L89 96 L77 96Z" fill="#ffb4d8" />
+
+      {/* Tail and dorsal fin: the silhouette reads as a shark before anything else */}
+      <path d="M37 69 C27 65 20 57 13 49 C13 62 20 70 29 73 C21 80 19 87 20 94 C30 87 37 80 43 74Z" fill="#347fa8" />
+      <path d="M48 29 C47 17 55 8 62 5 C65 16 71 23 80 29Z" fill="#347fa8" />
+
+      {/* Fin-like swept crest, not a human wig */}
+      <path d="M31 44 C27 27 41 14 57 15 C69 8 86 18 93 33 L98 52 L89 67 L79 60 L42 62 L33 54Z" fill="url(#shark-fin-hair)" />
+      <path d="M35 36 C39 23 52 19 63 20 C74 17 85 25 89 37 C77 31 70 29 64 31 C55 38 46 40 35 36Z" fill="#365f8c" />
+      <path d="M82 28 C91 30 98 39 97 49 L91 57 L88 43Z" fill="#142746" />
+
+      {/* Broad shark cranium, tapering into a short rounded snout */}
+      <path d="M34 38 C37 25 48 20 62 21 C76 20 87 29 89 41 L87 53 C85 65 76 72 64 73 C52 72 42 66 39 57 L34 47Z" fill="url(#shark-skin)" />
+      {/* White lower jaw and muzzle, essential shark anatomy */}
+      <path d="M39 49 C46 46 54 47 62 50 C70 46 79 47 85 51 C83 62 75 68 64 69 C52 68 43 61 39 49Z" fill="url(#shark-belly)" />
+      <path d="M47 55 Q55 52 62 56 Q70 52 79 55 Q74 63 64 64 Q54 63 47 55Z" fill="#effcff" />
+      <path d="M58 55 Q64 58 70 55" fill="none" stroke="#438cad" strokeWidth="1.3" strokeLinecap="round" />
+
+      {/* Side fins and visible gill slits */}
+      <path d="M39 43 L26 34 C27 45 31 53 41 55Z" fill="#4aa5cb" />
+      <path d="M86 43 L99 34 C98 45 94 53 84 55Z" fill="#4aa5cb" />
+      <path d="M38 49 Q34 54 37 59 M42 49 Q39 54 42 58 M46 49 Q43 53 46 56" fill="none" stroke="#2879a2" strokeWidth="1.6" strokeLinecap="round" />
+
+      {/* Expressive feminine eyes, shaped for an anthro shark rather than a human face */}
+      <path d="M43 41 Q50 35 58 41" fill="none" stroke="#17324e" strokeWidth="2.3" strokeLinecap="round" />
+      <path d="M69 41 Q77 35 84 41" fill="none" stroke="#17324e" strokeWidth="2.3" strokeLinecap="round" />
+      <path d="M43 44 Q50 38 58 44 Q58 52 51 53 Q44 52 43 44Z" fill="#132b48" />
+      <path d="M69 44 Q77 38 84 44 Q83 52 76 53 Q69 52 69 44Z" fill="#132b48" />
+      <ellipse cx="51" cy="46" rx="3.2" ry="4.2" fill="#f8ffff" />
+      <ellipse cx="76" cy="46" rx="3.2" ry="4.2" fill="#f8ffff" />
+      <ellipse cx="52" cy="47" rx="1.9" ry="3" fill="#263d69" />
+      <ellipse cx="77" cy="47" rx="1.9" ry="3" fill="#263d69" />
+      <circle cx="50.5" cy="44.5" r="1.2" fill="#fff" />
+      <circle cx="75.5" cy="44.5" r="1.2" fill="#fff" />
+      <ellipse cx="46" cy="57" rx="4.4" ry="2.4" fill="#ff9fc8" opacity=".78" />
+      <ellipse cx="81" cy="57" rx="4.4" ry="2.4" fill="#ff9fc8" opacity=".78" />
+      <path d="M57 61 Q64 66 71 61" fill="none" stroke="#1c4567" strokeWidth="1.8" strokeLinecap="round" />
+
+      {/* Furry-style humanoid body: shoulders, arms, hands and a fitted courier jacket */}
+      <path d="M48 70 L39 75 C33 80 31 88 33 99 L95 99 C97 88 91 79 82 75 L73 70 C68 77 55 77 48 70Z" fill="url(#shark-coat)" />
+      <path d="M48 72 L56 83 L64 78 L72 83 L80 72 L73 69 C66 76 56 76 50 69Z" fill="#fff0f7" />
+      <path d="M63 80 L63 98" stroke="#bd568c" strokeWidth="1.4" opacity=".8" />
+      <path d="M41 78 C35 82 34 88 36 93 L43 95 L49 82Z" fill="url(#shark-skin)" />
+      <path d="M82 78 C89 82 92 88 89 93 L83 95 L77 82Z" fill="url(#shark-skin)" />
+      <path d="M36 92 Q39 95 43 92 L45 97 L37 99Z" fill="#347fa8" />
+      <path d="M83 92 Q87 95 90 92 L91 97 L84 99Z" fill="#347fa8" />
+
+      {/* Cross-body satchel, the character's courier signature */}
+      <path d="M78 74 L54 99" fill="none" stroke="#243b60" strokeWidth="4.5" strokeLinecap="round" />
+      <path d="M74 84 Q83 80 89 86 L93 99 L73 99 L71 91Z" fill="#243b60" />
+      <path d="M77 88 Q83 85 87 89 L89 96 L77 96Z" fill="#ffb6d9" />
       <path d="M79 90 L83 93 L87 90" fill="none" stroke="#fff7fc" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      {/* Tailored fin accents and little sparkle */}
-      <path d="M28 78 L21 74 L25 85Z" fill="#5bbfe3" />
-      <path d="M99 21 L101 26 L106 28 L101 30 L99 35 L97 30 L92 28 L97 26Z" fill="#ff9dc9" />
-      <circle cx="22" cy="36" r="2" fill="#ffdc72" />
+
+      {/* Small graphic sparkle */}
+      <path d="M101 22 L103 27 L108 29 L103 31 L101 36 L99 31 L94 29 L99 27Z" fill="#ff9fc8" />
+      <circle cx="23" cy="35" r="2" fill="#ffdc72" />
     </svg>
   );
 }
