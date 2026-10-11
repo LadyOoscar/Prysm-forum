@@ -130,6 +130,7 @@ export default function ModerationPage() {
       <div className="moderator-action-card"><span>🔎</span><strong>{reviewedCount} en cours d'examen</strong><small>Signalements déjà pris en charge.</small></div>
       <div className="moderator-action-card"><span>🗑️</span><strong>Actions sur les contenus</strong><small>Ouvrir le sujet, verrouiller ou supprimer le message.</small></div>
       <div className="moderator-action-card"><span>🛡️</span><strong>{isAdmin ? "ADMIN" : "MODO"}</strong><small>{isAdmin ? "Accès au panneau d'administration." : "Outils communautaires, sans gestion des rôles."}</small></div>
+      {isAdmin && <Link className="moderator-action-card" href="/admin/decorations"><span>🖼️</span><strong>Atelier de création</strong><small>Créer et gérer les décorations PNG du forum.</small></Link>}
     </div>
     {error && <div className="notice error" role="alert">{error}</div>}
     <section className="moderation-queue-tools">
