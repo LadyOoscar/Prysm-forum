@@ -6,14 +6,13 @@ import { usePathname } from "next/navigation";
 import { createSupabaseBrowser } from "../../lib/supabase-browser";
 import SiteDecoration from "./site-decoration";
 
-const decorationSlots: Record<string, string> = { "/forum": "tab-forum", "/rencontres": "tab-rencontres", "/orbite": "tab-orbite", "/messages": "tab-messages", "/profil": "tab-profil" };
+const decorationSlots: Record<string, string> = { "/forum": "tab-forum", "/rencontres": "tab-rencontres", "/orbite": "tab-orbite", "/profil": "tab-profil" };
 
 const links = [
   { href: "/", label: "Accueil", matches: (path: string) => path === "/" },
   { href: "/forum", label: "Forum", matches: (path: string) => path.startsWith("/forum") || path.startsWith("/topic") },
   { href: "/rencontres", label: "Rencontres", matches: (path: string) => path.startsWith("/rencontres") },
   { href: "/orbite", label: "Orbite", matches: (path: string) => path.startsWith("/orbite") },
-  { href: "/messages", label: "Messages", matches: (path: string) => path.startsWith("/messages") },
   { href: "/profil", label: "Profil", matches: (path: string) => path.startsWith("/profil") || path.startsWith("/membre") },
 ];
 
@@ -123,9 +122,6 @@ export default function SiteNav() {
               {decorationSlots[link.href] ? <SiteDecoration slot={decorationSlots[link.href]}>{link.label}</SiteDecoration> : link.label}
             </Link>
           ))}
-          <Link className={"site-notifications-link " + (pathname.startsWith("/notifications") ? "active" : "")} href="/notifications" aria-label={unreadCount ? `Notifications, ${unreadCount} non lue(s)` : "Notifications"}>
-            <span>Notifications</span>{unreadCount > 0 && <span className="site-notification-count">{unreadCount > 99 ? "99+" : unreadCount}</span>}
-          </Link>
           {canModerate && <Link className={pathname.startsWith("/moderation") || pathname.startsWith("/admin") ? "active" : ""} href="/moderation">Modo/Admin</Link>}
         </nav>
       </header>
