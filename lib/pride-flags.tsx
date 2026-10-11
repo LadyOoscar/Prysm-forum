@@ -44,7 +44,7 @@ export function PrideFlag({ id, size = "small" }: { id: string; size?: "small" |
   const width = size === "small" ? 22 : 30;
   const height = size === "small" ? 15 : 20;
   return (
-    <svg className="pride-flag" width={width} height={height} viewBox="0 0 30 20" role="img" aria-label={flag.label} title={flag.label} focusable="false">
+    <svg className="pride-flag" width={width} height={height} viewBox="0 0 30 20" role="img" aria-label={flag.label} focusable="false">\n      <title>{flag.label}</title>
       {flag.colors.map((color, index) => <rect key={color + index} x="0" y={(20 / flag.colors.length) * index} width="30" height={20 / flag.colors.length + 0.15} fill={color} />)}
       {"symbol" in flag && flag.symbol === "circle" && <circle cx="15" cy="10" r="5.3" fill="none" stroke="#7B00A8" strokeWidth="2.1" />}
       <rect x=".35" y=".35" width="29.3" height="19.3" fill="none" stroke="rgba(0,0,0,.28)" strokeWidth=".7" rx="1.3" />
