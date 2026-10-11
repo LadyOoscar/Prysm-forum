@@ -1984,3 +1984,16 @@ footer:before {
 @keyframes prysm-alert-in{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:760px){.prysm-notification-toast{top:auto;right:10px;bottom:14px;width:calc(100vw - 20px);padding:12px;box-shadow:0 12px 38px rgba(0,0,0,.58)}.site-notification-count{min-width:18px;height:18px}}
 @media(prefers-reduced-motion:reduce){.prysm-notification-toast{animation:none}}
+
+
+/* PRYSM CLEAN // pixel shark courier notification mascot */
+.site-notification-shark{display:inline-grid;place-items:center;width:25px;height:25px;flex:none;image-rendering:pixelated}
+.site-notification-shark svg{display:block;width:25px;height:25px;image-rendering:pixelated;animation:prysm-shark-float 2.4s steps(2,end) infinite;filter:drop-shadow(0 0 5px #65c5e955)}
+.site-notifications-link.active .site-notification-shark svg,.site-notifications-link:hover .site-notification-shark svg{animation:prysm-shark-shy .72s steps(2,end) infinite}
+.prysm-notification-toast__signal{display:grid;place-items:center;flex:0 0 38px;height:38px;border:1px solid rgba(255,79,195,.7);border-radius:7px;background:#101632;overflow:hidden}
+.prysm-notification-toast__signal svg{display:block;width:34px;height:34px;image-rendering:pixelated;animation:prysm-shark-deliver .6s steps(3,end) both;filter:drop-shadow(0 0 5px #ff8bbd66)}
+@keyframes prysm-shark-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes prysm-shark-shy{0%,100%{transform:translateX(0) rotate(0)}25%{transform:translateX(-1px) rotate(-4deg)}75%{transform:translateX(1px) rotate(4deg)}}
+@keyframes prysm-shark-deliver{0%{transform:translate(-9px,5px) scale(.7);opacity:.3}65%{transform:translate(2px,-1px) scale(1.08);opacity:1}100%{transform:translate(0,0) scale(1);opacity:1}}
+@media(max-width:760px){.site-notification-shark,.site-notification-shark svg{width:22px;height:22px}.prysm-notification-toast__signal{flex-basis:34px;height:34px}.prysm-notification-toast__signal svg{width:30px;height:30px}}
+@media(prefers-reduced-motion:reduce){.site-notification-shark svg,.site-notifications-link.active .site-notification-shark svg,.site-notifications-link:hover .site-notification-shark svg,.prysm-notification-toast__signal svg{animation:none}}
