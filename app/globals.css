@@ -2037,3 +2037,7 @@ footer:before {
 @media(max-width:760px){.decoration-workshop{grid-template-columns:minmax(0,1fr)}.site-decoration-desktop-only{display:none!important}.site-decoration-no-desktop{display:inline-block!important}}
 @media(min-width:761px){.site-decoration-no-desktop{display:none!important}}
 @media(max-width:460px){.decoration-form-actions{display:grid;grid-template-columns:minmax(0,1fr)}.decoration-form-actions .button{width:100%}}
+
+
+@media(max-width:760px){.site-decoration-hide-mobile{display:none!important}}
+@media(min-width:761px){.site-decoration-hide-desktop{display:none!important}}
