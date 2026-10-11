@@ -503,3 +503,48 @@ nav .active{background:var(--surface-3);color:var(--text)}
 }
 
 .datingPage{min-height:100vh}.datingHero{max-width:1200px;margin:auto;padding:56px 5vw 36px;display:flex;gap:30px;align-items:end;justify-content:space-between}.datingHero h1{font-size:48px;line-height:1.05;max-width:720px;margin:12px 0}.datingHero p:not(.eyebrow){color:#a9a0b2;line-height:1.7;max-width:720px}.secondaryButton,.outlineButton{display:inline-flex;align-items:center;justify-content:center;border:1px solid #40364c;background:#1a1523;color:#eee9f5;border-radius:10px;padding:11px 16px;text-decoration:none}.datingShell{max-width:1200px;margin:auto;padding:0 5vw 70px}.datingGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.datingCard{border:1px solid #30283a;background:#17121f;border-radius:18px;padding:18px;box-shadow:0 10px 30px #0003}.datingProfile{display:flex;gap:14px;align-items:center;width:100%;border:0;background:none;color:inherit;text-align:left;padding:0}.datingProfile h2{font-size:20px;margin:0 0 5px}.datingProfile p{margin:0;color:#93899f;font-size:13px}.datingAvatar{width:64px;height:64px;border-radius:50%}.datingMeta{display:flex;gap:7px;flex-wrap:wrap;margin:16px 0 10px}.datingMeta span,.interestTags span{font-size:12px;color:#bfb5ca;background:#211a2b;border:1px solid #342a40;border-radius:999px;padding:5px 8px}.datingBio{color:#b2a8ba;line-height:1.55;min-height:62px}.interestTags{display:flex;gap:6px;flex-wrap:wrap}.datingActions{display:flex;gap:8px;margin-top:18px}.likeButton{flex:1;border:1px solid #754b83;background:#2a1c31;color:#e9b8ff;border-radius:10px;padding:10px;font-weight:700}.likeButton.liked{background:#5a2b68;color:#fff}.datingActions .outlineButton{flex:1}.datingSettings{margin:12px 0 8px;padding:16px;border:1px solid #332a3e;border-radius:14px;background:#16111e}.toggleLabel{display:flex;gap:10px;align-items:center;margin:10px 0}.profileTwoCols{display:grid;grid-template-columns:1fr 1fr;gap:12px}.toggleLabel input{accent-color:#c888ef}.emptyCommunity{border:1px dashed #3a3044;background:#15101d;border-radius:16px;padding:40px;text-align:center;color:#aaa0b2}@media(max-width:850px){.datingHero{display:block}.datingHero h1{font-size:38px}.datingGrid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.datingGrid{grid-template-columns:1fr}.profileTwoCols{grid-template-columns:1fr}.datingHero{padding-top:36px}}
+
+
+/* PRYSM notification alerts: compact indicator + clickable live toast, no submenu */
+.notificationButton.hasNotifications{
+  color:#f2d8ff;
+  border-color:#9a65b2;
+  box-shadow:0 0 0 3px rgba(200,136,239,.09),0 0 20px rgba(200,136,239,.12);
+}
+.notificationButton.hasNotifications::after{
+  content:"";
+  position:absolute;
+  width:6px;height:6px;right:5px;top:5px;border-radius:50%;
+  background:#ff647f;box-shadow:0 0 0 3px #1a1523;
+}
+.notificationAlert{
+  position:fixed;top:76px;right:clamp(12px,4vw,56px);z-index:100;
+  width:min(360px,calc(100vw - 24px));display:flex;align-items:flex-start;gap:11px;
+  padding:14px 12px;text-align:left;color:#f1e8f7;
+  background:linear-gradient(135deg,rgba(38,26,49,.98),rgba(22,17,31,.98));
+  border:1px solid #755184;border-radius:14px;
+  box-shadow:0 18px 55px rgba(0,0,0,.5),0 0 26px rgba(200,136,239,.1);
+  animation:notificationAlertIn .22s ease-out;
+}
+.notificationAlert:hover{border-color:#c888ef;background:#2a1c35}
+.notificationAlertIcon{
+  display:grid;place-items:center;flex:none;width:34px;height:34px;
+  border-radius:10px;background:#392747;font-size:16px;
+}
+.notificationAlertCopy{display:grid;gap:4px;min-width:0;flex:1}
+.notificationAlertCopy strong{font-size:12px;color:#e8c9f7}
+.notificationAlertCopy span{font-size:12px;line-height:1.45;overflow-wrap:anywhere;color:#f1eaf5}
+.notificationAlertCopy small{font-size:10px;color:#a991b8;margin-top:3px}
+.notificationAlertClose{
+  flex:none;font-size:18px;line-height:18px;color:#a89aaf;padding:0 3px;
+}
+@keyframes notificationAlertIn{
+  from{opacity:0;transform:translateY(-8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@media(max-width:700px){
+  .notificationAlert{top:66px;left:12px;right:12px;width:auto}
+}
+@media(prefers-reduced-motion:reduce){
+  .notificationAlert{animation:none}
+}
