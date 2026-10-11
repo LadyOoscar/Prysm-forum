@@ -179,6 +179,15 @@ export default function OrbitePage() {
           const style = {
             left: `${50 + (orbitStageWidth > 0 ? Math.cos(radians) * radius / orbitStageWidth * 100 : 0)}%`,
             top: `${50 + (orbitStageWidth > 0 ? Math.sin(radians) * radius / orbitStageWidth * 100 : 0)}%`,
+            position: "absolute",
+            width: "38px",
+            height: "38px",
+            zIndex: 50,
+            display: "block",
+            visibility: "visible",
+            opacity: 1,
+            transform: "translate(-50%, -50%)",
+            borderRadius: "50%",
           } as React.CSSProperties;
           return <Link key={m.id} className="orbit-person" href={`/membre/${encodeURIComponent(m.username)}`} style={style} title={`${m.display_name || m.username} · ${r.label}`} aria-label={`Voir le profil de ${m.display_name || m.username}, ${r.label}`}>
             <span className="orbit-person-face">{m.avatar_url && !failedAvatars.includes(m.id) ? <img src={m.avatar_url} alt="" loading="eager" decoding="async" onError={() => setFailedAvatars(current => current.includes(m.id) ? current : [...current, m.id])} /> : (m.display_name || m.username).slice(0, 1).toUpperCase()}</span>
