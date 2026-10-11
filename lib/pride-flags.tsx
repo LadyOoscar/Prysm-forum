@@ -19,7 +19,7 @@ export const PRIDE_FLAGS = [
   { id: "genderfluid", label: "Genderfluid", colors: ["#FF76A4","#FFFFFF","#C011D7","#000000","#2F3CBE"] },
   { id: "asexual", label: "Asexuel·le", colors: ["#000000","#A4A4A4","#FFFFFF","#810081"] },
   { id: "demisexual", label: "Demi-sexuel·le", colors: ["#FFFFFF","#810081","#A4A4A4","#000000"], symbol: "demisexual" },
-  { id: "leather", label: "Leather", colors: ["#000000","#252580","#000000","#252580","#FFFFFF","#252580","#000000","#252580","#000000"], symbol: "heart" },
+  { id: "leather", label: "Leather", colors: ["#000000","#2A2A7F","#000000","#2A2A7F","#FFFFFF","#2A2A7F","#000000","#2A2A7F","#000000"], symbol: "heart" },
   { id: "pup", label: "Pup / Puppy", colors: ["#21409A","#000000","#FFFFFF","#000000","#21409A"], symbol: "bone" },
   { id: "sapphic", label: "Saphique", colors: ["#D62900","#FF9A8A","#FFFFFF","#D36AB2","#A30262"], symbol: "flower" },
   { id: "polyamorous", label: "Polyamoureux·se", colors: ["#0000FF","#FF0000","#000000"], symbol: "pi" },
@@ -57,7 +57,7 @@ export function PrideFlag({ id, size = "small" }: { id: string; size?: "small" |
         <>
           {flag.colors.map((color, index) => <rect key={color + index} x="0" y={stripeHeight * index} width="30" height={stripeHeight + 0.12} fill={color} />)}
           {"symbol" in flag && flag.symbol === "intersex" && <circle cx="15" cy="10" r="5.3" fill="none" stroke="#7B00A8" strokeWidth="2.1" />}
-          {"symbol" in flag && flag.symbol === "heart" && <path d="M2 1.8C2.7.7 4.6.7 5.4 1.9C6.4.6 8.3.8 8.8 2.1C9.8 4.3 6.8 6.1 5.4 7.2C4 6 1 4.2 2 1.8Z" fill="#E80035" stroke="#FFFFFF" strokeWidth=".25" />}
+          {"symbol" in flag && flag.symbol === "heart" && <path d="M2 3.2C2.7 1.1 5.1.7 6.5 2.4C8 0.7 10.5 1.2 11.1 3.5C12 6.8 7.9 9.1 6.5 10.2C5 9 1 6.5 2 3.2Z" fill="#E70039" stroke="#FFFFFF" strokeWidth=".25" />}
           {"symbol" in flag && flag.symbol === "bearpaw" && <g fill="#000000"><ellipse cx="8.2" cy="5.2" rx="1.7" ry="2.2" transform="rotate(-24 8.2 5.2)"/><ellipse cx="12.1" cy="3.8" rx="1.7" ry="2.2" transform="rotate(-8 12.1 3.8)"/><ellipse cx="16.3" cy="4" rx="1.7" ry="2.2" transform="rotate(10 16.3 4)"/><ellipse cx="20.1" cy="5.8" rx="1.7" ry="2.2" transform="rotate(24 20.1 5.8)"/><path d="M7 12.1C7 9.2 10.2 7.3 14.1 7.6C18.2 7.8 21.4 10.2 21 13.2C20.7 16.1 17.5 17 13.8 16.6C10 16.3 7 15.2 7 12.1Z"/></g>}
           {"symbol" in flag && flag.symbol === "twink" && <g fill="none" stroke="#000000" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"><circle cx="12.2" cy="10.5" r="3.5"/><circle cx="17.8" cy="10.5" r="3.5"/><path d="M14.5 8.2L18.6 3.8M15.8 3.8H18.6V6.6M20 8.2L24.1 3.8M21.3 3.8H24.1V6.6"/></g>}
           {"symbol" in flag && flag.symbol === "flower" && <g transform="translate(15 10)" fill="#7B2C91"><ellipse cy="-3" rx="1.6" ry="3"/><ellipse cy="3" rx="1.6" ry="3"/><ellipse cx="-3" rx="3" ry="1.6"/><ellipse cx="3" rx="3" ry="1.6"/><circle r="1.5" fill="#F5D442"/></g>}
