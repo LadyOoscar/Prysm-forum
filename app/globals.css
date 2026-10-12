@@ -595,3 +595,18 @@ nav .active{background:var(--surface-3);color:var(--text)}
   .notificationShark,.notificationButton.hasNotifications .notificationShark,.notificationAlertIcon svg{animation:none}
   .notificationButton{transition:none}
 }
+
+/* Gaydar: proximity by profile city, never by live GPS */
+.gaydarControls{margin:0 0 26px;padding:22px 24px;border:1px solid #40304f;border-radius:18px;background:radial-gradient(ellipse at 100% 0%,#382247 0%,#1b1425 46%,#17121f 100%);box-shadow:0 14px 36px #0003}
+.gaydarControlHeading{display:flex;align-items:center;justify-content:space-between;gap:18px}
+.gaydarControlHeading .eyebrow{margin:0 0 8px}
+.gaydarControlHeading h2{margin:0;font-size:23px}
+.gaydarControlHeading p:not(.eyebrow){margin:8px 0 0;color:#a99db5;font-size:13px;line-height:1.5}
+.gaydarRadarIcon{display:grid;place-items:center;width:58px;height:58px;flex:none;border:1px solid #79538d;border-radius:50%;color:#e3b6fa;font-size:35px;background:radial-gradient(circle,#50315f,#21172b 72%);box-shadow:0 0 30px #c888ef22}
+.gaydarRadiusLabel{display:flex;justify-content:space-between;gap:12px;margin:24px 0 10px;color:#d8cfe1;font-size:13px}
+.gaydarRadiusLabel strong{color:#e4b8fa}
+.gaydarRadius{width:100%;accent-color:#c888ef;cursor:pointer}
+.gaydarRadiusTicks{display:flex;justify-content:space-between;color:#82758f;font-size:11px;margin-top:6px}
+.gaydarMessage{margin:0 0 18px}
+.gaydarDistance{color:#e4b8fa!important;background:#35213f!important;border-color:#6b4580!important}
+@media(max-width:560px){.gaydarControls{padding:18px}.gaydarControlHeading h2{font-size:19px}.gaydarRadarIcon{width:46px;height:46px;font-size:28px}}
