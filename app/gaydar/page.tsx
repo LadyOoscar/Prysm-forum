@@ -244,6 +244,20 @@ export default function GAYDARPage() {
       @media(prefers-reduced-motion:reduce){.orbit-person,.orbit-person-face{animation:none!important}}
       @media(max-width:900px){.orbit-layout{grid-template-columns:1fr}.orbit-stage{--stage-size:min(86vw,650px)}}
       @media(max-width:600px){.orbit-controls{align-items:stretch;flex-direction:column}.orbit-controls .button{width:100%}.orbit-stage{--stage-size:calc(100vw - 40px)}.orbit-center{width:92px;height:92px}.orbit-center-avatar{width:36px;height:36px}.orbit-person{width:32px;height:32px}.orbit-ring span{font-size:.5rem}.orbit-overlay{width:64%;bottom:12%;padding:8px 9px}.orbit-overlay strong{font-size:.78rem}.orbit-overlay span{font-size:.62rem}}
-    `}</style>
+
+      .gaydar-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px 22px;align-items:center}
+      .gaydar-radius-copy{grid-column:1/-1}
+      .gaydar-radius-copy strong{font-size:1rem;color:var(--text,#f2f3ff)}
+      .gaydar-radius-copy p{margin:5px 0 0;color:var(--muted);font-size:.8rem}
+      .gaydar-slider-label{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--muted);font-size:.8rem}
+      .gaydar-slider-label strong{color:var(--cyan);font-size:1rem}
+      .gaydar-slider{grid-column:1/-1;width:100%;accent-color:var(--cyan);cursor:pointer}
+      .gaydar-slider-ticks{grid-column:1/-1;display:flex;justify-content:space-between;margin-top:-5px;color:var(--muted);font-size:.68rem}
+      .orbit-empty{padding:25px;margin:0 0 18px;border:1px solid var(--line);background:rgba(14,17,46,.92);text-align:center}
+      .orbit-empty h2{margin:0 0 8px;font-size:1.2rem}
+      .orbit-empty p{margin:0 0 16px;color:var(--muted);font-size:.84rem;line-height:1.6}
+      .orbit-empty .button{display:inline-flex;text-decoration:none}
+      @media(max-width:600px){.gaydar-controls{grid-template-columns:1fr}.gaydar-slider-label,.gaydar-slider,.gaydar-slider-ticks{grid-column:1}.gaydar-radius-copy{grid-column:1}}
+\n    `}</style>
   </main>;
 }
