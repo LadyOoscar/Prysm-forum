@@ -100,7 +100,21 @@ export default function HomePage() {
     <SiteBanner />
     <Stories />
     <section className="hero home-community-hero home-community-hero-no-orbit"><div><p className="eyebrow">PRYSM · réseau communautaire queer</p><h1>Bienvenue dans<br/><span>ta galaxie.</span></h1><p className="lead">Un forum queer, mille façons d’être soi. On échange, on s’entraide et on refait le monde. Tu peux participer sans avoir à expliquer qui tu es.</p><div className="actions"><Link className="button primary" href="/forum">Rejoindre les discussions <span aria-hidden="true">↗</span></Link><Link className="button" href="/gaydar">Explorer le GAYDAR</Link></div><p className="home-community-note"><span aria-hidden="true">✳</span> Identités libres · Communauté vivante · Respect mutuel</p></div></section>
-    <style jsx>{`.home-community-hero-no-orbit{grid-template-columns:minmax(0,1fr);min-height:0;padding:64px 0 48px}`}</style>
+    <style jsx>{`
+      .home-community-hero-no-orbit { grid-template-columns: minmax(0, 1fr); min-height: 0; padding: 51px 0 38px; }
+      .home-community-hero-no-orbit > div { max-width: 80%; }
+      .home-community-hero-no-orbit h1 { font-size: 80%; line-height: 1.08; }
+      .home-community-hero-no-orbit .eyebrow, .home-community-hero-no-orbit .lead, .home-community-hero-no-orbit .home-community-note { font-size: 80%; }
+      .home-community-hero-no-orbit .lead { max-width: 80%; }
+      .home-community-hero-no-orbit .actions { gap: 8px; }
+      .home-community-hero-no-orbit .button { transform: scale(.8); transform-origin: left center; }
+      .home-community-hero-no-orbit .home-community-note { margin-top: 12px; }
+      @media (max-width: 640px) {
+        .home-community-hero-no-orbit > div, .home-community-hero-no-orbit .lead { max-width: 100%; }
+        .home-community-hero-no-orbit .actions { gap: 8px; flex-wrap: wrap; }
+        .home-community-hero-no-orbit .button { transform: none; }
+      }
+    `}</style>
     <section className="home-popular">
       <div className="section-heading home-popular-heading"><div><p className="eyebrow">À suivre en ce moment</p><h2>Topics populaires</h2></div><Link className="home-popular-all" href="/forum">Tout le forum <span>↗</span></Link></div>
       {popularTopics.length > 0 ? <div className="home-popular-list">{popularTopics.map((topic, index) => <Link className={"home-popular-topic category-" + topic.categorySlug} href={"/topic/" + topic.id} key={topic.id}><span className="home-popular-rank">{String(index + 1).padStart(2, "0")}</span><span className="home-popular-copy"><span className="home-popular-category">{topic.categoryName}</span><strong>{topic.title}</strong><small>{topic.postCount} message{topic.postCount > 1 ? "s" : ""} · {topic.voteCount} vote{topic.voteCount > 1 ? "s" : ""}</small></span><span className="home-popular-arrow">↗</span></Link>)}</div> : <div className="home-popular-empty">{topicsLoaded ? "Les premières discussions apparaîtront ici dès qu’elles seront actives." : "Recherche des discussions actives…"}</div>}
