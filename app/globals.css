@@ -2111,3 +2111,6 @@ footer:before {
 .decoration-banner-preview.is-mobile{max-width:360px;margin:auto;min-height:100px}
 .decoration-banner-preview>span{color:var(--muted);font-size:.8rem}
 @media(max-width:760px){.site-home-banner{margin:12px auto 2px}.site-home-banner img{max-height:160px}}
+
+@media(max-width:760px){.site-decoration-hide-mobile{display:none!important}}
+@media(min-width:761px){.site-decoration-hide-desktop{display:none!important}}
