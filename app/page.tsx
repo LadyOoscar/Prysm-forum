@@ -5,6 +5,7 @@ import Link from "next/link";
 import { createSupabaseBrowser } from "../lib/supabase-browser";
 import CommunityCalendar from "./components/community-calendar";
 import Stories from "./components/stories";
+import SiteDecoration from "./components/site-decoration";
 
 type PopularTopic = {
   id: string;
@@ -91,7 +92,7 @@ export default function HomePage() {
     <header className="topbar">
       <Link className="brand" href="/">PRYSM</Link>
       <nav>
-        <Link className="active" href="/">Accueil</Link>
+        <Link className="active" href="/"><SiteDecoration slot="tab-accueil">Accueil</SiteDecoration></Link>
         <Link href="/forum">Forum</Link>
         <Link href="/rencontres">Rencontres</Link>
         <Link href="/orbite">Orbite</Link>
