@@ -6,6 +6,7 @@ import { createSupabaseBrowser } from "../lib/supabase-browser";
 import CommunityCalendar from "./components/community-calendar";
 import Stories from "./components/stories";
 import SiteDecoration from "./components/site-decoration";
+import SiteBanner from "./components/site-banner";
 
 type PopularTopic = {
   id: string;
@@ -101,6 +102,7 @@ export default function HomePage() {
         {canModerate && <Link href="/moderation" aria-label="Espace Modo/Admin">Modo/Admin</Link>}
       </nav>
     </header>
+    <SiteBanner />
     <Stories />
     <section className="hero home-community-hero"><div><p className="eyebrow">PRYSM · réseau communautaire queer</p><h1>Bienvenue dans<br/><span>ta galaxie.</span></h1><p className="lead">Un forum queer, mille façons d’être soi. On échange, on s’entraide et on refait le monde. Tu peux participer sans avoir à expliquer qui tu es.</p><div className="actions"><Link className="button primary" href="/forum">Rejoindre les discussions <span aria-hidden="true">↗</span></Link><Link className="button" href="/orbite">Explorer la communauté</Link></div><p className="home-community-note"><span aria-hidden="true">✳</span> Identités libres · Communauté vivante · Respect mutuel</p></div><Link className="home-orbit" href="/orbite" aria-label="Découvrir PRYSM Orbite"><span className="home-orbit-stars" aria-hidden="true"/><span className="home-orbit-ring home-orbit-ring-1"><i className="home-orbit-dot"/></span><span className="home-orbit-ring home-orbit-ring-2"><i className="home-orbit-dot"/></span><span className="home-orbit-ring home-orbit-ring-3"><i className="home-orbit-dot"/></span><span className="home-orbit-ring home-orbit-ring-4"><i className="home-orbit-dot"/></span><span className="home-orbit-sun">{orbitAvatar ? <img src={orbitAvatar} alt=""/> : <b>{orbitName}</b>}</span><span className="home-orbit-caption"><strong>PRYSM ORBITE</strong><small>Les membres dans ta galaxie</small></span></Link></section>
     <section className="home-popular">
