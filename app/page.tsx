@@ -99,7 +99,7 @@ export default function HomePage() {
     </header>
     <SiteBanner />
     <Stories />
-    <section className="hero home-community-hero home-community-hero-no-orbit"><div><p className="eyebrow">PRYSM · réseau communautaire queer</p><h1>Bienvenue dans<br/><span>ta galaxie.</span></h1><p className="lead">Un forum queer, mille façons d’être soi. On échange, on s’entraide et on refait le monde. Tu peux participer sans avoir à expliquer qui tu es.</p><div className="actions"><Link className="button primary" href="/forum">Rejoindre les discussions <span aria-hidden="true">↗</span></Link><Link className="button" href="/gaydar">Explorer Orbite</Link></div><p className="home-community-note"><span aria-hidden="true">✳</span> Identités libres · Communauté vivante · Respect mutuel</p></div></section>
+    <section className="hero home-community-hero home-community-hero-no-orbit"><div><p className="eyebrow">PRYSM · réseau communautaire queer</p><h1>Bienvenue dans<br/><span>ta galaxie.</span></h1><p className="lead">Un forum queer, mille façons d’être soi. On échange, on s’entraide et on refait le monde. Tu peux participer sans avoir à expliquer qui tu es.</p><div className="actions"><Link className="button primary" href="/forum">Rejoindre les discussions <span aria-hidden="true">↗</span></Link><Link className="button" href="/gaydar">Activer le Gaydar</Link></div><p className="home-community-note"><span aria-hidden="true">✳</span> Identités libres · Communauté vivante · Respect mutuel</p></div></section>
     <style jsx>{`
       .home-community-hero-no-orbit { grid-template-columns: minmax(0, 1fr); min-height: 0; padding: 43px 0 32px; }
       .home-community-hero-no-orbit > div { max-width: 80.64%; }
