@@ -82,7 +82,7 @@ export default function GAYDARPage() {
   useEffect(() => {
     try {
       const saved = Number(window.localStorage.getItem("prysm-gaydar-radius"));
-      if (Number.isFinite(saved) && saved >= 10 && saved <= 300) setSearchRadius(saved);
+      if (Number.isFinite(saved) && saved >= 10 && saved <= 100) setSearchRadius(saved);
     } catch { /* Le rayon par défaut reste disponible sans stockage local. */ }
     setRadiusReady(true);
   }, []);
@@ -183,8 +183,8 @@ export default function GAYDARPage() {
     <section className="orbit-controls gaydar-controls">
       <div className="gaydar-radius-copy"><strong>{searchRadius} km autour de {cityName(profile?.location) || "ta ville"}</strong><p>Choisis ton périmètre. Le rayon est mémorisé sur cet appareil.</p></div>
       <label className="gaydar-slider-label" htmlFor="gaydar-radius"><span>Rayon de recherche</span><strong>{searchRadius} km</strong></label>
-      <input id="gaydar-radius" className="gaydar-slider" type="range" min="10" max="300" step="10" value={searchRadius} onChange={event => setSearchRadius(Number(event.target.value))} />
-      <div className="gaydar-slider-ticks"><span>10 km</span><span>150 km</span><span>300 km</span></div>
+      <input id="gaydar-radius" className="gaydar-slider" type="range" min="10" max="100" step="10" value={searchRadius} onChange={event => setSearchRadius(Number(event.target.value))} />
+      <div className="gaydar-slider-ticks"><span>10 km</span><span>50 km</span><span>100 km</span></div>
     </section>
     {message && <p className="orbit-message" role="status">{message}</p>}
     {!cityName(profile?.location) ? <section className="orbit-empty"><h2>Ajoute ta ville pour commencer</h2><p>Dans ton profil, indique une ville comme Épernay ou Reims. Le Gaydar ne demande jamais l'accès au GPS.</p><Link className="button primary" href="/profil">Compléter mon profil</Link></section> :
