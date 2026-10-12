@@ -199,11 +199,11 @@ export default function ProfilePage() {
               <small className="fieldHint">Sépare les centres d'intérêt par des virgules, jusqu'à 12.</small>
             </label>
             <div className="datingSettings">
-              <p className="eyebrow">RENCONTRES</p>
-              <label className="toggleLabel"><input type="checkbox" checked={profile.dating_enabled} onChange={e => setProfile({...profile, dating_enabled: e.target.checked})} /> Afficher mon profil dans Rencontres</label>
+              <p className="eyebrow">GAYDAR</p>
+              <label className="toggleLabel"><input type="checkbox" checked={profile.dating_enabled} onChange={e => setProfile({...profile, dating_enabled: e.target.checked})} /> Afficher mon profil dans le Gaydar</label>
               <div className="profileTwoCols">
                 <label>Âge<input type="number" min="18" max="120" value={profile.age ?? ""} onChange={e => setProfile({...profile, age: e.target.value ? Number(e.target.value) : null})} placeholder="18+" /></label>
-                <label>Région / ville<input value={profile.location ?? ""} onChange={e => setProfile({...profile, location: e.target.value})} maxLength={80} placeholder="ex. Paris, Bretagne…" /></label>
+                <label>Ville<input value={profile.location ?? ""} onChange={e => setProfile({...profile, location: e.target.value})} maxLength={80} placeholder="ex. Épernay, Reims…" /></label>
               </div>
               <label>Orientation<input value={profile.orientation ?? ""} onChange={e => setProfile({...profile, orientation: e.target.value})} maxLength={80} placeholder="ex. lesbienne, bi, pan…" /></label>
               <label>Je recherche<input value={profile.looking_for ?? ""} onChange={e => setProfile({...profile, looking_for: e.target.value})} maxLength={120} placeholder="ex. amitié, relation, rencontres…" /></label>
