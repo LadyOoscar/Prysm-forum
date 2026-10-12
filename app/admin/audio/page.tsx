@@ -56,19 +56,19 @@ export default function AdminAudioPage() {
       const { data: { user } } = await db.auth.getUser();
       if (!user) throw new Error("Reconnecte-toi à PRYSM.");
       const path = user.id + "/audio/" + crypto.randomUUID() + ".mp3";
-      const { error: uploadError } = await db.storage.from("stickers").upload(path, file, { contentType: "audio/mpeg", upsert: false });
+      const { error: uploadError } = await db.storage.from("prysm-audio").upload(path, file, { contentType: "audio/mpeg", upsert: false });
       if (uploadError) throw new Error("Import MP3 : " + uploadError.message);
       uploadedPath = path;
-      const audioUrl = db.storage.from("stickers").getPublicUrl(path).data.publicUrl;
+      const audioUrl = db.storage.from("prysm-audio").getPublicUrl(path).data.publicUrl;
       const { error: saveError } = await db.from("site_audio_settings").upsert({
         id: 1, audio_url: audioUrl, audio_path: path, updated_by: user.id, updated_at: new Date().toISOString()
       }, { onConflict: "id" });
       if (saveError) throw new Error("Enregistrement : " + saveError.message);
-      if (current?.audio_path && current.audio_path !== path) await db.storage.from("stickers").remove([current.audio_path]);
+      if (current?.audio_path && current.audio_path !== path) await db.storage.from("prysm-audio").remove([current.audio_path]);
       setFile(null); setPreview(""); setMessage("Musique enregistrée. Elle devient la bande-son d’ambiance du forum pour tout le monde.");
       await load();
     } catch (cause) {
-      if (uploadedPath) await db.storage.from("stickers").remove([uploadedPath]);
+      if (uploadedPath) await db.storage.from("prysm-audio").remove([uploadedPath]);
       setError(cause instanceof Error ? cause.message : "Impossible d’enregistrer cette musique.");
     } finally { setBusy(false); }
   }
@@ -79,7 +79,7 @@ export default function AdminAudioPage() {
     const { error: deleteError } = await db.from("site_audio_settings").delete().eq("id", 1);
     if (deleteError) setError("Impossible de rétablir la musique d’origine : " + deleteError.message);
     else {
-      if (current?.audio_path) await db.storage.from("stickers").remove([current.audio_path]);
+      if (current?.audio_path) await db.storage.from("prysm-audio").remove([current.audio_path]);
       setCurrent(null); setFile(null); setPreview("");
       setMessage("Musique d’origine rétablie.");
     }
