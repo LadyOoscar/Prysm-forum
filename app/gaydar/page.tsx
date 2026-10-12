@@ -55,7 +55,6 @@ function distanceKm(a: Coordinates, b: Coordinates) {
 
 export default function GAYDARPage() {
   const supabase = useMemo(() => createSupabaseBrowser(), []);
-  const [userId, setUserId] = useState("");
   const [profile, setProfile] = useState<Profile | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
@@ -97,7 +96,6 @@ export default function GAYDARPage() {
     async function load() {
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) { window.location.href = "/auth"; return; }
-      setUserId(auth.user.id);
 
       const [{ data: own, error: ownError }, { data: people, error: peopleError }] = await Promise.all([
         supabase.from("profiles").select("username,display_name,avatar_url,location").eq("id", auth.user.id).maybeSingle(),
