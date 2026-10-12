@@ -57,6 +57,11 @@ export default function AdminCustomizationPage() {
           <strong>Icônes &amp; décorations</strong>
           <small>Importer des PNG, personnaliser les icônes des onglets, régler leur taille, leur position et leur visibilité sur mobile ou ordinateur.</small>
         </Link>
+        <Link className="admin-action-card" href="/admin/audio">
+          <span className="admin-action-icon">♫</span>
+          <strong>Musique d’ambiance</strong>
+          <small>Importer ton propre MP3, l’écouter en aperçu, remplacer la bande-son actuelle ou rétablir celle d’origine.</small>
+        </Link>
         <Link className="admin-action-card" href="/moderation#badges">
           <span className="admin-action-icon">⬡</span>
           <strong>Badges &amp; insignes</strong>
