@@ -101,18 +101,18 @@ export default function HomePage() {
     <Stories />
     <section className="hero home-community-hero home-community-hero-no-orbit"><div><p className="eyebrow">PRYSM · réseau communautaire queer</p><h1>Bienvenue dans<br/><span>ta galaxie.</span></h1><p className="lead">Un forum queer, mille façons d’être soi. On échange, on s’entraide et on refait le monde. Tu peux participer sans avoir à expliquer qui tu es.</p><div className="actions"><Link className="button primary" href="/forum">Rejoindre les discussions <span aria-hidden="true">↗</span></Link><Link className="button" href="/gaydar">Explorer le GAYDAR</Link></div><p className="home-community-note"><span aria-hidden="true">✳</span> Identités libres · Communauté vivante · Respect mutuel</p></div></section>
     <style jsx>{`
-      .home-community-hero-no-orbit { grid-template-columns: minmax(0, 1fr); min-height: 0; padding: 51px 0 38px; }
-      .home-community-hero-no-orbit > div { max-width: 80%; }
-      .home-community-hero-no-orbit h1 { font-size: 80%; line-height: 1.08; }
-      .home-community-hero-no-orbit .eyebrow, .home-community-hero-no-orbit .lead, .home-community-hero-no-orbit .home-community-note { font-size: 80%; }
-      .home-community-hero-no-orbit .lead { max-width: 80%; }
-      .home-community-hero-no-orbit .actions { gap: 8px; }
-      .home-community-hero-no-orbit .button { transform: scale(.8); transform-origin: left center; }
-      .home-community-hero-no-orbit .home-community-note { margin-top: 12px; }
+      .home-community-hero-no-orbit { grid-template-columns: minmax(0, 1fr); min-height: 0; padding: 36px 0 27px; }
+      .home-community-hero-no-orbit > div { max-width: 56%; }
+      .home-community-hero-no-orbit h1 { font-size: 56%; line-height: 1.08; }
+      .home-community-hero-no-orbit .eyebrow, .home-community-hero-no-orbit .lead, .home-community-hero-no-orbit .home-community-note { font-size: 56%; }
+      .home-community-hero-no-orbit .lead { max-width: 56%; }
+      .home-community-hero-no-orbit .actions { gap: 6px; }
+      .home-community-hero-no-orbit .button { transform: scale(.56); transform-origin: left center; }
+      .home-community-hero-no-orbit .home-community-note { margin-top: 8px; }
       @media (max-width: 640px) {
         .home-community-hero-no-orbit > div, .home-community-hero-no-orbit .lead { max-width: 100%; }
-        .home-community-hero-no-orbit .actions { gap: 8px; flex-wrap: wrap; }
-        .home-community-hero-no-orbit .button { transform: none; }
+        .home-community-hero-no-orbit .actions { gap: 6px; flex-wrap: wrap; }
+        .home-community-hero-no-orbit .button { transform: scale(.7); transform-origin: left center; }
       }
     `}</style>
     <section className="home-popular">
