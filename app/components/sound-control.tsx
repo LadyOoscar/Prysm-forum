@@ -21,9 +21,12 @@ export default function SoundControl() {
   useEffect(() => {
     let cancelled = false;
     const db = createSupabaseBrowser();
-    void db.from("site_audio_settings").select("audio_url").eq("id", 1).maybeSingle().then(({ data }) => {
-      if (!cancelled && data?.audio_url) setAmbientUrl(data.audio_url);
-    }).catch(() => {});
+    void (async () => {
+      try {
+        const { data } = await db.from("site_audio_settings").select("audio_url").eq("id", 1).maybeSingle();
+        if (!cancelled && data?.audio_url) setAmbientUrl(data.audio_url);
+      } catch {}
+    })();
     return () => { cancelled = true; };
   }, []);
 
