@@ -157,14 +157,14 @@ export default function GAYDARPage() {
     setBusy(false);
   }
 
-  if (loading) return <main className="shell"><section className="page-head"><p className="eyebrow">PRYSM · GAYDAR</p><h1>GAYDAR.</h1><p className="lead">Préparation de ta GAYDAR…</p></section></main>;
+  if (loading) return <main className="shell"><section className="page-head"><p className="eyebrow">PRYSM · GAYDAR</p><h1>GAYDAR.</h1><p className="lead">Chargement du GAYDAR…</p></section></main>;
   const grouped = rings.map(r => ({ ...r, members: members.filter(m => m.distance_band === r.id) }));
 
   return <main className="shell orbit-page">
     <header className="topbar"><Link className="brand" href="/">PRYSM</Link><nav><Link href="/">Accueil</Link><Link href="/forum">Forum</Link><Link href="/rencontres">Rencontres</Link><Link href="/messages">Messages</Link><Link href="/profil">Profil</Link><Link className="active" href="/gaydar">GAYDAR</Link></nav></header>
     <section className="page-head compact"><p className="eyebrow">PRYSM · Rencontres de proximité</p><h1>GAYDAR<span>.</span></h1><p className="lead">Les membres queer près de toi, répartis sur quatre zones de distance.</p></section>
     {testOrbit && <p className="orbit-test-banner" role="status">MODE TEST · 6 profils fictifs avec avatars générés, affichés uniquement dans cette session. Aucune fausse position ni aucun compte n’a été créé en base.</p>}
-    <section className="orbit-controls"><div><strong>{enabled ? "Ta présence est activée" : "Entre dans l’GAYDAR"}</strong><p>{enabled ? "Les membres ayant activé GAYDAR peuvent te découvrir." : "Active volontairement ta position pour découvrir les membres à proximité."}</p></div>
+    <section className="orbit-controls"><div><strong>{enabled ? "Ta présence est activée" : "Entre dans le GAYDAR"}</strong><p>{enabled ? "Les membres ayant activé GAYDAR peuvent te découvrir." : "Active volontairement ta position pour découvrir les membres à proximité."}</p></div>
       {enabled ? <button className="button" disabled={busy} onClick={() => void disable()}>{busy ? "Mise à jour…" : "Désactiver GAYDAR"}</button> : <button className="button primary" disabled={busy} onClick={() => void enable()}>{busy ? "Localisation…" : "Activer ma position"}</button>}
     </section>
     {message && <p className="orbit-message" role="status">{message}</p>}
