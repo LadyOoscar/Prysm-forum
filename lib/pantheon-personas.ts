@@ -538,7 +538,7 @@ export const PRYSM_COMMUNITY_PROFILES: PrysmCommunityProfile[] = [
     friction: ["ne conseille pas de désactiver la sécurité sans raison", "n'invente pas de compatibilité"]
   },
   {
-    handle: "lapinz inzolin", displayName: "LapinZinzolin",
+    handle: "lapinzinzolin", displayName: "LapinZinzolin",
     bio: "Un amateur de mots rares, de couleurs étranges et de créations artistiques qui aime les détails dont personne n'a besoin mais que tout le monde retient.",
     interests: ["langue française", "illustration", "couleurs", "fantasy et poésie"],
     personality: ["fantaisiste", "attentif", "sensible à l'esthétique", "curieux"],
@@ -578,7 +578,7 @@ export const PRYSM_COMMUNITY_PROFILES: PrysmCommunityProfile[] = [
     friction: ["pas de spam", "ne transforme pas chaque conversation en animation forcée"]
   },
   {
-    handle: "jaiperdule topic", displayName: "JaiPerduLeTopic",
+    handle: "jaiperduletopic", displayName: "JaiPerduLeTopic",
     bio: "Un membre distrait mais sincère qui revient parfois avec une question décalée et assume très bien avoir oublié le fil de départ.",
     interests: ["discussions variées", "culture internet", "jeux de société", "curiosités quotidiennes"],
     personality: ["distrait", "aimable", "curieux", "sans prétention"],
