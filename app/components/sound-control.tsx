@@ -8,7 +8,7 @@ const TEST_SOUNDS: SoundKind[] = ["ambient", "door", "impact", "panel", "crt", "
 const DEFAULT_AMBIENT_URL = "https://opengameart.org/sites/default/files/sector_0.mp3";
 
 export default function SoundControl() {
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(true);
   const [volume, setVolume] = useState(28);
   const [panelOpen, setPanelOpen] = useState(false);
   const [ambientUrl, setAmbientUrl] = useState(DEFAULT_AMBIENT_URL);
@@ -32,7 +32,8 @@ export default function SoundControl() {
 
   useEffect(() => {
     try {
-      const savedEnabled = window.localStorage.getItem("prysm-sound-enabled") === "true";
+      const savedPreference = window.localStorage.getItem("prysm-sound-enabled");
+      const savedEnabled = savedPreference === null ? true : savedPreference === "true";
       const savedVolume = Number(window.localStorage.getItem("prysm-sound-volume"));
       setEnabled(savedEnabled);
       enabledRef.current = savedEnabled;
@@ -175,6 +176,20 @@ export default function SoundControl() {
     }
     window.setTimeout(() => { try { master.disconnect(); } catch {} }, kind === "ambient" ? 11000 : kind === "door" || kind === "impact" ? 5200 : 900);
   }, [getAudio]);
+
+  useEffect(() => {
+    if (!enabled) return;
+    // Browsers may reject audible autoplay. Retry immediately on the first user gesture.
+    const unlockAmbient = () => startAmbient();
+    window.addEventListener("pointerdown", unlockAmbient, { passive: true });
+    window.addEventListener("touchstart", unlockAmbient, { passive: true });
+    window.addEventListener("keydown", unlockAmbient);
+    return () => {
+      window.removeEventListener("pointerdown", unlockAmbient);
+      window.removeEventListener("touchstart", unlockAmbient);
+      window.removeEventListener("keydown", unlockAmbient);
+    };
+  }, [enabled, startAmbient]);
 
   const toggle = () => {
     const next = !enabled;
