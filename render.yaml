@@ -1,3 +1,4 @@
+# Redeploy after removing the AI character directory and BOT_TEST harness.
 services:
   - type: web
     name: prysm-clean
