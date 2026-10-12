@@ -2102,3 +2102,12 @@ footer:before {
 .post-author-display-name+.pride-flag-list{margin-left:5px}
 .public-profile-hero .pride-flag-list{margin-left:0;gap:5px}
 @media(max-width:600px){.pride-flag-list{gap:2px;margin-left:4px}.pride-flag{width:19px;height:13px}}
+
+
+/* User-uploaded PRYSM homepage banner */
+.site-home-banner{display:flex;align-items:center;justify-content:center;width:100%;margin:22px auto 8px;overflow:hidden}
+.site-home-banner img{display:block;width:100%;height:auto;max-width:100%;object-fit:contain}
+.decoration-banner-preview{display:flex;align-items:center;justify-content:center;min-height:130px;padding:12px;border:1px dashed rgba(69,239,255,.35);background:rgba(7,8,25,.7);border-radius:4px;overflow:hidden}
+.decoration-banner-preview.is-mobile{max-width:360px;margin:auto;min-height:100px}
+.decoration-banner-preview>span{color:var(--muted);font-size:.8rem}
+@media(max-width:760px){.site-home-banner{margin:12px auto 2px}.site-home-banner img{max-height:160px}}
