@@ -1,26 +1,67 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { createSupabaseBrowser } from "../../lib/supabase-browser";
 
-type Member = { id: string; username: string; display_name: string; avatar_url: string | null; distance_band: 1 | 2 | 3 | 4 };
-type Profile = { username: string; display_name: string; avatar_url: string | null };
+type Member = { id: string; username: string; display_name: string; avatar_url: string | null; location: string; distance_km: number };
+type Profile = { username: string; display_name: string; avatar_url: string | null; location: string | null };
+type Coordinates = { latitude: number; longitude: number };
+type GeocodingResult = Coordinates & { name: string; country_code?: string; feature_code?: string };
+
+const DEFAULT_RADIUS = 50;
+const cityCache = new Map<string, Promise<Coordinates | null>>();
 const rings = [
-  { id: 1, label: "0 à 5 km", name: "Proximité", color: "#b58cff", size: "50%", duration: "30s" },
-  { id: 2, label: "6 à 10 km", name: "Voisinage", color: "#66a5ff", size: "59%", duration: "38s" },
-  { id: 3, label: "11 à 25 km", name: "Horizon local", color: "#52e0d0", size: "77%", duration: "46s" },
-  { id: 4, label: "26 à 50 km", name: "Grand voisinage", color: "#f2c56b", size: "95%", duration: "56s" },
+  { id: 1, fraction: 0.25, name: "Tout proche", color: "#b58cff", size: "25%" },
+  { id: 2, fraction: 0.5, name: "Voisinage", color: "#66a5ff", size: "50%" },
+  { id: 3, fraction: 0.75, name: "Horizon local", color: "#52e0d0", size: "75%" },
+  { id: 4, fraction: 1, name: "Limite du rayon", color: "#f2c56b", size: "95%" },
 ];
 
+function cityName(value: string | null | undefined) {
+  return (value ?? "").split(",")[0].trim();
+}
+function normalizeCity(value: string) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLocaleLowerCase();
+}
+function geocodeCity(location: string | null | undefined): Promise<Coordinates | null> {
+  const city = cityName(location);
+  if (!city) return Promise.resolve(null);
+  const key = normalizeCity(city);
+  const cached = cityCache.get(key);
+  if (cached) return cached;
+  const request = (async () => {
+    try {
+      const params = new URLSearchParams({ name: city, count: "10", language: "fr", format: "json" });
+      const response = await fetch("https://geocoding-api.open-meteo.com/v1/search?" + params.toString());
+      if (!response.ok) return null;
+      const data = await response.json() as { results?: GeocodingResult[] };
+      const results = data.results ?? [];
+      const exactCity = results.find(item => item.feature_code?.startsWith("PPL") && normalizeCity(item.name) === key);
+      return exactCity ? { latitude: exactCity.latitude, longitude: exactCity.longitude } : null;
+    } catch {
+      return null;
+    }
+  })();
+  cityCache.set(key, request);
+  return request;
+}
+function distanceKm(a: Coordinates, b: Coordinates) {
+  const radians = (degrees: number) => degrees * Math.PI / 180;
+  const dLat = radians(b.latitude - a.latitude);
+  const dLon = radians(b.longitude - a.longitude);
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(radians(a.latitude)) * Math.cos(radians(b.latitude)) * Math.sin(dLon / 2) ** 2;
+  return 6371 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(Math.max(0, 1 - h)));
+}
+
 export default function GAYDARPage() {
-  const supabase = createSupabaseBrowser();
+  const supabase = useMemo(() => createSupabaseBrowser(), []);
   const [userId, setUserId] = useState("");
   const [profile, setProfile] = useState<Profile | null>(null);
   const [members, setMembers] = useState<Member[]>([]);
-  const [enabled, setEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [searchRadius, setSearchRadius] = useState(DEFAULT_RADIUS);
+  const [radiusReady, setRadiusReady] = useState(false);
   const [failedAvatars, setFailedAvatars] = useState<string[]>([]);
   const orbitStageRef = useRef<HTMLDivElement | null>(null);
   const [orbitStageWidth, setOrbitStageWidth] = useState(0);
@@ -39,16 +80,17 @@ export default function GAYDARPage() {
     return () => observer.disconnect();
   }, [loading]);
 
-  const loadMembers = useCallback(async () => {
-    const { data, error } = await supabase.rpc("get_orbit_members");
-    if (error) {
-      console.error("PRYSM GAYDAR: chargement des membres impossible", error);
-      setMessage("Ta position est activée, mais la liste des membres n’a pas pu être chargée. Réessaie dans un instant.");
-      return false;
-    }
-    setMembers((data ?? []) as Member[]);
-    return !error;
-  }, [supabase]);
+  useEffect(() => {
+    try {
+      const saved = Number(window.localStorage.getItem("prysm-gaydar-radius"));
+      if (Number.isFinite(saved) && saved >= 10 && saved <= 300) setSearchRadius(saved);
+    } catch { /* Le rayon par défaut reste disponible sans stockage local. */ }
+    setRadiusReady(true);
+  }, []);
+  useEffect(() => {
+    if (!radiusReady) return;
+    try { window.localStorage.setItem("prysm-gaydar-radius", String(searchRadius)); } catch { /* Préférence limitée à la session. */ }
+  }, [searchRadius, radiusReady]);
 
   useEffect(() => {
     let active = true;
@@ -56,135 +98,126 @@ export default function GAYDARPage() {
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) { window.location.href = "/auth"; return; }
       setUserId(auth.user.id);
-      const [{ data: p }, { data: loc }] = await Promise.all([
-        supabase.from("profiles").select("username,display_name,avatar_url").eq("id", auth.user.id).maybeSingle(),
-        supabase.from("orbit_locations").select("enabled").eq("user_id", auth.user.id).maybeSingle(),
+
+      const [{ data: own, error: ownError }, { data: people, error: peopleError }] = await Promise.all([
+        supabase.from("profiles").select("username,display_name,avatar_url,location").eq("id", auth.user.id).maybeSingle(),
+        supabase.from("profiles")
+          .select("id,username,display_name,avatar_url,location")
+          .eq("match_discovery_enabled", true)
+          .eq("profile_visibility", "public")
+          .neq("id", auth.user.id)
+          .not("location", "is", null)
+          .order("updated_at", { ascending: false })
+          .limit(150),
       ]);
       if (!active) return;
-      setProfile((p as Profile | null) ?? null);
-      setEnabled(Boolean(loc?.enabled));
-      if (loc?.enabled) await loadMembers();
-      if (active) setLoading(false);
+      if (ownError || !own) {
+        setMessage("Impossible de charger ton profil. Réessaie après avoir actualisé la page.");
+        setLoading(false);
+        return;
+      }
+      const ownProfile = own as Profile;
+      setProfile(ownProfile);
+      if (!cityName(ownProfile.location)) {
+        setMessage("Renseigne ta ville dans ton profil pour activer le Gaydar. Aucune localisation GPS ne sera demandée.");
+        setLoading(false);
+        return;
+      }
+      if (peopleError) {
+        setMessage("Impossible de charger les profils visibles pour le moment. Réessaie dans un instant.");
+        setLoading(false);
+        return;
+      }
+
+      setMessage("Repérage des villes et calcul des distances estimées…");
+      const peopleList = (people ?? []) as Array<{ id: string; username: string; display_name: string; avatar_url: string | null; location: string | null }>;
+      const uniqueLocations = [...new Set([ownProfile.location ?? "", ...peopleList.map(person => person.location ?? "")].filter(value => cityName(value)))];
+      const coordinates = new Map<string, Coordinates | null>();
+      for (let index = 0; index < uniqueLocations.length; index += 4) {
+        const batch = uniqueLocations.slice(index, index + 4);
+        const results = await Promise.all(batch.map(async location => [normalizeCity(cityName(location)), await geocodeCity(location)] as const));
+        results.forEach(([key, value]) => coordinates.set(key, value));
+      }
+      if (!active) return;
+      const origin = coordinates.get(normalizeCity(cityName(ownProfile.location)));
+      if (!origin) {
+        setMessage("Ville non reconnue. Dans ton profil, indique le nom précis d'une ville, par exemple Épernay ou Reims, plutôt qu'une région.");
+        setLoading(false);
+        return;
+      }
+      const nextMembers: Member[] = [];
+      for (const person of peopleList) {
+        if (!person.location) continue;
+        const destination = coordinates.get(normalizeCity(cityName(person.location)));
+        if (!destination) continue;
+        nextMembers.push({
+          ...person,
+          location: cityName(person.location),
+          distance_km: distanceKm(origin, destination),
+        });
+      }
+      setMembers(nextMembers.sort((a, b) => a.distance_km - b.distance_km));
+      setMessage("");
+      setLoading(false);
     }
     void load();
     return () => { active = false; };
-  }, [supabase, loadMembers]);
+  }, [supabase]);
 
-  async function enable() {
-    setBusy(true);
-    setMessage("");
+  const visibleMembers = useMemo(
+    () => members.filter(member => member.distance_km <= searchRadius).sort((a, b) => a.distance_km - b.distance_km),
+    [members, searchRadius]
+  );
+  const grouped = useMemo(() => rings.map(ring => ({
+    ...ring,
+    label: Math.round(searchRadius * ring.fraction) + " km",
+    members: visibleMembers.filter(member => ring.id === 1
+      ? member.distance_km <= searchRadius * ring.fraction
+      : member.distance_km > searchRadius * rings[ring.id - 2].fraction && member.distance_km <= searchRadius * ring.fraction),
+  })), [visibleMembers, searchRadius]);
 
-    if (!window.isSecureContext) {
-      setMessage("La géolocalisation exige une connexion HTTPS. Ouvre PRYSM directement dans Chrome à l’adresse https://prysm-clean.onrender.com/gaydar.");
-      setBusy(false);
-      return;
-    }
-    if (!navigator.geolocation) {
-      setMessage("Ce navigateur ne propose pas la géolocalisation. Ouvre PRYSM dans Chrome plutôt que dans un navigateur intégré.");
-      setBusy(false);
-      return;
-    }
-    if (!userId) {
-      setMessage("Ta session n’est pas encore prête. Actualise la page puis réessaie.");
-      setBusy(false);
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        try {
-          const { error } = await supabase.from("orbit_locations").upsert({
-            user_id: userId,
-            latitude: pos.coords.latitude,
-            longitude: pos.coords.longitude,
-            enabled: true,
-            updated_at: new Date().toISOString(),
-          }, { onConflict: "user_id" });
-
-          if (error) {
-            console.error("PRYSM GAYDAR: sauvegarde de position impossible", error);
-            setMessage(`Position obtenue, mais l’enregistrement a échoué : ${error.message}`);
-          } else {
-            setEnabled(true);
-            const membersLoaded = await loadMembers();
-            if (membersLoaded) setMessage("GAYDAR est activée. Ta position exacte reste privée.");
-          }
-        } catch (error) {
-          console.error("PRYSM GAYDAR: erreur inattendue", error);
-          setMessage("La position a été obtenue, mais PRYSM n’a pas pu l’enregistrer. Vérifie ta connexion puis réessaie.");
-        } finally {
-          setBusy(false);
-        }
-      },
-      (err) => {
-        console.warn("PRYSM GAYDAR: géolocalisation refusée ou indisponible", { code: err.code, message: err.message });
-        if (err.code === err.PERMISSION_DENIED) {
-          setMessage("Autorisation refusée. Dans Chrome Android : appuie sur le cadenas à gauche de l’adresse → Autorisations → Position → Autoriser, puis recharge PRYSM.");
-        } else if (err.code === err.POSITION_UNAVAILABLE) {
-          setMessage("Le téléphone n’arrive pas à déterminer ta position. Active la localisation Android, puis réessaie près d’une fenêtre ou en extérieur.");
-        } else if (err.code === err.TIMEOUT) {
-          setMessage("Android n’a pas fourni de position après 60 secondes. Vérifie Paramètres → Localisation → Services de localisation → Précision de la localisation Google, active la recherche Wi‑Fi et Bluetooth si proposées, puis réessaie dehors avec une vue dégagée du ciel.");
-        } else {
-          setMessage(`Géolocalisation indisponible : ${err.message || "erreur inconnue"}`);
-        }
-        setBusy(false);
-      },
-      { enableHighAccuracy: true, timeout: 60000, maximumAge: 60000 }
-    );
-  }
-
-  async function disable() {
-    setBusy(true); setMessage("");
-    const { error } = await supabase.from("orbit_locations").delete().eq("user_id", userId);
-    if (error) setMessage("Impossible de désactiver GAYDAR pour le moment.");
-    else { setEnabled(false); setMembers([]); setMessage("GAYDAR désactivée. Ta position enregistrée a été supprimée."); }
-    setBusy(false);
-  }
-
-  if (loading) return <main className="shell"><section className="page-head"><p className="eyebrow">PRYSM · GAYDAR</p><h1>GAYDAR.</h1><p className="lead">Chargement du GAYDAR…</p></section></main>;
-  const grouped = rings.map(r => ({ ...r, members: members.filter(m => m.distance_band === r.id) }));
+  if (loading) return <main className="shell"><section className="page-head"><p className="eyebrow">PRYSM · GAYDAR</p><h1>GAYDAR.</h1><p className="lead">Calcul des distances entre les villes…</p></section></main>;
 
   return <main className="shell orbit-page">
-    <header className="topbar"><Link className="brand" href="/">PRYSM</Link><nav><Link href="/">Accueil</Link><Link href="/forum">Forum</Link><Link href="/rencontres">Rencontres</Link><Link href="/messages">Messages</Link><Link href="/profil">Profil</Link><Link className="active" href="/gaydar">GAYDAR</Link></nav></header>
-    <section className="page-head compact"><p className="eyebrow">PRYSM · Rencontres de proximité</p><h1>GAYDAR<span>.</span></h1><p className="lead">Les membres queer près de toi, répartis sur quatre zones de distance.</p></section>
-    <section className="orbit-controls"><div><strong>{enabled ? "Ta présence est activée" : "Entre dans le GAYDAR"}</strong><p>{enabled ? "Les membres ayant activé GAYDAR peuvent te découvrir." : "Active volontairement ta position pour découvrir les membres à proximité."}</p></div>
-      {enabled ? <button className="button" disabled={busy} onClick={() => void disable()}>{busy ? "Mise à jour…" : "Désactiver GAYDAR"}</button> : <button className="button primary" disabled={busy} onClick={() => void enable()}>{busy ? "Localisation…" : "Activer ma position"}</button>}
+    <header className="topbar"><Link className="brand" href="/">PRYSM</Link><nav><Link href="/">Accueil</Link><Link href="/forum">Forum</Link><Link href="/rencontres">Rencontres</Link><Link href="/messages">Messages</Link><Link href="/profil">Profil</Link><Link className="active" href="/gaydar">Gaydar</Link></nav></header>
+    <section className="page-head compact"><p className="eyebrow">PRYSM · Proximité par ville</p><h1>GAYDAR<span>.</span></h1><p className="lead">Découvre les membres près de ta ville, avec une distance estimée entre les villes de vos profils. Aucun GPS, aucune position en direct.</p></section>
+
+    <section className="orbit-controls gaydar-controls">
+      <div className="gaydar-radius-copy"><strong>{searchRadius} km autour de {cityName(profile?.location) || "ta ville"}</strong><p>Choisis ton périmètre. Le rayon est mémorisé sur cet appareil.</p></div>
+      <label className="gaydar-slider-label" htmlFor="gaydar-radius"><span>Rayon de recherche</span><strong>{searchRadius} km</strong></label>
+      <input id="gaydar-radius" className="gaydar-slider" type="range" min="10" max="300" step="10" value={searchRadius} onChange={event => setSearchRadius(Number(event.target.value))} />
+      <div className="gaydar-slider-ticks"><span>10 km</span><span>150 km</span><span>300 km</span></div>
     </section>
     {message && <p className="orbit-message" role="status">{message}</p>}
-    <section className="orbit-layout">
-      <div ref={orbitStageRef} className="orbit-stage" aria-label="GAYDAR : membres à proximité">
-        <div className="orbit-stars" />
-        {rings.map(r => <div key={r.id} className="orbit-ring" style={{ "--orbit-size": r.size, "--orbit-color": r.color } as React.CSSProperties}><span>{r.label}</span></div>)}
-        {grouped.map(r => r.members.map((m, i) => {
-          const angle = (i * 360 / Math.max(1, r.members.length) + r.id * 29) % 360;
-          const radius = orbitStageWidth * Number(r.size.slice(0, -1)) / 200;
-          const radians = angle * Math.PI / 180;
-          const style = {
-            left: `${50 + (orbitStageWidth > 0 ? Math.cos(radians) * radius / orbitStageWidth * 100 : 0)}%`,
-            top: `${50 + (orbitStageWidth > 0 ? Math.sin(radians) * radius / orbitStageWidth * 100 : 0)}%`,
-            position: "absolute",
-            width: "38px",
-            height: "38px",
-            zIndex: 50,
-            display: "block",
-            visibility: "visible",
-            opacity: 1,
-            transform: "translate(-50%, -50%)",
-            borderRadius: "50%",
-          } as React.CSSProperties;
-          return <Link key={m.id} className="orbit-person" href={`/membre/${encodeURIComponent(m.username)}`} style={style} title={`${m.display_name || m.username} · ${r.label}`} aria-label={`Voir le profil de ${m.display_name || m.username}, ${r.label}`}>
-            <span className="orbit-person-face" style={{ display: "grid", placeItems: "center", width: "38px", height: "38px", minWidth: "38px", minHeight: "38px", overflow: "hidden", boxSizing: "border-box", borderRadius: "50%", border: `2px solid ${rings.find(ring => ring.id === m.distance_band)?.color || "#ffffff"}`, background: "#11152d", color: "#ffffff", fontSize: "14px", fontWeight: 800, lineHeight: 1, boxShadow: `0 0 12px ${rings.find(ring => ring.id === m.distance_band)?.color || "#ffffff"}88` }}>{m.avatar_url && !failedAvatars.includes(m.id) ? <img style={{ display: "block", width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} src={m.avatar_url} alt="" loading="eager" decoding="async" onError={() => setFailedAvatars(current => current.includes(m.id) ? current : [...current, m.id])} /> : (m.display_name || m.username).slice(0, 1).toUpperCase()}</span>
-          </Link>;
-        }))}
-        <div className="orbit-center"><div className="orbit-center-avatar">{profile?.avatar_url ? <img src={profile.avatar_url} alt="" /> : (profile?.display_name || profile?.username || "P").slice(0, 1).toUpperCase()}</div><strong>{profile?.display_name || profile?.username || "Mon profil"}</strong><small>TOI</small></div>
-      </div>
-      <aside className="orbit-legend"><div className="orbit-legend-head"><div><p className="eyebrow">Les distances</p><h2>Ton voisinage</h2></div><strong>{members.length}<small> profils</small></strong></div>
-        {grouped.map(r => <div className="orbit-legend-row" key={r.id}><span className="orbit-legend-dot" style={{ background: r.color, boxShadow: `0 0 14px ${r.color}` }} /><div><strong>{r.name}</strong><small>{r.label}</small></div><b>{r.members.length}</b></div>)}
-        {members.length > 0 && <section className="orbit-member-list" aria-label="Membres visibles dans GAYDAR"><h3>Membres à proximité</h3>{members.map(m => <Link key={m.id} className="orbit-member-link" href={`/membre/${encodeURIComponent(m.username)}`}><span className="orbit-member-avatar">{m.avatar_url && !failedAvatars.includes(m.id) ? <img src={m.avatar_url} alt="" loading="eager" onError={() => setFailedAvatars(current => current.includes(m.id) ? current : [...current, m.id])} /> : (m.display_name || m.username).slice(0, 1).toUpperCase()}</span><span className="orbit-member-name"><strong>{m.display_name || m.username}</strong><small>{rings.find(r => r.id === m.distance_band)?.label || "À proximité"}</small></span><span className="orbit-member-arrow">↗</span></Link>)}</section>}
-        <p className="orbit-privacy">🔒 Les coordonnées exactes ne sont jamais affichées. Seuls les membres ayant activé GAYDAR et un profil public apparaissent. Tu peux te retirer en un clic.</p>
-      </aside>
-    </section>
-    <footer>PRYSM ORBITE · Distances indicatives.</footer>
+    {!cityName(profile?.location) ? <section className="orbit-empty"><h2>Ajoute ta ville pour commencer</h2><p>Dans ton profil, indique une ville comme Épernay ou Reims. Le Gaydar ne demande jamais l'accès au GPS.</p><Link className="button primary" href="/profil">Compléter mon profil</Link></section> :
+      <section className="orbit-layout">
+        <div ref={orbitStageRef} className="orbit-stage" aria-label="Radar illustratif des membres proches">
+          <div className="orbit-stars" />
+          {rings.map(ring => <div key={ring.id} className="orbit-ring" style={{ "--orbit-size": ring.size, "--orbit-color": ring.color } as React.CSSProperties}><span>{Math.round(searchRadius * ring.fraction)} km</span></div>)}
+          {visibleMembers.map((member, index) => {
+            const angle = (index * 137.5 + 29) * Math.PI / 180;
+            const normalizedDistance = Math.min(member.distance_km / searchRadius, 1);
+            const radialDistance = orbitStageWidth * 0.46 * normalizedDistance;
+            const style = {
+              left: `${50 + (orbitStageWidth > 0 ? Math.cos(angle) * radialDistance / orbitStageWidth * 100 : 0)}%`,
+              top: `${50 + (orbitStageWidth > 0 ? Math.sin(angle) * radialDistance / orbitStageWidth * 100 : 0)}%`,
+              position: "absolute", width: "38px", height: "38px", zIndex: 50, display: "block",
+              visibility: "visible", opacity: 1, transform: "translate(-50%, -50%)", borderRadius: "50%",
+            } as React.CSSProperties;
+            return <Link key={member.id} className="orbit-person" href={`/membre/${encodeURIComponent(member.username)}`} style={style} title={`${member.display_name || member.username} · ${Math.round(member.distance_km)} km estimés`} aria-label={`Voir le profil de ${member.display_name || member.username}, à environ ${Math.round(member.distance_km)} kilomètres`}>
+              <span className="orbit-person-face" style={{ display: "grid", placeItems: "center", width: "38px", height: "38px", minWidth: "38px", minHeight: "38px", overflow: "hidden", boxSizing: "border-box", borderRadius: "50%", border: `2px solid ${rings[index % rings.length].color}`, background: "#11152d", color: "#ffffff", fontSize: "14px", fontWeight: 800, lineHeight: 1, boxShadow: `0 0 12px ${rings[index % rings.length].color}88` }}>{member.avatar_url && !failedAvatars.includes(member.id) ? <img style={{ display: "block", width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }} src={member.avatar_url} alt="" loading="eager" decoding="async" onError={() => setFailedAvatars(current => current.includes(member.id) ? current : [...current, member.id])} /> : (member.display_name || member.username).slice(0, 1).toUpperCase()}</span>
+            </Link>;
+          })}
+          <div className="orbit-center"><div className="orbit-center-avatar">{profile?.avatar_url ? <img src={profile.avatar_url} alt="" /> : (profile?.display_name || profile?.username || "P").slice(0, 1).toUpperCase()}</div><strong>{profile?.display_name || profile?.username || "Mon profil"}</strong><small>TA VILLE</small></div>
+        </div>
+        <aside className="orbit-legend"><div className="orbit-legend-head"><div><p className="eyebrow">Les distances</p><h2>Ton voisinage</h2></div><strong>{visibleMembers.length}<small> profils</small></strong></div>
+          {grouped.map(ring => <div className="orbit-legend-row" key={ring.id}><span className="orbit-legend-dot" style={{ background: ring.color, boxShadow: `0 0 14px ${ring.color}` }} /><div><strong>{ring.name}</strong><small>Jusqu'à {ring.label}</small></div><b>{ring.members.length}</b></div>)}
+          {visibleMembers.length > 0 && <section className="orbit-member-list" aria-label="Membres visibles dans le Gaydar"><h3>Membres à proximité</h3>{visibleMembers.map(member => <Link key={member.id} className="orbit-member-link" href={`/membre/${encodeURIComponent(member.username)}`}><span className="orbit-member-avatar">{member.avatar_url && !failedAvatars.includes(member.id) ? <img src={member.avatar_url} alt="" loading="eager" onError={() => setFailedAvatars(current => current.includes(member.id) ? current : [...current, member.id])} /> : (member.display_name || member.username).slice(0, 1).toUpperCase()}</span><span className="orbit-member-name"><strong>{member.display_name || member.username}</strong><small>{member.location} · {Math.round(member.distance_km)} km estimés</small></span><span className="orbit-member-arrow">↗</span></Link>)}</section>}
+          <p className="orbit-privacy">🔒 La distance est calculée entre les centres des villes. Les positions sur le radar sont illustratives et n'indiquent aucune direction réelle. Seuls les profils publics ayant activé la découverte apparaissent.</p>
+        </aside>
+      </section>}
+    {cityName(profile?.location) && visibleMembers.length === 0 && <section className="orbit-empty"><h2>Aucun profil dans ce rayon pour le moment.</h2><p>Essaie d'augmenter le rayon ou reviens plus tard. Les profils sans ville reconnue ne sont pas inclus.</p></section>}
+    <footer>PRYSM GAYDAR · Distances estimées entre villes, sans GPS.</footer>
     <style jsx>{`
       .orbit-controls{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:17px 20px;margin-bottom:12px;border:1px solid var(--line);background:rgba(14,17,46,.92)}
       .orbit-controls p{margin:4px 0 0;color:var(--muted);font-size:.8rem}
