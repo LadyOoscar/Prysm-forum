@@ -4,8 +4,8 @@ import Link from "next/link";
 import { createSupabaseBrowser } from "../../../lib/supabase-browser";
 
 const slots = [
-["tab-forum","Onglet Forum","Navigation"],["tab-rencontres","Onglet Rencontres","Navigation"],["tab-orbite","Onglet Orbite","Navigation"],["tab-messages","Onglet Messages","Navigation"],["tab-profil","Onglet Profil","Navigation"],
-["header-forum","En-tête Forum","En-têtes"],["header-rencontres","En-tête Rencontres","En-têtes"],["header-orbite","En-tête Orbite","En-têtes"],["header-messages","En-tête Messages","En-têtes"],["header-profil","En-tête Profil","En-têtes"],
+["tab-accueil","Onglet Accueil","Navigation"],["tab-forum","Onglet Forum","Navigation"],["tab-rencontres","Onglet Rencontres","Navigation"],["tab-orbite","Onglet Orbite","Navigation"],["tab-messages","Onglet Messages","Navigation"],["tab-profil","Onglet Profil","Navigation"],
+["header-accueil","En-tête Accueil","En-têtes"],["header-forum","En-tête Forum","En-têtes"],["header-rencontres","En-tête Rencontres","En-têtes"],["header-orbite","En-tête Orbite","En-têtes"],["header-messages","En-tête Messages","En-têtes"],["header-profil","En-tête Profil","En-têtes"],
 ["panel-home","Panneau Accueil","Panneaux"],["panel-forum","Panneau Forum","Panneaux"],["panel-rencontres","Panneau Rencontres","Panneaux"],["panel-orbite","Panneau Orbite","Panneaux"],["panel-profil","Panneau Profil","Panneaux"]
 ] as const;
 type Decoration={id:string;slot:string;image_url:string;image_path:string;alt_text:string;width_px:number;height_px:number;alignment:"before"|"after";mobile_visible:boolean;desktop_visible:boolean;enabled:boolean};
