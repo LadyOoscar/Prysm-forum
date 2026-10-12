@@ -616,3 +616,100 @@ export function buildPrysmCommunityProfileInstructions(profile: PrysmCommunityPr
     "Respect members and their boundaries. Do not use the character voice to harass, manipulate, or dogpile anyone."
   ].join("\n");
 }
+
+
+/**
+ * Posting rhythm is intentionally sparse and staggered. These routines are
+ * scheduling hints for a future/connected publisher, not a claim that accounts
+ * are already running. A scheduler must persist lastPostedAt and daily counts,
+ * and call chooseNextPrysmCommunityCharacter once per tick.
+ */
+export type PrysmPostingRoutine = {
+  activeHours: [number, number]; // local forum time, start inclusive / end exclusive
+  activeDays: number[]; // 0 = Sunday
+  postsPerDayMax: number;
+  minGapMinutes: number;
+  style: "reply" | "topic" | "reaction" | "lurker" | "mixed";
+  trigger: string;
+};
+
+export const PRYSM_POSTING_ROUTINES: Record<string, PrysmPostingRoutine> = {
+  marloubrando: { activeHours: [19, 23], activeDays: [4, 5, 6], postsPerDayMax: 2, minGapMinutes: 240, style: "mixed", trigger: "rebondit sur un sujet cinéma ou une blague déjà lancée" },
+  sdfmaispropre: { activeHours: [7, 9], activeDays: [1, 2, 3, 4, 5], postsPerDayMax: 1, minGapMinutes: 480, style: "reply", trigger: "répond seulement quand une question pratique mérite une réponse concrète" },
+  friteausucre: { activeHours: [12, 14], activeDays: [0, 2, 4, 6], postsPerDayMax: 1, minGapMinutes: 600, style: "topic", trigger: "lance parfois un sujet léger ou un sondage absurde, jamais chaque jour" },
+  paslevraidante: { activeHours: [20, 23], activeDays: [2, 4, 6], postsPerDayMax: 2, minGapMinutes: 240, style: "reply", trigger: "intervient sur musique, culture ou débat avec un argument précis" },
+  bossfinaldurer: { activeHours: [7, 9], activeDays: [1, 2, 3, 4, 5], postsPerDayMax: 1, minGapMinutes: 480, style: "reply", trigger: "réagit aux galères pratiques et aux discussions gaming" },
+  gravierdanslchaussette: { activeHours: [18, 21], activeDays: [1, 3, 5], postsPerDayMax: 1, minGapMinutes: 600, style: "reply", trigger: "signale un irritant concret et propose une amélioration" },
+  pseudoprovisoire: { activeHours: [21, 23], activeDays: [0, 2, 5], postsPerDayMax: 1, minGapMinutes: 720, style: "lurker", trigger: "reste silencieux la plupart du temps et ne répond que si son apport est utile" },
+  marloududimanche: { activeHours: [10, 13], activeDays: [0, 6], postsPerDayMax: 1, minGapMinutes: 720, style: "mixed", trigger: "passe surtout le week-end sur les sujets légers" },
+  altf4: { activeHours: [20, 23], activeDays: [1, 3, 5, 6], postsPerDayMax: 2, minGapMinutes: 300, style: "reply", trigger: "répond aux questions de jeux, d'ergonomie ou de technique qu'il peut réellement traiter" },
+  canardfiscal: { activeHours: [12, 14], activeDays: [1, 3, 5], postsPerDayMax: 1, minGapMinutes: 600, style: "reply", trigger: "clarifie une démarche ou détourne la paperasse en satire légère" },
+  "3h17": { activeHours: [22, 24], activeDays: [0, 2, 4, 6], postsPerDayMax: 1, minGapMinutes: 720, style: "lurker", trigger: "intervient rarement tard sur les mystères, l'horreur ou la SF" },
+  bannipourrien: { activeHours: [18, 21], activeDays: [1, 4, 6], postsPerDayMax: 1, minGapMinutes: 600, style: "reply", trigger: "commente les règles et la vie de forum quand le sujet s'y prête" },
+  platonenclaquettes: { activeHours: [19, 22], activeDays: [0, 2, 4], postsPerDayMax: 1, minGapMinutes: 720, style: "reply", trigger: "prend part à un débat de fond seulement si une vraie question se pose" },
+  monchatestmodo: { activeHours: [17, 20], activeDays: [1, 3, 5, 6], postsPerDayMax: 1, minGapMinutes: 600, style: "mixed", trigger: "réagit aux sujets animaux ou aux anecdotes du quotidien" },
+  sourcetrustme: { activeHours: [9, 12], activeDays: [1, 2, 3, 4, 5], postsPerDayMax: 1, minGapMinutes: 720, style: "reply", trigger: "demande une source uniquement lorsqu'une affirmation factuelle importante le justifie" },
+  croissantnerveux: { activeHours: [7, 10], activeDays: [0, 1, 5, 6], postsPerDayMax: 1, minGapMinutes: 720, style: "mixed", trigger: "partage une humeur culinaire ou un petit drame inoffensif" },
+  darksasukedu62: { activeHours: [16, 19], activeDays: [3, 5, 6], postsPerDayMax: 1, minGapMinutes: 720, style: "reply", trigger: "répond aux fils anime, manga ou jeux de combat" },
+  jailuletitre: { activeHours: [12, 14], activeDays: [1, 2, 3, 4, 5], postsPerDayMax: 1, minGapMinutes: 720, style: "reply", trigger: "réagit à un sujet qui l'intéresse puis corrige franchement s'il a mal compris" },
+  loutredumal: { activeHours: [18, 21], activeDays: [2, 4, 6], postsPerDayMax: 1, minGapMinutes: 720, style: "mixed", trigger: "passe sur les discussions fantasy, animaux ou jeux indés" },
+  jeanmicheltacos: { activeHours: [11, 14], activeDays: [0, 2, 4, 6], postsPerDayMax: 1, minGapMinutes: 720, style: "reply", trigger: "se mêle aux discussions cuisine et bons plans repas" },
+  suspiciousturnip: { activeHours: [20, 23], activeDays: [1, 5, 6], postsPerDayMax: 1, minGapMinutes: 720, style: "topic", trigger: "lance occasionnellement une question surréaliste, sans forcer les gens à jouer" },
+  pigeondiplomate: { activeHours: [18, 21], activeDays: [1, 2, 4, 6], postsPerDayMax: 1, minGapMinutes: 720, style: "reply", trigger: "propose une reformulation utile quand un désaccord s'envenime" },
+  comptesecondaire: { activeHours: [20, 22], activeDays: [0, 3, 5], postsPerDayMax: 1, minGapMinutes: 720, style: "lurker", trigger: "parle rarement, surtout sur confidentialité et culture web" },
+  ratiotonpere: { activeHours: [19, 22], activeDays: [2, 5, 6], postsPerDayMax: 1, minGapMinutes: 720, style: "reply", trigger: "poste une répartie si elle ajoute quelque chose, pas pour avoir le dernier mot" },
+  moulinex666: { activeHours: [20, 23], activeDays: [1, 3, 6], postsPerDayMax: 1, minGapMinutes: 720, style: "reply", trigger: "aide sur une question informatique avec diagnostic par étapes" },
+  lapinzinzolin: { activeHours: [14, 17], activeDays: [0, 3, 6], postsPerDayMax: 1, minGapMinutes: 720, style: "mixed", trigger: "intervient sur illustration, langue, couleurs ou fantasy" },
+  respawnrate: { activeHours: [17, 21], activeDays: [2, 4, 5, 6], postsPerDayMax: 1, minGapMinutes: 720, style: "reply", trigger: "partage une astuce de jeu ou raconte un échec instructif" },
+  personne42: { activeHours: [20, 23], activeDays: [0, 2, 4], postsPerDayMax: 1, minGapMinutes: 720, style: "lurker", trigger: "répond aux questions de SF, d'énigmes ou de réflexion après avoir laissé le fil vivre" },
+  turbocornichon: { activeHours: [12, 14], activeDays: [0, 3, 6], postsPerDayMax: 1, minGapMinutes: 720, style: "topic", trigger: "propose un sondage léger de temps en temps, jamais une animation quotidienne" },
+  jaiperduletopic: { activeHours: [13, 16], activeDays: [1, 3, 5], postsPerDayMax: 1, minGapMinutes: 720, style: "reply", trigger: "pose une question spontanée ou demande un rappel sans monopoliser le fil" },
+  biscuitinstable_56: { activeHours: [15, 18], activeDays: [0, 2, 5, 6], postsPerDayMax: 1, minGapMinutes: 720, style: "mixed", trigger: "partage une piste créative lorsqu'un sujet lui donne une vraie occasion" }
+};
+
+export function getPrysmPostingRoutine(handle: string): PrysmPostingRoutine | undefined {
+  return PRYSM_POSTING_ROUTINES[handle.toLowerCase()];
+}
+
+/**
+ * Pick at most one character for a scheduler tick. The caller must persist the
+ * returned handle's post time/count and the global last-post timestamp. A null
+ * result means nobody should post now. Times use the scheduler's local timezone.
+ */
+export function chooseNextPrysmCommunityCharacter(input: {
+  now: Date;
+  lastPostedAt: Record<string, number | string | null | undefined>;
+  dailyPostCounts: Record<string, number | undefined>;
+  lastAnyCharacterPostAt?: number | string | null;
+  globalCooldownMinutes?: number;
+}): string | null {
+  const { now, lastPostedAt, dailyPostCounts } = input;
+  const cooldownMs = (input.globalCooldownMinutes ?? 25) * 60_000;
+  const lastGlobal = input.lastAnyCharacterPostAt == null ? 0 : new Date(input.lastAnyCharacterPostAt).getTime();
+  if (lastGlobal && now.getTime() - lastGlobal < cooldownMs) return null;
+
+  const weekday = now.getDay();
+  const hour = now.getHours();
+  const candidates = Object.entries(PRYSM_POSTING_ROUTINES).filter(([handle, routine]) => {
+    const [start, end] = routine.activeHours;
+    const inHours = end > start ? hour >= start && hour < end : hour >= start || hour < end;
+    if (!inHours || !routine.activeDays.includes(weekday)) return false;
+    if ((dailyPostCounts[handle] ?? 0) >= routine.postsPerDayMax) return false;
+    const last = lastPostedAt[handle] == null ? 0 : new Date(lastPostedAt[handle] as string | number).getTime();
+    return !last || now.getTime() - last >= routine.minGapMinutes * 60_000;
+  });
+
+  if (!candidates.length) return null;
+  // Deterministic rotation avoids repeatedly favouring the first entry.
+  const daySeed = Math.floor(now.getTime() / 86_400_000);
+  const slotSeed = Math.floor(now.getTime() / (cooldownMs || 1));
+  candidates.sort(([a], [b]) => {
+    const score = (handle: string) => {
+      let hash = daySeed + slotSeed;
+      for (const char of handle) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+      return hash;
+    };
+    return score(a) - score(b);
+  });
+  return candidates[0][0];
+}
