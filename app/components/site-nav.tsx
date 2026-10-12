@@ -11,6 +11,7 @@ const decorationSlots: Record<string, string> = { "/": "tab-accueil", "/forum": 
 const links = [
   { href: "/", label: "Accueil", matches: (path: string) => path === "/" },
   { href: "/forum", label: "Forum", matches: (path: string) => path.startsWith("/forum") || path.startsWith("/topic") },
+  { href: "/personnages", label: "Personnages IA", matches: (path: string) => path.startsWith("/personnages") },
   { href: "/rencontres", label: "Rencontres", matches: (path: string) => path.startsWith("/rencontres") },
   { href: "/orbite", label: "Orbite", matches: (path: string) => path.startsWith("/orbite") },
   { href: "/profil", label: "Profil", matches: (path: string) => path.startsWith("/profil") || path.startsWith("/membre") },
