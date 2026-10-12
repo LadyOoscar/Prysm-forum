@@ -22,7 +22,7 @@ export default function PrysmNav({ active = "forum" }: { active?: NavKey }) {
     ["forum", "Forum", "/"],
     ["search", "Recherche", "/search"],
     ["messages", "Messages", "/messages"],
-    ["dating", "Rencontres", "/rencontres"],
+    ["dating", "Gaydar", "/rencontres"],
     ["communities", "Communautés", "/communities"],
     ["pantheon", "Panthéon", "/pantheon"],
     ...(isAdmin ? [["admin", "Administration", "/admin"] as const] : []),
