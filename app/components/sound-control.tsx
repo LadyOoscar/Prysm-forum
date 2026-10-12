@@ -19,6 +19,15 @@ export default function SoundControl() {
   const uiSoundRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+    const db = createSupabaseBrowser();
+    void db.from("site_audio_settings").select("audio_url").eq("id", 1).maybeSingle().then(({ data }) => {
+      if (!cancelled && data?.audio_url) setAmbientUrl(data.audio_url);
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
     try {
       const savedEnabled = window.localStorage.getItem("prysm-sound-enabled") === "true";
       const savedVolume = Number(window.localStorage.getItem("prysm-sound-volume"));
@@ -58,7 +67,7 @@ export default function SoundControl() {
     void track.play().catch(() => {
       if (ambientRef.current === track) ambientRef.current = null;
     });
-  }, [stopAmbient]);
+  }, [ambientUrl]);
 
   const play = useCallback((kind: SoundKind) => {
     if (!enabledRef.current || volumeRef.current <= 0) return;
