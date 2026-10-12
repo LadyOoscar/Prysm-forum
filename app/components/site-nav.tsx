@@ -6,12 +6,13 @@ import { usePathname } from "next/navigation";
 import { createSupabaseBrowser } from "../../lib/supabase-browser";
 import SiteDecoration from "./site-decoration";
 
-const decorationSlots: Record<string, string> = { "/": "tab-accueil", "/forum": "tab-forum", "/rencontres": "tab-rencontres", "/profil": "tab-profil" };
+const decorationSlots: Record<string, string> = { "/": "tab-accueil", "/forum": "tab-forum", "/rencontres": "tab-rencontres", "/orbite": "tab-orbite", "/profil": "tab-profil" };
 
 const links = [
   { href: "/", label: "Accueil", matches: (path: string) => path === "/" },
   { href: "/forum", label: "Forum", matches: (path: string) => path.startsWith("/forum") || path.startsWith("/topic") },
   { href: "/rencontres", label: "Rencontres", matches: (path: string) => path.startsWith("/rencontres") },
+  { href: "/orbite", label: "Orbite", matches: (path: string) => path.startsWith("/orbite") },
   { href: "/profil", label: "Profil", matches: (path: string) => path.startsWith("/profil") || path.startsWith("/membre") },
 ];
 
