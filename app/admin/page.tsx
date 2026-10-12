@@ -111,6 +111,8 @@ export default function AdminPage() {
 
       {message && <div className="notice">{message}</div>}
 
+      <div className="admin-subtabs" aria-label="Sous-sections administration"><Link className="button" href="/admin">Gestion &amp; sécurité</Link><Link className="button primary" href="/admin/customization">🎨 Personnalisation du forum</Link></div>
+
       <section className="admin-action-grid">
         <Link className="admin-action-card" href="#roles"><span className="admin-action-icon">👑</span><strong>Rôles & permissions</strong><small>Promouvoir ou retirer les droits Admin et Modo.</small></Link>
         <Link className="admin-action-card" href="/moderation"><span className="admin-action-icon">🛡️</span><strong>Centre de modération</strong><small>Accéder à la file des signalements et aux sanctions.</small></Link>
