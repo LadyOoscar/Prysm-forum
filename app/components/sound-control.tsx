@@ -4,11 +4,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 type SoundKind = "click" | "confirm" | "error" | "broadcast" | "cut" | "secret" | "notification" | "crt" | "military" | "static" | "arcade" | "ambient" | "door" | "impact" | "panel";
 const TEST_SOUNDS: SoundKind[] = ["ambient", "door", "impact", "panel", "crt", "military", "static", "secret"];
+const DEFAULT_AMBIENT_URL = "https://opengameart.org/sites/default/files/sector_0.mp3";
 
 export default function SoundControl() {
   const [enabled, setEnabled] = useState(false);
   const [volume, setVolume] = useState(28);
   const [panelOpen, setPanelOpen] = useState(false);
+  const [ambientUrl, setAmbientUrl] = useState(DEFAULT_AMBIENT_URL);
   const audioRef = useRef<AudioContext | null>(null);
   const enabledRef = useRef(false);
   const volumeRef = useRef(28);
@@ -47,7 +49,7 @@ export default function SoundControl() {
 
   const startAmbient = useCallback(() => {
     if (!enabledRef.current || ambientRef.current) return;
-    const track = new Audio("https://opengameart.org/sites/default/files/sector_0.mp3");
+    const track = new Audio(ambientUrl);
     track.loop = true;
     track.preload = "auto";
     track.volume = Math.max(0, Math.min(1, volumeRef.current / 100 * 0.18));
@@ -203,7 +205,7 @@ export default function SoundControl() {
     if (enabled) startAmbient();
     else stopAmbient();
     return () => stopAmbient();
-  }, [enabled, startAmbient, stopAmbient]);
+  }, [enabled, ambientUrl, startAmbient, stopAmbient]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -237,7 +239,7 @@ export default function SoundControl() {
             <input aria-label="Volume des effets sonores" type="range" min="0" max="100" step="1" value={volume} onChange={(e) => changeVolume(Number(e.target.value))} />
           </label>
           <button className="prysm-sound-test" type="button" disabled={!enabled} onClick={() => play(TEST_SOUNDS[Math.floor(Math.random() * TEST_SOUNDS.length)])}>▶ Tester un son aléatoire</button>
-          <p>AMBIANCE : bande-son sombre en boucle, bips de console, sas pressurisés et impacts sourds lointains. Sons désactivés par défaut. La bande-son et les effets sont réglables.</p>
+          <p>AMBIANCE : musique du forum en boucle, effets sonores de console et sons système. Sons désactivés par défaut. La musique et le volume sont réglables.</p>
         </div>
       )}
       <button className={`prysm-sound-launcher${enabled ? " is-on" : ""}`} type="button" aria-expanded={panelOpen} aria-label="Ouvrir les réglages sonores" onClick={() => setPanelOpen((open) => !open)}>
