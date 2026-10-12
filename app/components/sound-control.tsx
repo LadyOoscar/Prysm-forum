@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createSupabaseBrowser } from "../../lib/supabase-browser";
 
 type SoundKind = "click" | "confirm" | "error" | "broadcast" | "cut" | "secret" | "notification" | "crt" | "military" | "static" | "arcade" | "ambient" | "door" | "impact" | "panel";
 const TEST_SOUNDS: SoundKind[] = ["ambient", "door", "impact", "panel", "crt", "military", "static", "secret"];
