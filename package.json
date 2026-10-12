@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "test:bots": "node scripts/prysm-bots.mjs"
+    "start": "next start"
   },
   "dependencies": {
     "@supabase/ssr": "0.7.0",
