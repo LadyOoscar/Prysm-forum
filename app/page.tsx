@@ -5,7 +5,6 @@ import Link from "next/link";
 import { createSupabaseBrowser } from "../lib/supabase-browser";
 import CommunityCalendar from "./components/community-calendar";
 import Stories from "./components/stories";
-import SiteDecoration from "./components/site-decoration";
 import SiteBanner from "./components/site-banner";
 
 type PopularTopic = {
@@ -20,8 +19,6 @@ type PopularTopic = {
 
 export default function HomePage() {
   const [canModerate, setCanModerate] = useState(false);
-  const [orbitAvatar, setOrbitAvatar] = useState<string | null>(null);
-  const [orbitName, setOrbitName] = useState("P");
   const [popularTopics, setPopularTopics] = useState<PopularTopic[]>([]);
   const [topicsLoaded, setTopicsLoaded] = useState(false);
 
@@ -34,8 +31,6 @@ export default function HomePage() {
       const { data, error } = await supabase.from("profiles").select("is_moderator,is_admin,display_name,username,avatar_url").eq("id", user.id).maybeSingle();
       if (active && !error) {
         setCanModerate(Boolean(data?.is_moderator || data?.is_admin));
-        setOrbitAvatar(data?.avatar_url ?? null);
-        setOrbitName((data?.display_name || data?.username || "P").slice(0, 1).toUpperCase());
       }
     }
     void checkRole();
@@ -93,7 +88,7 @@ export default function HomePage() {
     <header className="topbar">
       <Link className="brand" href="/">PRYSM</Link>
       <nav>
-        <Link className="active" href="/"><SiteDecoration slot="tab-accueil">Accueil</SiteDecoration></Link>
+        <Link className="active" href="/">Accueil</Link>
         <Link href="/forum">Forum</Link>
         <Link href="/rencontres">Rencontres</Link>
         <Link href="/gaydar">GAYDAR</Link>
@@ -104,7 +99,8 @@ export default function HomePage() {
     </header>
     <SiteBanner />
     <Stories />
-    <section className="hero home-community-hero"><div><p className="eyebrow">PRYSM · réseau communautaire queer</p><h1>Bienvenue dans<br/><span>ta galaxie.</span></h1><p className="lead">Un forum queer, mille façons d’être soi. On échange, on s’entraide et on refait le monde. Tu peux participer sans avoir à expliquer qui tu es.</p><div className="actions"><Link className="button primary" href="/forum">Rejoindre les discussions <span aria-hidden="true">↗</span></Link><Link className="button" href="/gaydar">Explorer le GAYDAR</Link></div><p className="home-community-note"><span aria-hidden="true">✳</span> Identités libres · Communauté vivante · Respect mutuel</p></div><Link className="home-orbit" href="/gaydar" aria-label="Découvrir GAYDAR"><span className="home-orbit-stars" aria-hidden="true"/><span className="home-orbit-ring home-orbit-ring-1"><i className="home-orbit-dot"/></span><span className="home-orbit-ring home-orbit-ring-2"><i className="home-orbit-dot"/></span><span className="home-orbit-ring home-orbit-ring-3"><i className="home-orbit-dot"/></span><span className="home-orbit-ring home-orbit-ring-4"><i className="home-orbit-dot"/></span><span className="home-orbit-sun">{orbitAvatar ? <img src={orbitAvatar} alt=""/> : <b>{orbitName}</b>}</span><span className="home-orbit-caption"><strong>GAYDAR</strong><small>Les membres près de toi</small></span></Link></section>
+    <section className="hero home-community-hero home-community-hero-no-orbit"><div><p className="eyebrow">PRYSM · réseau communautaire queer</p><h1>Bienvenue dans<br/><span>ta galaxie.</span></h1><p className="lead">Un forum queer, mille façons d’être soi. On échange, on s’entraide et on refait le monde. Tu peux participer sans avoir à expliquer qui tu es.</p><div className="actions"><Link className="button primary" href="/forum">Rejoindre les discussions <span aria-hidden="true">↗</span></Link><Link className="button" href="/gaydar">Explorer le GAYDAR</Link></div><p className="home-community-note"><span aria-hidden="true">✳</span> Identités libres · Communauté vivante · Respect mutuel</p></div></section>
+    <style jsx>{`.home-community-hero-no-orbit{grid-template-columns:minmax(0,1fr);min-height:0;padding:64px 0 48px}`}</style>
     <section className="home-popular">
       <div className="section-heading home-popular-heading"><div><p className="eyebrow">À suivre en ce moment</p><h2>Topics populaires</h2></div><Link className="home-popular-all" href="/forum">Tout le forum <span>↗</span></Link></div>
       {popularTopics.length > 0 ? <div className="home-popular-list">{popularTopics.map((topic, index) => <Link className={"home-popular-topic category-" + topic.categorySlug} href={"/topic/" + topic.id} key={topic.id}><span className="home-popular-rank">{String(index + 1).padStart(2, "0")}</span><span className="home-popular-copy"><span className="home-popular-category">{topic.categoryName}</span><strong>{topic.title}</strong><small>{topic.postCount} message{topic.postCount > 1 ? "s" : ""} · {topic.voteCount} vote{topic.voteCount > 1 ? "s" : ""}</small></span><span className="home-popular-arrow">↗</span></Link>)}</div> : <div className="home-popular-empty">{topicsLoaded ? "Les premières discussions apparaîtront ici dès qu’elles seront actives." : "Recherche des discussions actives…"}</div>}
