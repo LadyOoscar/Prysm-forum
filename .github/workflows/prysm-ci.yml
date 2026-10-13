@@ -1,0 +1,41 @@
+name: PRYSM automated checks
+
+on:
+  push:
+    branches: [prysm-clean]
+  pull_request:
+    branches: [prysm-clean]
+  workflow_dispatch:
+  schedule:
+    - cron: "23 */6 * * *"
+
+jobs:
+  build:
+    name: Build and type-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build Next.js
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: test-anon-key
+
+  production-smoke:
+    name: Production route smoke tests
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check live PRYSM routes
+        run: node --test tests/production-smoke.test.cjs
+        env:
+          PRYSM_BASE_URL: https://prysm-clean.onrender.com
