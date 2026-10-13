@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import PrysmNav from "@/components/PrysmNav";
@@ -33,10 +33,6 @@ function TopicContent() {
   const [reportReason, setReportReason] = useState("");
   const [reporting, setReporting] = useState(false);
   const [reportMessage, setReportMessage] = useState("");
-  const insertStickerRef = useRef<(text: string) => void>(() => {});
-  const registerStickerInsert = useCallback((insertText: (text: string) => void) => {
-    insertStickerRef.current = insertText;
-  }, []);
 
   async function load() {
     const supabase = createClient();
@@ -197,8 +193,8 @@ function TopicContent() {
 
       <form className="replyForm" onSubmit={submit}>
         <h2>Répondre</h2>
-        <MentionTextarea value={reply} onChange={setReply} placeholder="Votre réponse…" onInsertReady={registerStickerInsert}/>
-        <StickerPicker onSelect={sticker => insertStickerRef.current(`[sticker:${sticker.id}]`)} />
+        <MentionTextarea value={reply} onChange={setReply} placeholder="Votre réponse…"/>
+        <StickerPicker onSelect={sticker => setReply(value => value + (value ? " " : "") + `[sticker:${sticker.id}]`)} />
         {message && <p className="authMessage">{message}</p>}
         <button className="primary" disabled={posting}>{posting ? "Publication…" : "Publier la réponse"}</button>
       </form>
