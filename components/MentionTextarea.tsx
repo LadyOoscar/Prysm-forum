@@ -36,8 +36,8 @@ export default function MentionTextarea({
       const end = textarea?.selectionEnd ?? start;
       const before = value.slice(0, start);
       const after = value.slice(end);
-      const prefix = before && !/\\s$/.test(before) ? " " : "";
-      const suffix = after && !/^\\s/.test(after) ? " " : "";
+      const prefix = before && !/\s$/.test(before) ? " " : "";
+      const suffix = after && !/^\s/.test(after) ? " " : "";
       const inserted = prefix + text + suffix;
       onChange(before + inserted + after);
       requestAnimationFrame(() => {
