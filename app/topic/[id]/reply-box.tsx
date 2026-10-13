@@ -1,5 +1,5 @@
 "use client";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { createSupabaseBrowser } from "../../../lib/supabase-browser";
 import MentionInput from "../../components/mention-input";
 import StickerPicker from "../../components/sticker-picker";
@@ -20,6 +20,8 @@ export default function ReplyBox({ topicId, locked }: { topicId: string; locked:
   const [quotedAuthor, setQuotedAuthor] = useState("");
   const [quotedBody, setQuotedBody] = useState("");
   const [parentPostId, setParentPostId] = useState<string | null>(null);
+  const insertStickerRef = useRef<(text: string) => void>(() => {});
+  const registerStickerInsert = useCallback((insertText: (text: string) => void) => { insertStickerRef.current = insertText; }, []);
 
   useEffect(() => {
     const handleQuote = (event: Event) => {
@@ -67,8 +69,8 @@ export default function ReplyBox({ topicId, locked }: { topicId: string; locked:
         <p>{quotedBody.length > 240 ? quotedBody.slice(0, 240).trimEnd() + "…" : quotedBody}</p>
         <span className="muted">Ta réponse sera affichée juste sous ce message. Le texte cité reste séparé de ta réponse.</span>
       </aside>}
-      <MentionInput required maxLength={10000} placeholder="Écris ta réponse… Utilise @pseudo pour mentionner quelqu’un." value={body} onChange={setBody} />
-      <StickerPicker onPick={(token) => setBody(current => current ? current + " " + token : token)} />
+      <MentionInput required maxLength={10000} placeholder="Écris ta réponse… Utilise @pseudo pour mentionner quelqu’un." value={body} onChange={setBody} onInsertReady={registerStickerInsert} />
+      <StickerPicker onPick={(token) => insertStickerRef.current(token)} />
       <ForumVoiceRecorder topicId={topicId} parentPostId={parentPostId} disabled={loading} onSent={() => window.location.reload()} />
       {error && <div className="notice error">{error}</div>}
       <button className="button primary" disabled={loading}>{loading ? "Envoi…" : "Publier la réponse"}</button>
