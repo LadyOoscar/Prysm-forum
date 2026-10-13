@@ -1,10 +1,11 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import PrysmNav from "@/components/PrysmNav";
 import MentionTextarea from "@/components/MentionTextarea";
+import StickerPicker from "@/components/StickerPicker";
 import ProfileAvatar from "@/components/ProfileAvatar";
 
 type Community = {
@@ -43,6 +44,10 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [feedMode, setFeedMode] = useState<"recent"|"popular"|"following">("recent");
   const [followedIds, setFollowedIds] = useState<string[]>([]);
+  const insertStickerRef = useRef<(text: string) => void>(() => {});
+  const registerStickerInsert = useCallback((insertText: (text: string) => void) => {
+    insertStickerRef.current = insertText;
+  }, []);
 
   useEffect(() => {
     async function loadForum() {
@@ -282,8 +287,9 @@ export default function Home() {
 
               <label>
                 Message
-                <MentionTextarea value={body} onChange={setBody} placeholder="Écrivez votre sujet…" />
+                <MentionTextarea value={body} onChange={setBody} placeholder="Écrivez votre sujet…" onInsertReady={registerStickerInsert} />
               </label>
+              <StickerPicker onSelect={sticker => insertStickerRef.current(`[sticker:${sticker.id}]`)} />
 
               {message && <p className="authMessage">{message}</p>}
               <button className="primary" type="submit" disabled={publishing}>
