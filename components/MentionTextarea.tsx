@@ -12,14 +12,12 @@ export default function MentionTextarea({
   placeholder,
   maxLength = 10000,
   rows = 6,
-  onInsertReady,
 }: {
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
   maxLength?: number;
   rows?: number;
-  onInsertReady?: (insertText: (text: string) => void) => void;
 }) {
   const router = useRouter();
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
@@ -28,26 +26,6 @@ export default function MentionTextarea({
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const ref = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    onInsertReady?.((text: string) => {
-      const textarea = ref.current;
-      const start = textarea?.selectionStart ?? value.length;
-      const end = textarea?.selectionEnd ?? start;
-      const before = value.slice(0, start);
-      const after = value.slice(end);
-      const prefix = before && !/\s$/.test(before) ? " " : "";
-      const suffix = after && !/^\s/.test(after) ? " " : "";
-      const inserted = prefix + text + suffix;
-      onChange(before + inserted + after);
-      requestAnimationFrame(() => {
-        if (!ref.current) return;
-        const cursor = before.length + inserted.length;
-        ref.current.focus();
-        ref.current.setSelectionRange(cursor, cursor);
-      });
-    });
-  }, [onInsertReady, onChange, value]);
 
   useEffect(() => {
     const match = value.match(/@([A-Za-z0-9_-]{0,32})$/);
