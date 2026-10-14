@@ -50,6 +50,11 @@ Deno.serve(async (req: Request) => {
     if (/user not found/i.test(deleteError.message)) {
       const { data: deleted, error: fallbackError } = await adminClient.rpc("delete_auth_user_by_id", { target_user_id: targetId });
       if (!fallbackError && deleted === true) {
+        const { error: profileCleanupError } = await adminClient.from("profiles").delete().eq("id", targetId);
+        if (profileCleanupError) {
+          console.error("PRYSM legacy profile cleanup failed:", profileCleanupError.message);
+          return json({ error: "Le compte Auth a été supprimé, mais le profil du forum n’a pas pu être nettoyé : " + profileCleanupError.message }, 500);
+        }
         return json({ success: true, username: targetProfile.username, cleanup: "database_fallback" });
       }
       console.error("PRYSM permanent account deletion fallback failed:", fallbackError?.message ?? "Target row not deleted");
