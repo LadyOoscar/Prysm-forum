@@ -54,14 +54,11 @@ export default function ModerationSanction() {
     setBusy(true);
     setMessage("");
     try {
-      const response = await fetch("/api/admin/delete-account", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ targetId: target.id }),
+      const { data: result, error } = await supabase.functions.invoke("delete-account", {
+        body: { targetId: target.id },
       });
-      const result = await response.json();
-      if (!response.ok || !result.success) {
-        setMessage(result.error || "La suppression définitive a échoué.");
+      if (error || !result?.success) {
+        setMessage(result?.error || error?.message || "La suppression définitive a échoué.");
         return;
       }
       setTargets((current) => current.filter((item) => item.id !== target.id));
