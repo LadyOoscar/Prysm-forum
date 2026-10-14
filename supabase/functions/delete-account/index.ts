@@ -29,7 +29,7 @@ Deno.serve(async (req: Request) => {
   if (!targetId) return json({ error: "Compte cible manquant." }, 400);
 
   const adminClient = createClient(supabaseUrl, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } });
-  const token = authorization.replace(/^Bearer\\s+/i, "");
+  const token = authorization.replace(/^Bearer\s+/i, "");
   const { data: { user }, error: authError } = await adminClient.auth.getUser(token);
   if (authError || !user) return json({ error: "Session invalide. Reconnecte-toi." }, 401);
   if (user.id === targetId) return json({ error: "Tu ne peux pas supprimer ton propre compte depuis cet outil." }, 400);
