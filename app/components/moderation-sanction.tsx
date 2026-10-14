@@ -46,19 +46,31 @@ export default function ModerationSanction() {
     const confirmation = window.prompt(
       "SUPPRESSION DÉFINITIVE\n\nLe compte de @" + target.username + " sera supprimé de PRYSM. Cette action est irréversible.\n\nPour confirmer, saisis exactement son pseudo :"
     );
-    if (confirmation !== target.username) {
-      if (confirmation !== null) setMessage("Confirmation incorrecte. Aucune suppression effectuée.");
+    if (confirmation === null) return;
+    if (confirmation.trim() !== target.username.trim()) {
+      setMessage("Confirmation incorrecte. Saisis exactement @" + target.username + ". Aucune suppression effectuée.");
       return;
     }
 
     setBusy(true);
-    setMessage("");
+    setMessage("Suppression définitive de @" + target.username + " en cours…");
     try {
       const { data: result, error } = await supabase.functions.invoke("delete-account", {
         body: { targetId: target.id },
       });
+      let failure = typeof result?.error === "string" ? result.error : "";
+      if (error) {
+        const context = (error as { context?: { json?: () => Promise<unknown> } }).context;
+        if (context && typeof context.json === "function") {
+          try {
+            const payload = await context.json() as { error?: string; message?: string };
+            failure = payload.error || payload.message || failure;
+          } catch { /* Réponse non JSON : utiliser le message du SDK. */ }
+        }
+        failure = failure || error.message;
+      }
       if (error || !result?.success) {
-        setMessage(result?.error || error?.message || "La suppression définitive a échoué.");
+        setMessage("Échec de la suppression : " + (failure || "aucune confirmation du serveur reçue."));
         return;
       }
       setTargets((current) => current.filter((item) => item.id !== target.id));
