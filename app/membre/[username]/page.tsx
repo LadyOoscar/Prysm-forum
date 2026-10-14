@@ -18,8 +18,14 @@ type PublicProfile = {
 };
 
 export default async function PublicProfilePage({params}:{params:Promise<{username:string}>}) {
-  const {username}=await params;
-  const {data:profile}=await getSupabase().from("profiles").select("id, username, display_name, bio, avatar_url, pronouns, identity, interests, age, location, orientation, community_flags, looking_for, banner_url, dating_enabled, profile_visibility, reputation, xp, level, title, is_admin, is_moderator, created_at").eq("username",username).maybeSingle();
+  const {username:rawUsername}=await params;
+  let username=rawUsername;
+  try { username=decodeURIComponent(rawUsername).trim(); } catch { username=rawUsername.trim(); }
+  const profileColumns="id, username, display_name, bio, avatar_url, pronouns, identity, interests, age, location, orientation, community_flags, looking_for, banner_url, dating_enabled, profile_visibility, reputation, xp, level, title, is_admin, is_moderator, created_at";
+  const supabase=getSupabase();
+  const exact=await supabase.from("profiles").select(profileColumns).eq("username",username).maybeSingle();
+  const fallback=exact.data ? exact : await supabase.from("profiles").select(profileColumns).ilike("username",username).maybeSingle();
+  const profile=fallback.data;
   if(!profile || profile.profile_visibility === "private") notFound();
   const person=profile as PublicProfile;
   const { data: badgeRows } = await getSupabase().from("profile_badges").select("badge_id,badges:badge_id(name,icon,tone,description,background_color,image_zoom,image_position_x,image_position_y,border_color,border_width,glow_intensity)").eq("profile_id", profile.id).order("awarded_at", { ascending: false });
