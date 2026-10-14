@@ -15,6 +15,9 @@ export const metadata: Metadata = {
   },
   description: "PRYSM est un forum communautaire queer pour échanger, s'entraider, rencontrer des personnes et partager ses passions dans un espace inclusif.",
   applicationName: "PRYSM",
+  verification: {
+    google: "BpOknOfseyfPCCJHhPMsv73M8LmOTlCNxeJ0kvKuixw"
+  },
   robots: {
     index: true,
     follow: true,
