@@ -29,7 +29,7 @@ function ForumPostCard({ post, childrenByParent, postsById, badgesByProfile, top
   depth?: number;
 }) {
   const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles;
-  const profileHref = "/membre/" + (profile?.username || "");
+  const profileHref = "/membre/" + encodeURIComponent(profile?.username || "");
   const authorBadges = badgesByProfile.get(post.author_id) ?? [];
   const visibleAuthorBadges = authorBadges.slice(0, 2);
   const hiddenAuthorBadgeCount = Math.max(0, authorBadges.length - visibleAuthorBadges.length);
