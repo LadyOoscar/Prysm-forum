@@ -2177,3 +2177,7 @@ body:has(main.shell .topbar a.active[href="/rencontres"]) .site-decoration-image
 .site-decoration-image{display:block;max-width:min(100%,100vw);height:auto;object-fit:contain}
 @media(max-width:760px){.site-decoration-image{max-height:180px;object-fit:contain}}
 body:has(main.shell .topbar a.active[href="/rencontres"]) .site-decoration-image{display:none!important}
+
+/* Definitive route-scoped removal: the oversized decoration is not wanted in Rencontres. */
+body:has(.dating-grid) .site-decoration-image,
+body:has(.dating-filters) .site-decoration-image{display:none!important;width:0!important;height:0!important;max-height:0!important;margin:0!important;padding:0!important;border:0!important}
