@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowser } from "../../../lib/supabase-browser";
 
 const reactions = [
@@ -21,7 +21,7 @@ export default function Reactions({ postId }: { postId: string }) {
   const [mine, setMine] = useState<string[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const supabase = createSupabaseBrowser();
+  const supabase = useMemo(() => createSupabaseBrowser(), []);
 
   useEffect(() => {
     let active = true;
