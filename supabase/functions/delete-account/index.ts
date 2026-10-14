@@ -49,19 +49,25 @@ Deno.serve(async (req: Request) => {
     // The Auth Admin API reports these as "User not found"; fall back to a service-role-only DB function.
     if (/user not found/i.test(deleteError.message)) {
       const { data: deleted, error: fallbackError } = await adminClient.rpc("delete_auth_user_by_id", { target_user_id: targetId });
-      if (!fallbackError && deleted === true) {
-        const { error: profileCleanupError } = await adminClient.from("profiles").delete().eq("id", targetId);
-        if (profileCleanupError) {
-          console.error("PRYSM legacy profile cleanup failed:", profileCleanupError.message);
-          return json({ error: "Le compte Auth a été supprimé, mais le profil du forum n’a pas pu être nettoyé : " + profileCleanupError.message }, 500);
-        }
-        return json({ success: true, username: targetProfile.username, cleanup: "database_fallback" });
+      if (fallbackError) {
+        console.error("PRYSM permanent account deletion fallback failed:", fallbackError.message);
+        return json({ error: "La suppression de secours a échoué : " + fallbackError.message }, 500);
       }
-      console.error("PRYSM permanent account deletion fallback failed:", fallbackError?.message ?? "Target row not deleted");
-      return json({ error: "L’API Auth ne reconnaît pas ce compte et la suppression de secours a échoué." }, 500);
+      // deleted=false means Auth already had no row, so still clean the orphaned forum profile.
+      const { error: profileCleanupError } = await adminClient.from("profiles").delete().eq("id", targetId);
+      if (profileCleanupError) {
+        console.error("PRYSM legacy profile cleanup failed:", profileCleanupError.message);
+        return json({ error: "Le compte Auth est absent, mais le profil du forum n’a pas pu être nettoyé : " + profileCleanupError.message }, 500);
+      }
+      return json({ success: true, username: targetProfile.username, cleanup: deleted === true ? "database_fallback" : "orphan_profile_cleanup" });
     }
     console.error("PRYSM permanent account deletion failed:", deleteError.message);
     return json({ error: "La suppression définitive a échoué : " + deleteError.message }, 500);
+  }
+  const { error: profileCleanupError } = await adminClient.from("profiles").delete().eq("id", targetId);
+  if (profileCleanupError) {
+    console.error("PRYSM profile cleanup failed:", profileCleanupError.message);
+    return json({ error: "Le compte Auth a été supprimé, mais le profil du forum n’a pas pu être nettoyé : " + profileCleanupError.message }, 500);
   }
   return json({ success: true, username: targetProfile.username });
 });
