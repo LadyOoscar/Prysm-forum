@@ -29,7 +29,7 @@ Deno.serve(async (req: Request) => {
   if (!targetId) return json({ error: "Compte cible manquant." }, 400);
 
   const adminClient = createClient(supabaseUrl, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } });
-  const token = authorization.replace(/^Bearer\s+/i, "");
+  const token = authorization.replace(/^Bearer\\s+/i, "");
   const { data: { user }, error: authError } = await adminClient.auth.getUser(token);
   if (authError || !user) return json({ error: "Session invalide. Reconnecte-toi." }, 401);
   if (user.id === targetId) return json({ error: "Tu ne peux pas supprimer ton propre compte depuis cet outil." }, 400);
@@ -45,6 +45,16 @@ Deno.serve(async (req: Request) => {
 
   const { error: deleteError } = await adminClient.auth.admin.deleteUser(targetId);
   if (deleteError) {
+    // Some legacy/test accounts exist in auth.users without a GoTrue identity record.
+    // The Auth Admin API reports these as "User not found"; fall back to a service-role-only DB function.
+    if (/user not found/i.test(deleteError.message)) {
+      const { data: deleted, error: fallbackError } = await adminClient.rpc("delete_auth_user_by_id", { target_user_id: targetId });
+      if (!fallbackError && deleted === true) {
+        return json({ success: true, username: targetProfile.username, cleanup: "database_fallback" });
+      }
+      console.error("PRYSM permanent account deletion fallback failed:", fallbackError?.message ?? "Target row not deleted");
+      return json({ error: "L’API Auth ne reconnaît pas ce compte et la suppression de secours a échoué." }, 500);
+    }
     console.error("PRYSM permanent account deletion failed:", deleteError.message);
     return json({ error: "La suppression définitive a échoué : " + deleteError.message }, 500);
   }
