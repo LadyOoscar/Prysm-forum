@@ -20,58 +20,103 @@ export default function Reactions({ postId }: { postId: string }) {
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [mine, setMine] = useState<string[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
   const supabase = createSupabaseBrowser();
 
   useEffect(() => {
     let active = true;
     async function load() {
-      const { data } = await supabase.from("forum_reactions").select("user_id, reaction").eq("post_id", postId);
+      const { data, error } = await supabase
+        .from("forum_reactions")
+        .select("user_id, reaction")
+        .eq("post_id", postId);
       if (!active) return;
+      if (error) {
+        setMessage("Impossible de charger les réactions. Réessaie dans un instant.");
+        return;
+      }
       const next: Record<string, number> = {};
       for (const row of data ?? []) next[row.reaction] = (next[row.reaction] ?? 0) + 1;
-      const { data: sessionData } = await supabase.auth.getSession();
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (!active) return;
+      if (sessionError) {
+        setMessage("Impossible de vérifier ta session. Recharge la page puis réessaie.");
+        return;
+      }
       const userId = sessionData.session?.user.id;
       setCounts(next);
       setMine(userId ? (data ?? []).filter((row) => row.user_id === userId).map((row) => row.reaction) : []);
+      setMessage(null);
     }
-    load();
+    void load();
     return () => { active = false; };
-  }, [postId]);
+  }, [postId, supabase]);
 
   async function toggle(reaction: ReactionKey) {
     if (busy) return;
     setBusy(reaction);
-    const { data: sessionData } = await supabase.auth.getSession();
-    const userId = sessionData.session?.user.id;
-    if (!userId) {
-      window.location.href = "/auth";
-      return;
-    }
-    if (mine.includes(reaction)) {
-      const { error } = await supabase.from("forum_reactions").delete().eq("post_id", postId).eq("user_id", userId).eq("reaction", reaction);
-      if (!error) {
-        setMine((current) => current.filter((item) => item !== reaction));
-        setCounts((current) => ({ ...current, [reaction]: Math.max(0, (current[reaction] ?? 1) - 1) }));
+    setMessage(null);
+    try {
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        setMessage("Ta session n’a pas pu être vérifiée. Recharge la page puis réessaie.");
+        return;
       }
-    } else {
-      const previous = mine[0];
-      if (previous) {
-        const { error: removeError } = await supabase.from("forum_reactions").delete().eq("post_id", postId).eq("user_id", userId);
-        if (removeError) {
-          setBusy(null);
+      const userId = sessionData.session?.user.id;
+      if (!userId) {
+        window.location.href = "/auth";
+        return;
+      }
+
+      if (mine.includes(reaction)) {
+        const { error } = await supabase
+          .from("forum_reactions")
+          .delete()
+          .eq("post_id", postId)
+          .eq("user_id", userId)
+          .eq("reaction", reaction);
+        if (error) {
+          setMessage("La réaction n’a pas été retirée. Vérifie ta connexion puis réessaie.");
           return;
         }
-        setCounts((current) => ({ ...current, [previous]: Math.max(0, (current[previous] ?? 1) - 1) }));
-      }
-      const { error } = await supabase.from("forum_reactions").insert({ post_id: postId, user_id: userId, reaction });
-      if (!error) {
+        setMine((current) => current.filter((item) => item !== reaction));
+        setCounts((current) => ({ ...current, [reaction]: Math.max(0, (current[reaction] ?? 1) - 1) }));
+      } else {
+        const previous = mine[0];
+        if (previous) {
+          const { error: removeError } = await supabase
+            .from("forum_reactions")
+            .delete()
+            .eq("post_id", postId)
+            .eq("user_id", userId);
+          if (removeError) {
+            setMessage("Impossible de remplacer ta réaction. Réessaie dans un instant.");
+            return;
+          }
+        }
+        const { error } = await supabase
+          .from("forum_reactions")
+          .insert({ post_id: postId, user_id: userId, reaction });
+        if (error) {
+          if (previous) {
+            setMine([]);
+            setCounts((current) => ({ ...current, [previous]: Math.max(0, (current[previous] ?? 1) - 1) }));
+          }
+          setMessage("PRYSM n’a pas pu enregistrer cette réaction. Les droits de la base ou la connexion peuvent être en cause.");
+          return;
+        }
         setMine([reaction]);
-        setCounts((current) => ({ ...current, [reaction]: (current[reaction] ?? 0) + 1 }));
-      } else if (previous) {
-        setMine([]);
+        setCounts((current) => ({
+          ...current,
+          ...(previous ? { [previous]: Math.max(0, (current[previous] ?? 1) - 1) } : {}),
+          [reaction]: (current[reaction] ?? 0) + 1,
+        }));
       }
+    } catch {
+      setMessage("Une erreur inattendue a bloqué la réaction. Recharge la page puis réessaie.");
+    } finally {
+      setBusy(null);
     }
-    setBusy(null);
   }
 
   return (
@@ -84,9 +129,10 @@ export default function Reactions({ postId }: { postId: string }) {
             className={selected ? "reaction selected" : "reaction"}
             key={reaction.key}
             type="button"
-            onClick={() => toggle(reaction.key)}
+            onClick={() => void toggle(reaction.key)}
             disabled={busy !== null}
             title={reaction.name}
+            aria-label={`${reaction.name}, ${counts[reaction.key] ?? 0} réactions`}
             aria-pressed={selected}
           >
             <span>{reaction.label}</span>
@@ -94,6 +140,7 @@ export default function Reactions({ postId }: { postId: string }) {
           </button>
         );
       })}
+      {message && <small className="reaction-error" role="status" aria-live="polite">{message}</small>}
     </div>
   );
 }
