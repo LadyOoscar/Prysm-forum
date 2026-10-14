@@ -2181,3 +2181,12 @@ body:has(main.shell .topbar a.active[href="/rencontres"]) .site-decoration-image
 /* Definitive route-scoped removal: the oversized decoration is not wanted in Rencontres. */
 body:has(.dating-grid) .site-decoration-image,
 body:has(.dating-filters) .site-decoration-image{display:none!important;width:0!important;height:0!important;max-height:0!important;margin:0!important;padding:0!important;border:0!important}
+
+/* Emergency fix: the giant clickable artwork on Rencontres is not a profile avatar. Hide non-avatar media and linked image wrappers on that route. */
+body:has(main.shell .dating-grid) main.shell img:not(.dating-avatar img),
+body:has(main.shell .dating-grid) main.shell picture,
+body:has(main.shell .dating-grid) main.shell a:has(img):not(:has(.dating-avatar)),
+body:has(main.shell .dating-grid) main.shell .site-home-banner,
+body:has(main.shell .dating-grid) main.shell .site-decoration-image,
+body:has(main.shell .dating-grid) main.shell [style*="background-image"]{display:none!important;visibility:hidden!important;width:0!important;height:0!important;max-width:0!important;max-height:0!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;background-image:none!important;overflow:hidden!important}
+body:has(main.shell .dating-grid) main.shell .dating-avatar img{display:block!important;visibility:visible!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important}
