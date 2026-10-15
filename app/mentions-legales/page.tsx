@@ -5,21 +5,21 @@ export const metadata = { title: "Mentions légales", description: "Informations
 export default function MentionsLegalesPage() {
   return <main className="shell legal-page">
     <header className="page-head compact"><p className="eyebrow">Informations du service</p><h1>Mentions légales</h1><p className="lead">Les informations essentielles sur l’éditeur et l’hébergement de PRYSM.</p></header>
-    <div className="notice error" role="alert"><strong>Informations à compléter avant publication.</strong><br />Les champs entre crochets nécessitent encore les coordonnées exactes de l’éditeur particulier. Cette page ne doit pas être considérée comme juridiquement complète tant que ces informations ne sont pas renseignées.</div>
+    <div className="notice error" role="alert"><strong>Ne pas publier avant validation juridique.</strong><br />L’identité de l’éditrice est volontairement absente de cette version de travail. Cette omission en production n’est possible que si PRYSM relève bien de l’édition à titre non professionnel et si les informations d’identification requises ont été communiquées au préalable à l’hébergeur, conformément à l’article 6, III, 2 de la LCEN.</div>
     <section className="legal-section"><h2>Édition du site</h2>
       <p><strong>Nom du service :</strong> PRYSM</p>
       <p><strong>Adresse du site :</strong> <a href="https://prysm-clean.onrender.com">https://prysm-clean.onrender.com</a></p>
-      <p><strong>Éditeur :</strong> [Nom et prénom de l’éditeur ou dénomination de la structure]</p>
-      <p><strong>Statut :</strong> Particulier (éditeur personne physique, hors activité professionnelle à confirmer)</p>
-      <p><strong>Adresse de l’éditeur :</strong> [Adresse postale à renseigner selon le statut applicable]</p>
+      <p><strong>Statut déclaré :</strong> personne physique éditant le service à titre personnel. Le caractère non professionnel doit être confirmé au regard de l’activité réelle du forum.</p>
+      <p><strong>Identité et domicile de l’éditrice :</strong> non affichés dans cette version préparatoire. Leur omission publique dépend de la validation du régime légal d’anonymat et de la communication préalable des informations exigées à l’hébergeur.</p>
       <p><strong>Contact :</strong> morgane.spiria@gmail.com</p>
-      <p><strong>Directeur ou directrice de la publication :</strong> [Nom à renseigner]</p>
+      <p><strong>Publication :</strong> les mentions définitives relatives à la direction de la publication doivent être validées avec le régime d’anonymat applicable avant mise en ligne.</p>
     </section>
     <section className="legal-section"><h2>Hébergement</h2>
       <p><strong>Application web :</strong> Render Services, Inc.</p>
-      <p><strong>Adresse :</strong> 525 Brannan Street, Suite 300, San Francisco, CA 94107, États-Unis.</p>
+      <p><strong>Adresse :</strong> 525 Brannan Street, San Francisco, CA 94131, États-Unis (adresse indiquée dans le Data Processing Addendum de Render).</p>
       <p><strong>Site de l’hébergeur :</strong> <a href="https://render.com" target="_blank" rel="noreferrer">render.com</a></p>
-      <p>PRYSM utilise également Supabase pour certaines fonctions de base de données, d’authentification et de stockage. Les informations contractuelles et les régions exactes de traitement doivent être vérifiées dans la configuration des services utilisés.</p>
+      <p><strong>Base de données, authentification et stockage :</strong> Supabase Pte. Ltd., 65 Chulia Street, #38-02/03, OCBC Centre, Singapour 049513, sous réserve de confirmer l’entité contractante dans le compte. Le projet Supabase de production est configuré dans la région AWS eu-west-3 (Paris). Supabase précise que certains traitements techniques ou sous-traitants peuvent intervenir hors de la région choisie.</p>
+      <p><strong>Région de l’application Render :</strong> Frankfurt, Allemagne. Les coordonnées contractuelles de Render et de Supabase doivent être vérifiées à nouveau avant publication définitive.</p>
     </section>
     <section className="legal-section"><h2>Propriété intellectuelle</h2>
       <p>Les éléments originaux créés pour PRYSM sont protégés par les règles applicables de propriété intellectuelle. Les contenus publiés par les membres restent soumis aux droits de leurs auteurs et titulaires de droits. Toute réutilisation d’un contenu tiers doit respecter sa licence et les autorisations applicables.</p>
