@@ -80,9 +80,25 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
   const supabase = getSupabase();
   const { data: topic } = await supabase.from("forum_topics").select("id, title, locked, pinned, category_id, forum_categories:category_id(slug, name)").eq("id", id).maybeSingle();
   if (!topic) notFound();
-  const { data: posts, error } = await supabase.from("forum_posts").select("id, body, created_at, author_id, parent_post_id, profiles:author_id(username, display_name, avatar_url, reputation, is_admin, is_moderator, community_flags)").eq("topic_id", id).order("created_at", { ascending: true });
+  const { data: posts, error } = await supabase.from("forum_posts").select("id, body, created_at, author_id, parent_post_id, profiles:author_id(username, display_name, avatar_url, reputation, is_admin, is_moderator)").eq("topic_id", id).order("created_at", { ascending: true });
+  const usernamesByAuthor = new Map<string, string>();
+  for (const post of posts ?? []) {
+    const joined = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles;
+    if (post.author_id && joined?.username) usernamesByAuthor.set(post.author_id, joined.username);
+  }
+  const publicFlagsEntries = await Promise.all([...usernamesByAuthor.keys()].map(async (authorId) => {
+    const { data: flags } = await supabase.rpc("get_public_profile_flags", { p_profile_id: authorId });
+    const row = Array.isArray(flags) ? flags[0] : flags;
+    return [authorId, row?.community_flags ?? []] as const;
+  }));
+  const flagsByAuthor = new Map(publicFlagsEntries);
+  const postsWithPublicFlags = (posts ?? []).map((post: any) => {
+    const joined = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles;
+    const profile = joined ? { ...joined, community_flags: flagsByAuthor.get(post.author_id) ?? [] } : joined;
+    return { ...post, profiles: profile };
+  });
   const { data: poll } = await supabase.from("forum_polls").select("id").eq("topic_id", id).maybeSingle();
-  const authorIds = [...new Set((posts ?? []).map((post: any) => post.author_id).filter(Boolean))];
+  const authorIds = [...new Set((postsWithPublicFlags ?? []).map((post: any) => post.author_id).filter(Boolean))];
   const { data: badgeRows } = authorIds.length ? await supabase.from("profile_badges").select("profile_id,badge_id,badges:badge_id(name,icon,tone,description,background_color,image_zoom,image_position_x,image_position_y,border_color,border_width,glow_intensity)").in("profile_id", authorIds) : { data: [] };
   const badgesByProfile = new Map<string, any[]>();
   for (const row of badgeRows ?? []) { const badge = Array.isArray(row.badges) ? row.badges[0] : row.badges; if (!badge) continue; const list = badgesByProfile.get(row.profile_id) ?? []; list.push({ ...badge, id: row.badge_id }); badgesByProfile.set(row.profile_id, list); }
@@ -94,9 +110,9 @@ export default async function TopicPage({ params }: { params: Promise<{ id: stri
       childrenByParent.set(post.parent_post_id, children);
     }
   }
-  const postsById = new Map<string, ForumPost>((posts ?? []).map((post: ForumPost) => [post.id, post]));
+  const postsById = new Map<string, ForumPost>((postsWithPublicFlags ?? []).map((post: ForumPost) => [post.id, post]));
   const category = Array.isArray(topic.forum_categories) ? topic.forum_categories[0] : topic.forum_categories;
-  const rootPosts = (posts ?? []).filter((post: any) => !post.parent_post_id);
+  const rootPosts = (postsWithPublicFlags ?? []).filter((post: any) => !post.parent_post_id);
 
   return (
     <main className="shell">
