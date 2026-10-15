@@ -2190,3 +2190,19 @@ body:has(main.shell .dating-grid) main.shell .site-home-banner,
 body:has(main.shell .dating-grid) main.shell .site-decoration-image,
 body:has(main.shell .dating-grid) main.shell [style*="background-image"]{display:none!important;visibility:hidden!important;width:0!important;height:0!important;max-width:0!important;max-height:0!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;background-image:none!important;overflow:hidden!important}
 body:has(main.shell .dating-grid) main.shell .dating-avatar img{display:block!important;visibility:visible!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important}
+
+/* Legal information pages */
+.legal-page{max-width:900px;padding-bottom:2.5rem}
+.legal-page>.notice{margin:1rem 0 1.5rem}
+.legal-section{margin:1.1rem 0;padding:1.15rem 1.25rem;border:1px solid var(--line);border-radius:12px;background:rgba(12,17,39,.42)}
+.legal-section h2{margin:0 0 .75rem;font-size:1.12rem;color:var(--text)}
+.legal-section p,.legal-section li{line-height:1.75;color:var(--muted)}
+.legal-section p+p{margin-top:.7rem}
+.legal-section ul{padding-left:1.35rem;display:grid;gap:.35rem}
+.legal-section a{color:var(--accent,#7de9df);text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+.legal-note{font-size:.85rem;line-height:1.6;color:var(--muted);margin:1.5rem 0}
+.legal-footer{width:min(1120px,calc(100% - 2rem));margin:1rem auto 0;padding:1.2rem 0 1.8rem;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;color:var(--muted);font-size:.85rem}
+.legal-footer nav{display:flex;align-items:center;gap:.7rem 1rem;flex-wrap:wrap}
+.legal-footer a{color:var(--muted);text-decoration:none}
+.legal-footer a:hover,.legal-footer a:focus-visible{color:var(--text);text-decoration:underline;text-underline-offset:3px}
+@media(max-width:640px){.legal-section{padding:.95rem}.legal-footer{width:calc(100% - 2rem);align-items:flex-start;flex-direction:column}.legal-footer nav{gap:.7rem 1rem}}
