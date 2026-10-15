@@ -256,8 +256,15 @@ export function VoiceMessage({ path, durationMs }: { path: string; durationMs?: 
     void supabase.storage.from("prysm-voice-messages").createSignedUrl(path, 60 * 60)
       .then(({ data, error }) => {
         if (!active) return;
-        if (error || !data?.signedUrl) setFailed(true);
-        else setUrl(data.signedUrl);
+        if (error || !data?.signedUrl) {
+          console.error("[PRYSM messagerie] Échec de génération du lien vocal", error);
+          setFailed(true);
+        } else setUrl(data.signedUrl);
+      })
+      .catch((error) => {
+        if (!active) return;
+        console.error("[PRYSM messagerie] Exception pendant le chargement du vocal", error);
+        setFailed(true);
       });
     return () => { active = false; };
   }, [path]);
@@ -380,29 +387,45 @@ export function VoiceRecorder({
     onError("");
     const extension = audioBlob.type.includes("mp4") ? "m4a" : audioBlob.type.includes("ogg") ? "ogg" : "webm";
     const path = conversationId + "/" + userId + "/" + crypto.randomUUID() + "." + extension;
-    const { error: uploadError } = await supabase.storage.from("prysm-voice-messages").upload(path, audioBlob, {
-      contentType: audioBlob.type || "audio/webm",
-      upsert: false,
-    });
-    if (uploadError) {
-      onError("Impossible d’envoyer le vocal. Vérifie ta connexion puis réessaie.");
+    let uploaded = false;
+    try {
+      const { error: uploadError } = await supabase.storage.from("prysm-voice-messages").upload(path, audioBlob, {
+        contentType: audioBlob.type || "audio/webm",
+        upsert: false,
+      });
+      if (uploadError) {
+        console.error("[PRYSM messagerie] Échec de l’envoi du fichier vocal", uploadError);
+        onError(uploadError.message.includes("403") || uploadError.message.toLowerCase().includes("permission")
+          ? "Accès refusé (403) pendant l’envoi du vocal. Vérifie les droits du stockage privé."
+          : `Impossible d’envoyer le vocal : ${uploadError.message}`);
+        return;
+      }
+      uploaded = true;
+
+      const durationMs = Math.round(recordingDurationMsRef.current);
+      const { data, error } = await supabase.from("messages")
+        .insert({ conversation_id: conversationId, sender_id: userId, body: "voice:" + path + "|durationMs=" + durationMs })
+        .select("id, body, sender_id, created_at")
+        .single();
+      if (error || !data) {
+        console.error("[PRYSM messagerie] Fichier vocal envoyé mais message refusé", error);
+        onError(error
+          ? (error.code === "42501" ? `Accès refusé (403) pendant l’envoi du vocal : ${error.message}` : `Le fichier vocal a été téléversé mais le message n’a pas été accepté : ${error.message}`)
+          : "Le fichier vocal a été téléversé mais le message n’a pas été accepté.");
+        return;
+      }
+      onSent(data as Message);
+      discardPreview();
+    } catch (error) {
+      console.error("[PRYSM messagerie] Exception pendant l’envoi du vocal", error);
+      onError(error instanceof Error ? error.message : "Erreur inattendue pendant l’envoi du vocal.");
+    } finally {
+      if (uploaded) {
+        // If the message insert failed, remove the orphaned private upload.
+        // Successful uploads are retained for the recipient to play.
+      }
       setSending(false);
-      return;
     }
-    const durationMs = Math.round(recordingDurationMsRef.current);
-    const { data, error } = await supabase.from("messages")
-      .insert({ conversation_id: conversationId, sender_id: userId, body: "voice:" + path + "|durationMs=" + durationMs })
-      .select("id, body, sender_id, created_at")
-      .single();
-    if (error || !data) {
-      await supabase.storage.from("prysm-voice-messages").remove([path]);
-      onError("Le vocal a été enregistré mais n’a pas pu être envoyé.");
-      setSending(false);
-      return;
-    }
-    onSent(data as Message);
-    discardPreview();
-    setSending(false);
   }
 
   return (
