@@ -17,9 +17,6 @@ export default async function MembresPage({ searchParams }: { searchParams: Sear
 
   if (q) {
     query = query.or("username.ilike.%"+q+"%,display_name.ilike.%"+q+"%");
-  } else {
-    query = query.not("last_seen_at", "is", null)
-      .gte("last_seen_at", new Date(Date.now() - 15 * 60 * 1000).toISOString());
   }
 
   const { data } = await query;
@@ -27,8 +24,8 @@ export default async function MembresPage({ searchParams }: { searchParams: Sear
     <header className="topbar"><Link className="brand" href="/">PRYSM</Link><nav><Link href="/">Accueil</Link><Link href="/forum">Forum</Link><Link href="/rencontres">Rencontres</Link><Link className="active" href="/membres">Membres</Link><Link href="/profil">Profil</Link></nav></header>
     <section className="page-head compact">
       <p className="eyebrow">Communauté</p>
-      <h1>{q ? "Trouver un membre." : "Membres actifs."}</h1>
-      <p className="lead">{q ? "Recherche par pseudo ou nom affiché." : "Les membres vus sur PRYSM au cours des 15 dernières minutes."}</p>
+      <h1>{q ? "Trouver un membre." : "Annuaire des membres."}</h1>
+      <p className="lead">{q ? "Recherche par pseudo ou nom affiché." : "Retrouve les membres de PRYSM, même ceux qui ne se sont pas connectés récemment."}</p>
     </section>
     <form action="/membres" method="get" role="search" className="member-search">
       <label htmlFor="member-query">Rechercher un membre</label>
@@ -40,7 +37,7 @@ export default async function MembresPage({ searchParams }: { searchParams: Sear
       <p className="member-search-hint">Tu peux saisir une partie du pseudo ou du nom. Seuls les profils publics apparaissent.</p>
     </form>
     {!data?.length ? <div className="empty"><div className="empty-symbol">⌕</div><h2>{q ? "Aucun membre trouvé" : "Personne en vue"}</h2><p>{q ? "Essaie un autre pseudo ou une autre orthographe." : "Les membres actifs apparaîtront ici dès qu’ils navigueront sur PRYSM."}</p></div> :
-      <section className="cards" aria-label={q ? "Résultats de recherche" : "Membres actifs"}>{data.map((p: any) => <Link className="card" href={"/membre/" + encodeURIComponent(p.username)} key={p.username}>
+      <section className="cards" aria-label={q ? "Résultats de recherche" : "Annuaire des membres"}>{data.map((p: any) => <Link className="card" href={"/membre/" + encodeURIComponent(p.username)} key={p.username}>
         <div className="avatar">{p.avatar_url ? <img src={p.avatar_url} alt="" /> : (p.display_name || p.username).slice(0, 1).toUpperCase()}</div>
         <span>@{p.username}</span><h3>{p.display_name || p.username}</h3>
         <p>Niveau {p.level || 1} · {p.title || "Nouveau"} · {p.reputation || 0} réputation</p>
