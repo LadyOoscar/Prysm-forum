@@ -103,7 +103,7 @@ export default function MessagesPage() {
         if (reason.includes("MEMBER_NOT_FOUND")) setMessage("Aucun membre ne correspond à ce pseudo.");
         else if (reason.includes("CANNOT_MESSAGE_SELF")) setMessage("Tu ne peux pas démarrer une conversation avec toi-même.");
         else if (reason.includes("MEMBER_BLOCKED")) setMessage("Impossible de démarrer cette conversation car un blocage est actif entre ces comptes.");
-        else if (error?.code === "42501" || error?.status === 403) setMessage("Accès refusé par la base de données (403). La requête a été journalisée pour diagnostic.");
+        else if (error?.code === "42501") setMessage("Accès refusé par la base de données (403). La requête a été journalisée pour diagnostic.");
         else if (error?.code === "28000" || reason.includes("AUTH_REQUIRED")) setMessage("Ta session a expiré. Reconnecte-toi puis réessaie.");
         else setMessage(`Impossible de créer la conversation. ${error?.message || "Réessaie dans un instant."}${error?.code ? ` [${error.code}]` : ""}`);
         return;
