@@ -18,7 +18,6 @@ export default function PwaInstallButton() {
       Boolean((navigator as Navigator & { standalone?: boolean }).standalone);
     setIsInstalled(standalone);
     const ua = window.navigator.userAgent;
-    setIsIosSafari(/iphone|ipad|ipod/i.test(ua)) && !/crios|fxios|edgios/i.test(ua);
     setIsIosSafari(/iphone|ipad|ipod/i.test(ua) && !/crios|fxios|edgios/i.test(ua));
 
     const onBeforeInstall = (event: Event) => {
