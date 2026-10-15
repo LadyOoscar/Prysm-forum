@@ -4,6 +4,8 @@ import ActivityPulse from "./components/activity-pulse";
 import SiteNav from "./components/site-nav";
 import FederationTicker from "./components/federation-ticker";
 import SoundControl from "./components/sound-control";
+import PwaRegister from "./components/pwa-register";
+import PwaInstallButton from "./components/pwa-install-button";
 
 const siteUrl = "https://prysm-clean.onrender.com";
 
@@ -15,6 +17,8 @@ export const metadata: Metadata = {
   },
   description: "PRYSM est un forum communautaire queer pour échanger, s'entraider, rencontrer des personnes et partager ses passions dans un espace inclusif.",
   applicationName: "PRYSM",
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "PRYSM" },
+  icons: { icon: "/prysm-icon.svg" },
   verification: {
     google: "MRXMQIUYO0uxsj15qw8WwNLAvfjuFUGvoPsamsvS8dE"
   },
@@ -45,7 +49,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="fr">
-      <body><ActivityPulse /><SiteNav /><FederationTicker /><SoundControl />{children}</body>
+      <body><PwaRegister /><PwaInstallButton /><ActivityPulse /><SiteNav /><FederationTicker /><SoundControl />{children}</body>
     </html>
   );
 }
