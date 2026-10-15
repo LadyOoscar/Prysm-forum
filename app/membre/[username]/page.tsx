@@ -26,8 +26,8 @@ export default async function PublicProfilePage({params}:{params:Promise<{userna
   const profile=result.data;
   if(!profile) notFound();
   const person=profile as PublicProfile;
-  const { data: badgeRows } = await getSupabase().from("profile_badges").select("badge_id,badges:badge_id(name,icon,tone,description,background_color,image_zoom,image_position_x,image_position_y,border_color,border_width,glow_intensity)").eq("profile_id", profile.id).order("awarded_at", { ascending: false });
-  const { data: photoRows } = await getSupabase().from("profile_photos").select("id, image_url, caption, created_at").eq("profile_id", profile.id).order("created_at", { ascending: false }).limit(12);
+  const { data: badgeRows } = await getSupabase().from("profile_badges").select("badge_id,badges:badge_id(name,icon,tone,description,background_color,image_zoom,image_position_x,image_position_y,border_color,border_width,glow_intensity)").eq("profile_id", person.id).order("awarded_at", { ascending: false });
+  const { data: photoRows } = await getSupabase().from("profile_photos").select("id, image_url, caption, created_at").eq("profile_id", person.id).order("created_at", { ascending: false }).limit(12);
   const initials=(person.display_name||person.username||"?").slice(0,1).toUpperCase();
   const level=Math.max(1,person.level||1);
   const xp=Math.max(0,person.xp||0);
