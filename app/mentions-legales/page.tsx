@@ -5,12 +5,12 @@ export const metadata = { title: "Mentions légales", description: "Informations
 export default function MentionsLegalesPage() {
   return <main className="shell legal-page">
     <header className="page-head compact"><p className="eyebrow">Informations du service</p><h1>Mentions légales</h1><p className="lead">Les informations essentielles sur l’éditeur et l’hébergement de PRYSM.</p></header>
-    <div className="notice error" role="alert"><strong>Informations à compléter avant publication.</strong><br />Les champs entre crochets nécessitent les coordonnées exactes de l’éditeur. Cette page ne doit pas être considérée comme juridiquement complète tant que ces informations ne sont pas renseignées.</div>
+    <div className="notice error" role="alert"><strong>Informations à compléter avant publication.</strong><br />Les champs entre crochets nécessitent encore les coordonnées exactes de l’éditeur particulier. Cette page ne doit pas être considérée comme juridiquement complète tant que ces informations ne sont pas renseignées.</div>
     <section className="legal-section"><h2>Édition du site</h2>
       <p><strong>Nom du service :</strong> PRYSM</p>
       <p><strong>Adresse du site :</strong> <a href="https://prysm-clean.onrender.com">https://prysm-clean.onrender.com</a></p>
       <p><strong>Éditeur :</strong> [Nom et prénom de l’éditeur ou dénomination de la structure]</p>
-      <p><strong>Statut :</strong> [Particulier, association ou entreprise, à préciser]</p>
+      <p><strong>Statut :</strong> Particulier (éditeur personne physique, hors activité professionnelle à confirmer)</p>
       <p><strong>Adresse de l’éditeur :</strong> [Adresse postale à renseigner selon le statut applicable]</p>
       <p><strong>Contact :</strong> [Adresse e-mail de contact à créer ou renseigner]</p>
       <p><strong>Directeur ou directrice de la publication :</strong> [Nom à renseigner]</p>
