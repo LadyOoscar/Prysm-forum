@@ -12,7 +12,7 @@ export default function MentionsLegalesPage() {
       <p><strong>Éditeur :</strong> [Nom et prénom de l’éditeur ou dénomination de la structure]</p>
       <p><strong>Statut :</strong> Particulier (éditeur personne physique, hors activité professionnelle à confirmer)</p>
       <p><strong>Adresse de l’éditeur :</strong> [Adresse postale à renseigner selon le statut applicable]</p>
-      <p><strong>Contact :</strong> [Adresse e-mail de contact à créer ou renseigner]</p>
+      <p><strong>Contact :</strong> morgane.spiria@gmail.com</p>
       <p><strong>Directeur ou directrice de la publication :</strong> [Nom à renseigner]</p>
     </section>
     <section className="legal-section"><h2>Hébergement</h2>
@@ -23,10 +23,10 @@ export default function MentionsLegalesPage() {
     </section>
     <section className="legal-section"><h2>Propriété intellectuelle</h2>
       <p>Les éléments originaux créés pour PRYSM sont protégés par les règles applicables de propriété intellectuelle. Les contenus publiés par les membres restent soumis aux droits de leurs auteurs et titulaires de droits. Toute réutilisation d’un contenu tiers doit respecter sa licence et les autorisations applicables.</p>
-      <p>Pour signaler un contenu susceptible de porter atteinte à un droit, contactez l’équipe à l’adresse [adresse de contact à renseigner] en indiquant l’URL concernée et les éléments permettant d’examiner la demande.</p>
+      <p>Pour signaler un contenu susceptible de porter atteinte à un droit, contactez l’équipe à l’adresse morgane.spiria@gmail.com en indiquant l’URL concernée et les éléments permettant d’examiner la demande.</p>
     </section>
     <section className="legal-section"><h2>Signalement de contenus illicites</h2>
-      <p>Un contenu peut être signalé depuis les outils disponibles sur le forum lorsqu’ils sont proposés. Pour une notification formelle, une voie de contact dédiée doit être renseignée ici : [adresse de signalement à renseigner]. Décrivez précisément le contenu, son emplacement, le motif du signalement et joignez les éléments utiles. N’envoyez que les données personnelles nécessaires au traitement de la demande.</p>
+      <p>Un contenu peut être signalé depuis les outils disponibles sur le forum lorsqu’ils sont proposés. Pour une notification formelle, une voie de contact dédiée doit être renseignée ici : morgane.spiria@gmail.com. Décrivez précisément le contenu, son emplacement, le motif du signalement et joignez les éléments utiles. N’envoyez que les données personnelles nécessaires au traitement de la demande.</p>
     </section>
     <section className="legal-section"><h2>Liens utiles</h2><ul><li><Link href="/politique-confidentialite">Politique de confidentialité</Link></li><li><Link href="/conditions-utilisation">Conditions d’utilisation</Link></li></ul></section>
     <p className="legal-note">Document préparatoire à faire vérifier et compléter en fonction du statut réel de l’éditeur et des services effectivement exploités.</p>
