@@ -77,6 +77,8 @@ export default function ModerationSanction() {
       }
       if (error || !result?.success) {
         setMessage("Échec de la suppression : " + (failure || "aucune confirmation du serveur reçue."));
+        setDeleteTarget(null);
+        setDeleteConfirmation("");
         return;
       }
       setTargets((current) => current.filter((item) => item.id !== target.id));
@@ -85,6 +87,8 @@ export default function ModerationSanction() {
       setDeleteConfirmation("");
     } catch {
       setMessage("Erreur réseau : impossible de confirmer la suppression du compte.");
+      setDeleteTarget(null);
+      setDeleteConfirmation("");
     } finally {
       setBusy(false);
     }
