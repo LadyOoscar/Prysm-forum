@@ -91,6 +91,7 @@ export default function AuthPage() {
       <p className="eyebrow">Compte PRYSM</p>
       <h1>{mode==="login"?"Se connecter":"Créer un compte"}</h1>
       <p className="lead">{mode==="login"?"Retrouve tes discussions et ton profil.":"Rejoins la communauté et participe aux discussions."}</p>
+      <div className="notice" role="status"><strong>Environnement de test PRYSM LAB.</strong> Les comptes du forum public ne sont pas transférés ici. Pour tester cette version, crée un compte de test distinct. Ton compte public reste inchangé.</div>
       <form onSubmit={submit}>
         {mode==="signup" && <label>Pseudo<input required minLength={2} maxLength={32} value={username} onChange={e=>setUsername(e.target.value)} /></label>}
         <label>E-mail<input required type="email" value={email} onChange={e=>setEmail(e.target.value)} /></label>

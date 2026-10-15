@@ -7,7 +7,7 @@ import SoundControl from "./components/sound-control";
 import PwaRegister from "./components/pwa-register";
 import PwaInstallButton from "./components/pwa-install-button";
 
-const siteUrl = "https://prysm-clean.onrender.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -19,16 +19,13 @@ export const metadata: Metadata = {
   applicationName: "PRYSM",
   appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "PRYSM" },
   icons: { icon: "/prysm-icon.svg" },
-  verification: {
-    google: "MRXMQIUYO0uxsj15qw8WwNLAvfjuFUGvoPsamsvS8dE"
-  },
   robots: {
-    index: true,
-    follow: true,
+    index: false,
+    follow: false,
     googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "large"
+      index: false,
+      follow: false,
+      "max-image-preview": "none"
     }
   },
   openGraph: {
