@@ -122,13 +122,15 @@ export default function SiteNav() {
               {decorationSlots[link.href] ? <SiteDecoration slot={decorationSlots[link.href]}>{link.label}</SiteDecoration> : link.label}
             </Link>
           ))}
-          <Link className={"site-notification-button " + (pathname.startsWith("/notifications") ? "active" : "")} href="/notifications" aria-label={unreadCount ? `Notifications, ${unreadCount} non lue(s)` : "Notifications"} title={unreadCount ? `Notifications (${unreadCount} non lue(s))` : "Notifications"}>
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
-            {unreadCount > 0 && <span className="site-notification-count">{unreadCount > 99 ? "99+" : unreadCount}</span>}
-          </Link>
-          <Link className={"site-notification-button site-members-button " + (pathname.startsWith("/membres") ? "active" : "")} href="/membres" aria-label="Rechercher des membres" title="Rechercher des membres">
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 20v-1.5a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4V20M9.5 10.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM16 4.5a3.5 3.5 0 0 1 0 6.8M17 14.5a4 4 0 0 1 4 4V20"/></svg>
-          </Link>
+          <div className="site-nav-utility-stack">
+            <Link className={"site-notification-button " + (pathname.startsWith("/notifications") ? "active" : "")} href="/notifications" aria-label={unreadCount ? `Notifications, ${unreadCount} non lue(s)` : "Notifications"} title={unreadCount ? `Notifications (${unreadCount} non lue(s))` : "Notifications"}>
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
+              {unreadCount > 0 && <span className="site-notification-count">{unreadCount > 99 ? "99+" : unreadCount}</span>}
+            </Link>
+            <Link className={"site-notification-button site-members-button " + (pathname.startsWith("/membres") ? "active" : "")} href="/membres" aria-label="Rechercher des membres" title="Rechercher des membres">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 20v-1.5a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4V20M9.5 10.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7ZM16 4.5a3.5 3.5 0 0 1 0 6.8M17 14.5a4 4 0 0 1 4 4V20"/></svg>
+            </Link>
+          </div>
           {canModerate && <Link className={pathname.startsWith("/moderation") || pathname.startsWith("/admin") ? "active" : ""} href="/moderation">Modo/Admin</Link>}
         </nav>
       </header>
