@@ -5,7 +5,6 @@ import { createSupabaseBrowser } from "../../lib/supabase-browser";
 
 type Profile = {
   id: string;
-  location: string | null;
   looking_for: string | null;
   interests: string[] | null;
 };
@@ -22,13 +21,13 @@ export default function CompatibilityScore({ profileId }: { profileId: string })
 
       const { data: me } = await supabase
         .from("profiles")
-        .select("id,location,looking_for,interests")
+        .select("id,looking_for,interests")
         .eq("id", user.id)
         .single();
 
       const { data: them } = await supabase
         .from("profiles")
-        .select("id,location,looking_for,interests")
+        .select("id,looking_for,interests")
         .eq("id", profileId)
         .single();
 
@@ -51,12 +50,7 @@ export default function CompatibilityScore({ profileId }: { profileId: string })
       const shared = Array.from(a).filter((item) => b.has(item));
       const interestScore = Math.min(60, shared.length * 15);
 
-      const locationScore =
-        mine.location &&
-        target.location &&
-        mine.location.toLocaleLowerCase() === target.location.toLocaleLowerCase()
-          ? 15
-          : 0;
+      const locationScore = 0;
 
       const wordsA = (mine.looking_for ?? "")
         .toLocaleLowerCase()
