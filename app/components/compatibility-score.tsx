@@ -27,7 +27,7 @@ export default function CompatibilityScore({ profileId }: { profileId: string })
 
       const { data: them } = await supabase
         .from("profiles")
-        .select("id,location,looking_for,interests")
+        .select("id,looking_for,interests")
         .eq("id", profileId)
         .single();
 
