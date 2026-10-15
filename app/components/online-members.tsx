@@ -18,13 +18,7 @@ export default function OnlineMembers() {
 
   const loadMembers = useCallback(async () => {
     const supabase = createSupabaseBrowser();
-    const cutoff = new Date(Date.now() - 3 * 60 * 1000).toISOString();
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("id,username,display_name,avatar_url,last_seen_at")
-      .gte("last_seen_at", cutoff)
-      .order("last_seen_at", { ascending: false })
-      .limit(12);
+    const { data, error } = await supabase.rpc("get_online_members", { p_limit: 12 });
     if (!error) setMembers((data ?? []) as OnlineMember[]);
     setLoaded(true);
   }, []);
