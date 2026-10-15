@@ -6,6 +6,7 @@ import { createSupabaseBrowser } from "../lib/supabase-browser";
 import CommunityCalendar from "./components/community-calendar";
 import Stories from "./components/stories";
 import SiteBanner from "./components/site-banner";
+import OnlineMembers from "./components/online-members";
 
 type PopularTopic = {
   id: string;
@@ -115,6 +116,7 @@ export default function HomePage() {
         .home-community-hero-no-orbit .button { transform: scale(.448); transform-origin: left center; }
       }
     `}</style>
+    <OnlineMembers />
     <section className="home-popular">
       <div className="section-heading home-popular-heading"><div><p className="eyebrow">À suivre en ce moment</p><h2>Topics populaires</h2></div><Link className="home-popular-all" href="/forum">Tout le forum <span>↗</span></Link></div>
       {popularTopics.length > 0 ? <div className="home-popular-list">{popularTopics.map((topic, index) => <Link className={"home-popular-topic category-" + topic.categorySlug} href={"/topic/" + topic.id} key={topic.id}><span className="home-popular-rank">{String(index + 1).padStart(2, "0")}</span><span className="home-popular-copy"><span className="home-popular-category">{topic.categoryName}</span><strong>{topic.title}</strong><small>{topic.postCount} message{topic.postCount > 1 ? "s" : ""} · {topic.voteCount} vote{topic.voteCount > 1 ? "s" : ""}</small></span><span className="home-popular-arrow">↗</span></Link>)}</div> : <div className="home-popular-empty">{topicsLoaded ? "Les premières discussions apparaîtront ici dès qu’elles seront actives." : "Recherche des discussions actives…"}</div>}
