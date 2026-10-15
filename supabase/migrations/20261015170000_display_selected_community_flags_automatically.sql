@@ -19,7 +19,7 @@ AS $$
     LIMIT 1
   ) AS consent ON true
   WHERE p.id = ANY(p_profile_ids)
-    AND p.profile_visibility = 'public'
+    AND cardinality(coalesce(p.community_flags, ARRAY[]::text[])) > 0
     AND consent.action = 'granted'
     AND NOT private.is_blocked_between(p.id);
 $$;
