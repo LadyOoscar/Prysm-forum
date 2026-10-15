@@ -388,6 +388,7 @@ export function VoiceRecorder({
     const extension = audioBlob.type.includes("mp4") ? "m4a" : audioBlob.type.includes("ogg") ? "ogg" : "webm";
     const path = conversationId + "/" + userId + "/" + crypto.randomUUID() + "." + extension;
     let uploaded = false;
+    let messageSaved = false;
     try {
       const { error: uploadError } = await supabase.storage.from("prysm-voice-messages").upload(path, audioBlob, {
         contentType: audioBlob.type || "audio/webm",
@@ -414,15 +415,16 @@ export function VoiceRecorder({
           : "Le fichier vocal a été téléversé mais le message n’a pas été accepté.");
         return;
       }
+      messageSaved = true;
       onSent(data as Message);
       discardPreview();
     } catch (error) {
       console.error("[PRYSM messagerie] Exception pendant l’envoi du vocal", error);
       onError(error instanceof Error ? error.message : "Erreur inattendue pendant l’envoi du vocal.");
     } finally {
-      if (uploaded) {
-        // If the message insert failed, remove the orphaned private upload.
-        // Successful uploads are retained for the recipient to play.
+      if (uploaded && !messageSaved) {
+        const { error: cleanupError } = await supabase.storage.from("prysm-voice-messages").remove([path]);
+        if (cleanupError) console.error("[PRYSM messagerie] Impossible de nettoyer le vocal orphelin", cleanupError);
       }
       setSending(false);
     }
