@@ -5,6 +5,7 @@ import { createSupabaseBrowser } from "../../lib/supabase-browser";
 
 type Profile = {
   id: string;
+  username?: string;
   location: string | null;
   looking_for: string | null;
   interests: string[] | null;
@@ -22,20 +23,24 @@ export default function CompatibilityScore({ profileId }: { profileId: string })
 
       const { data: me } = await supabase
         .from("profiles")
-        .select("id,location,looking_for,interests")
+        .select("id,looking_for,interests")
         .eq("id", user.id)
         .single();
 
       const { data: them } = await supabase
         .from("profiles")
-        .select("id,location,looking_for,interests")
+        .select("id,username,looking_for,interests")
         .eq("id", profileId)
         .single();
 
       if (!me || !them) return;
-
-      const mine = me as Profile;
-      const target = them as Profile;
+      const [{ data: minePrivate }, { data: targetPublic }] = await Promise.all([
+        supabase.rpc("get_my_sensitive_profile_fields"),
+        supabase.rpc("get_public_profile_by_username", { p_username: them.username }),
+      ]);
+      const mine = { ...me, location: (Array.isArray(minePrivate) ? minePrivate[0]?.location : null) ?? null } as Profile;
+      const publicTarget = Array.isArray(targetPublic) ? targetPublic[0] : targetPublic;
+      const target = { ...them, location: publicTarget?.location ?? null } as Profile;
 
       const a = new Set(
         (mine.interests ?? [])

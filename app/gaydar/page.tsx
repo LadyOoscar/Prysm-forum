@@ -97,24 +97,18 @@ export default function GAYDARPage() {
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) { window.location.href = "/auth"; return; }
 
-      const [{ data: own, error: ownError }, { data: people, error: peopleError }] = await Promise.all([
-        supabase.from("profiles").select("username,display_name,avatar_url,location").eq("id", auth.user.id).maybeSingle(),
-        supabase.from("profiles")
-          .select("id,username,display_name,avatar_url,location")
-          .eq("match_discovery_enabled", true)
-          .eq("profile_visibility", "public")
-          .neq("id", auth.user.id)
-          .not("location", "is", null)
-          .order("updated_at", { ascending: false })
-          .limit(150),
+      const [{ data: own, error: ownError }, { data: privateFields, error: privateError }, { data: people, error: peopleError }] = await Promise.all([
+        supabase.from("profiles").select("username,display_name,avatar_url").eq("id", auth.user.id).maybeSingle(),
+        supabase.rpc("get_my_sensitive_profile_fields"),
+        supabase.rpc("get_gaydar_profiles"),
       ]);
       if (!active) return;
-      if (ownError || !own) {
+      if (ownError || privateError || !own) {
         setMessage("Impossible de charger ton profil. Réessaie après avoir actualisé la page.");
         setLoading(false);
         return;
       }
-      const ownProfile = own as Profile;
+      const ownProfile = { ...own, location: (Array.isArray(privateFields) ? privateFields[0]?.location : null) ?? null } as Profile;
       setProfile(ownProfile);
       if (!cityName(ownProfile.location)) {
         setMessage("Renseigne ta ville dans ton profil pour activer le Gaydar. Aucune localisation GPS ne sera demandée.");
