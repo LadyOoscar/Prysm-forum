@@ -6,6 +6,7 @@ import FederationTicker from "./components/federation-ticker";
 import SoundControl from "./components/sound-control";
 import PwaRegister from "./components/pwa-register";
 import PwaInstallButton from "./components/pwa-install-button";
+import LegalFooter from "./components/legal-footer";
 
 const siteUrl = "https://prysm-clean.onrender.com";
 
@@ -49,7 +50,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="fr">
-      <body><PwaRegister /><PwaInstallButton /><ActivityPulse /><SiteNav /><FederationTicker /><SoundControl />{children}</body>
+      <body><PwaRegister /><PwaInstallButton /><ActivityPulse /><SiteNav /><FederationTicker /><SoundControl />{children}<LegalFooter /></body>
     </html>
   );
 }
