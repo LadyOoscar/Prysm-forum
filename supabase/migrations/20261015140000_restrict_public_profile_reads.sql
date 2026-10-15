@@ -69,3 +69,8 @@ grant execute on function public.get_public_profile_by_username(text) to anon, a
 
 -- Keep the legacy table from being a public source of sensitive profile fields.
 revoke select on table public.profiles from anon;
+grant select (
+  id, username, display_name, bio, avatar_url, reputation, created_at,
+  updated_at, banner_url, interests, looking_for, is_admin, xp, level,
+  title, is_moderator
+) on table public.profiles to anon;
