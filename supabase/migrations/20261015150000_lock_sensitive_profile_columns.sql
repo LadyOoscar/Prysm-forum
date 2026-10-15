@@ -11,7 +11,7 @@ grant select (
 ) on table public.profiles to anon;
 
 grant select (
-  id, username, display_name, bio, avatar_url, interests, age, location,
+  id, username, display_name, bio, avatar_url, interests,
   looking_for, banner_url, dating_enabled, profile_visibility, reputation,
   xp, level, title, is_admin, is_moderator, created_at, updated_at,
   match_discovery_enabled, dating_intentions, dating_open_to, last_seen_at
@@ -23,7 +23,9 @@ returns table (
   identity text,
   orientation text,
   community_flags text[],
-  sensitive_profile_visible boolean
+  sensitive_profile_visible boolean,
+  age smallint,
+  location text
 )
 language sql
 stable
@@ -31,7 +33,7 @@ security definer
 set search_path = ''
 as $$
   select p.pronouns, p.identity, p.orientation, p.community_flags,
-         (p.sensitive_profile_visible and consent.action = 'granted')
+         (p.sensitive_profile_visible and consent.action = 'granted'), p.age, p.location
   from public.profiles as p
   left join lateral (
     select e.action
@@ -90,6 +92,32 @@ as $$
 $$;
 revoke all on function public.get_dating_discovery_profiles() from public, anon;
 grant execute on function public.get_dating_discovery_profiles() to authenticated;
+
+create or replace function public.get_gaydar_profiles()
+returns table (
+  id uuid,
+  username text,
+  display_name text,
+  avatar_url text,
+  location text
+)
+language sql
+stable
+security definer
+set search_path = ''
+as $
+  select p.id, p.username, p.display_name, p.avatar_url, p.location
+  from public.profiles as p
+  where p.match_discovery_enabled = true
+    and p.profile_visibility = 'public'
+    and p.location is not null
+    and p.id is distinct from auth.uid()
+    and not private.is_blocked_between(p.id)
+  order by p.updated_at desc
+  limit 150;
+$;
+revoke all on function public.get_gaydar_profiles() from public, anon;
+grant execute on function public.get_gaydar_profiles() to authenticated;
 
 create or replace function public.get_public_profile_flags(p_profile_id uuid)
 returns table (community_flags text[])
