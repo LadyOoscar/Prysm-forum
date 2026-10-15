@@ -2206,3 +2206,9 @@ body:has(main.shell .dating-grid) main.shell .dating-avatar img{display:block!im
 .legal-footer a{color:var(--muted);text-decoration:none}
 .legal-footer a:hover,.legal-footer a:focus-visible{color:var(--text);text-decoration:underline;text-underline-offset:3px}
 @media(max-width:640px){.legal-section{padding:.95rem}.legal-footer{width:calc(100% - 2rem);align-items:flex-start;flex-direction:column}.legal-footer nav{gap:.7rem 1rem}}
+
+
+/* Keep the member directory shortcut discreetly below notifications. */
+.site-nav-utility-stack{display:inline-flex;flex:0 0 auto;flex-direction:column;align-items:center;gap:4px;align-self:center}
+.site-nav-utility-stack .site-notification-button{flex:0 0 34px}
+@media(max-width:760px){.site-nav-utility-stack .site-notification-button{flex:0 0 32px}}
