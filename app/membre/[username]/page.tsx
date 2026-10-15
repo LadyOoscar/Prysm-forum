@@ -21,12 +21,10 @@ export default async function PublicProfilePage({params}:{params:Promise<{userna
   const {username:rawUsername}=await params;
   let username=rawUsername;
   try { username=decodeURIComponent(rawUsername).trim(); } catch { username=rawUsername.trim(); }
-  const profileColumns="id, username, display_name, bio, avatar_url, pronouns, identity, interests, age, location, orientation, community_flags, looking_for, banner_url, dating_enabled, profile_visibility, sensitive_profile_visible, reputation, xp, level, title, is_admin, is_moderator, created_at";
   const supabase=getSupabase();
-  const exact=await supabase.from("profiles").select(profileColumns).eq("username",username).maybeSingle();
-  const fallback=exact.data ? exact : await supabase.from("profiles").select(profileColumns).ilike("username",username).maybeSingle();
-  const profile=fallback.data;
-  if(!profile || profile.profile_visibility === "private") notFound();
+  const result=await supabase.rpc("get_public_profile_by_username",{p_username:username}).maybeSingle();
+  const profile=result.data;
+  if(!profile) notFound();
   const person=profile as PublicProfile;
   const { data: badgeRows } = await getSupabase().from("profile_badges").select("badge_id,badges:badge_id(name,icon,tone,description,background_color,image_zoom,image_position_x,image_position_y,border_color,border_width,glow_intensity)").eq("profile_id", profile.id).order("awarded_at", { ascending: false });
   const { data: photoRows } = await getSupabase().from("profile_photos").select("id, image_url, caption, created_at").eq("profile_id", profile.id).order("created_at", { ascending: false }).limit(12);
