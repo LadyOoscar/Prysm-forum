@@ -97,24 +97,19 @@ export default function GAYDARPage() {
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) { window.location.href = "/auth"; return; }
 
-      const [{ data: own, error: ownError }, { data: people, error: peopleError }] = await Promise.all([
-        supabase.from("profiles").select("username,display_name,avatar_url,location").eq("id", auth.user.id).maybeSingle(),
-        supabase.from("profiles")
-          .select("id,username,display_name,avatar_url,location")
-          .eq("match_discovery_enabled", true)
-          .eq("profile_visibility", "public")
-          .neq("id", auth.user.id)
-          .not("location", "is", null)
-          .order("updated_at", { ascending: false })
-          .limit(150),
+      const [{ data: own, error: ownError }, { data: people, error: peopleError }, { data: ownSensitiveRows, error: ownSensitiveError }] = await Promise.all([
+        supabase.from("profiles").select("username,display_name,avatar_url").eq("id", auth.user.id).maybeSingle(),
+        supabase.rpc("get_public_discovery_profiles"),
+        supabase.rpc("get_my_sensitive_profile"),
       ]);
       if (!active) return;
-      if (ownError || !own) {
+      if (ownError || ownSensitiveError || !own) {
         setMessage("Impossible de charger ton profil. Réessaie après avoir actualisé la page.");
         setLoading(false);
         return;
       }
-      const ownProfile = own as Profile;
+      const ownSensitive = Array.isArray(ownSensitiveRows) ? ownSensitiveRows[0] : null;
+      const ownProfile = { ...own, ...(ownSensitive || {}) } as Profile;
       setProfile(ownProfile);
       if (!cityName(ownProfile.location)) {
         setMessage("Renseigne ta ville dans ton profil pour activer le Gaydar. Aucune localisation GPS ne sera demandée.");
