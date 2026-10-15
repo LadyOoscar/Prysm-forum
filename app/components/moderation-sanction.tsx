@@ -18,6 +18,8 @@ export default function ModerationSanction() {
   const [role, setRole] = useState<{ moderator: boolean; admin: boolean } | null>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState<Target | null>(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState("");
 
   async function searchMembers() {
     setMessage("");
@@ -41,13 +43,17 @@ export default function ModerationSanction() {
     setTargets((data ?? []) as Target[]);
   }
 
-  async function deletePermanently(target: Target) {
+  function deletePermanently(target: Target) {
     if (!role?.admin || busy) return;
-    const confirmation = window.prompt(
-      "SUPPRESSION DÉFINITIVE\n\nLe compte de @" + target.username + " sera supprimé de PRYSM. Cette action est irréversible.\n\nPour confirmer, saisis exactement son pseudo :"
-    );
-    if (confirmation === null) return;
-    if (confirmation.trim() !== target.username.trim()) {
+    setDeleteTarget(target);
+    setDeleteConfirmation("");
+    setMessage("");
+  }
+
+  async function confirmPermanentDeletion() {
+    const target = deleteTarget;
+    if (!target || !role?.admin || busy) return;
+    if (deleteConfirmation.trim() !== target.username.trim()) {
       setMessage("Confirmation incorrecte. Saisis exactement @" + target.username + ". Aucune suppression effectuée.");
       return;
     }
@@ -75,6 +81,8 @@ export default function ModerationSanction() {
       }
       setTargets((current) => current.filter((item) => item.id !== target.id));
       setMessage("Le compte @" + target.username + " a été supprimé définitivement.");
+      setDeleteTarget(null);
+      setDeleteConfirmation("");
     } catch {
       setMessage("Erreur réseau : impossible de confirmer la suppression du compte.");
     } finally {
@@ -164,6 +172,42 @@ export default function ModerationSanction() {
               </div>
             </article>
           ))}
+        </div>
+      )}
+      {deleteTarget && (
+        <div
+          role="presentation"
+          onClick={(event) => { if (event.target === event.currentTarget && !busy) { setDeleteTarget(null); setDeleteConfirmation(""); } }}
+          style={{ position: "fixed", inset: 0, zIndex: 2000, display: "flex", alignItems: "center", justifyContent: "center", padding: 18, background: "rgba(3, 5, 18, 0.82)" }}
+        >
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="delete-account-title"
+            style={{ width: "100%", maxWidth: 440, padding: 22, border: "1px solid #ff647c", borderRadius: 14, background: "var(--panel, #15172b)", color: "var(--foreground, #f7f7ff)", boxShadow: "0 18px 60px #0009" }}
+          >
+            <h3 id="delete-account-title">Suppression définitive</h3>
+            <p>Le compte de <strong>@{deleteTarget.username}</strong> sera supprimé définitivement de PRYSM. Cette action est irréversible.</p>
+            <label htmlFor="delete-account-confirmation">Saisis exactement le pseudo pour confirmer :</label>
+            <input
+              id="delete-account-confirmation"
+              autoComplete="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              value={deleteConfirmation}
+              onChange={(event) => setDeleteConfirmation(event.target.value)}
+              onKeyDown={(event) => { if (event.key === "Enter") void confirmPermanentDeletion(); }}
+              placeholder={deleteTarget.username}
+              disabled={busy}
+              style={{ display: "block", boxSizing: "border-box", width: "100%", marginTop: 10, padding: 12, borderRadius: 8 }}
+            />
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "flex-end", marginTop: 18 }}>
+              <button type="button" className="button" disabled={busy} onClick={() => { setDeleteTarget(null); setDeleteConfirmation(""); }}>Annuler</button>
+              <button type="button" className="button danger" disabled={busy || deleteConfirmation.trim() !== deleteTarget.username.trim()} onClick={() => void confirmPermanentDeletion()}>
+                {busy ? "Suppression…" : "Supprimer définitivement"}
+              </button>
+            </div>
+          </section>
         </div>
       )}
       {message && <div className="notice" role="status">{message}</div>}
